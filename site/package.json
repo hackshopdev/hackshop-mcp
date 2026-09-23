@@ -12,7 +12,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",
     "ai": "^6.0.0",
-    "next": "^16.0.0",
+    "next": "^16.3.6",
     "openai": "^6.36.0",
     "posthog-js": "^1.399.3",
     "react": "^19.0.0",
