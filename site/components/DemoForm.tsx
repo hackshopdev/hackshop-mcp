@@ -8,6 +8,7 @@ import type { AssemblyResponse } from "@/lib/assembly";
 import { AssemblyPanel } from "./AssemblyPanel";
 import { SimViewer } from "./SimViewer";
 import { loadInventory } from "@/lib/inventory";
+import { track } from "@/lib/analytics";
 import {
   assemblyInputForCandidate,
   assemblyInputForSelectedDevice,
@@ -95,6 +96,7 @@ function DemoFormInner() {
     setAssembly(null);
     setAssemblyError(null);
     setPlanDeviceId("");
+    const startedAt = Date.now();
     try {
       const body: Record<string, unknown> = { idea: idea.trim() };
       const b = parseFloat(budget);
@@ -106,6 +108,14 @@ function DemoFormInner() {
         const inv = loadInventory();
         if (inv.length > 0) body.inventory_ids = inv;
       }
+      track("propose_submitted", {
+        idea_length: idea.trim().length,
+        has_budget: body.budget_usd !== undefined,
+        has_constraints: body.constraints !== undefined,
+        include_premium: includePremium,
+        open_source_only: openSourceOnly,
+        inventory_count: Array.isArray(body.inventory_ids) ? body.inventory_ids.length : 0,
+      });
 
       const res = await fetch("/api/propose", {
         method: "POST",
@@ -115,13 +125,22 @@ function DemoFormInner() {
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? `Server returned ${res.status}`);
+        track("propose_failed", { status: res.status, duration_ms: Date.now() - startedAt });
       } else {
         const next = data as ProposeResponse;
         setResult(next);
+        track("propose_completed", {
+          proposal_count: next.proposals.length,
+          build_candidate_count: next.build_candidates?.length ?? 0,
+          degraded: next.degraded,
+          premium_status: next.premium_status,
+          duration_ms: Date.now() - startedAt,
+        });
         setPlanDeviceId(next.proposals[0]?.id ?? "");
       }
     } catch (err) {
       setError((err as Error).message);
+      track("propose_failed", { status: 0, duration_ms: Date.now() - startedAt });
     } finally {
       setLoading(false);
     }
@@ -131,6 +150,7 @@ function DemoFormInner() {
     setAssemblyLoading(true);
     setAssemblyError(null);
     setAssembly(null);
+    track("assembly_requested", { device_count: input.device_ids.length });
     try {
       const res = await fetch("/api/assembly", {
         method: "POST",
@@ -335,6 +355,7 @@ function DemoFormInner() {
                       const tick = setInterval(() => {
                         setDiagramElapsed(Math.floor((Date.now() - startedAt) / 1000));
                       }, 1000);
+                      track("diagram_requested", { device_count: result.proposals.length });
                       try {
                         const res = await fetch("/api/diagram", {
                           method: "POST",
@@ -739,6 +760,7 @@ function DemoFormInner() {
                       setHowtoFor(p.id);
                       setHowtoMd(null);
                       setHowtoLoading(true);
+                      track("howto_requested", { device_id: p.id });
                       try {
                         const res = await fetch("/api/howto", {
                           method: "POST",

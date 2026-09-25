@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { proposeInput } from "@/lib/types";
 import { loadCatalog } from "@/lib/catalog";
 import { propose } from "@/lib/propose";
@@ -7,6 +7,13 @@ import {
   generateBuildCandidates,
   shouldOfferSimulationCandidates,
 } from "@/lib/build-candidates";
+import {
+  anonymousRequestId,
+  captureServerEvent,
+  classifyUserAgent,
+  requestCallerKind,
+  type ServerEventProperties,
+} from "@/lib/serverAnalytics";
 
 export const runtime = "nodejs";
 // Per Vercel knowledge: default function timeout is 300s on Fluid Compute.
@@ -55,13 +62,39 @@ function rateLimit(ip: string): { ok: true } | { ok: false; resetIn: number } {
   return { ok: true };
 }
 
+// Server-side receipt for every served proposal, so direct API callers
+// (agents, scripts) show up even though they never load posthog-js.
+function trackServed(
+  req: Request,
+  startedAt: number,
+  status: number,
+  properties: ServerEventProperties = {},
+): void {
+  after(() =>
+    captureServerEvent({
+      event: "api_propose_served",
+      distinctId: anonymousRequestId(req),
+      properties: {
+        ...properties,
+        status,
+        duration_ms: Date.now() - startedAt,
+        caller: requestCallerKind(req),
+        client_family: classifyUserAgent(req.headers.get("user-agent")),
+        surface: "api",
+      },
+    }),
+  );
+}
+
 export async function POST(req: Request): Promise<Response> {
+  const startedAt = Date.now();
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     req.headers.get("x-real-ip") ??
     "unknown";
   const limit = rateLimit(ip);
   if (!limit.ok) {
+    trackServed(req, startedAt, 429);
     return NextResponse.json(
       {
         error: `Rate limit hit. Try again in ${limit.resetIn}s. (${RATE_LIMIT} requests/hour per IP.)`,
@@ -96,6 +129,11 @@ export async function POST(req: Request): Promise<Response> {
           parsed.data.budget_usd,
         )
       : [];
+    trackServed(req, startedAt, 200, {
+      degraded: true,
+      proposal_count: 0,
+      build_candidate_count: buildCandidates.length,
+    });
     return NextResponse.json({
       proposals: [],
       reasoning:
@@ -166,5 +204,12 @@ export async function POST(req: Request): Promise<Response> {
     result.build_candidates = [];
   }
 
+  trackServed(req, startedAt, 200, {
+    degraded: Boolean(result.degraded),
+    proposal_count: result.proposals.length,
+    build_candidate_count: result.build_candidates?.length ?? 0,
+    include_premium: Boolean(parsed.data.include_premium),
+    premium_status: result.premium_status,
+  });
   return NextResponse.json(result);
 }

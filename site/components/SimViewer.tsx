@@ -11,6 +11,7 @@ import {
   simulationWorldFor,
 } from "@/lib/simulation-ui";
 import { InteractiveSimViewer } from "./InteractiveSimViewer";
+import { track } from "@/lib/analytics";
 
 // Drives the physics sim: kick a job, poll until done, play the mp4 the worker
 // rendered, and surface the *failure theatre* (stuck / tipped / collisions /
@@ -157,6 +158,7 @@ export function SimViewer({
       const media = assembly.components
         .filter((c) => IMAGE_SOURCES[c.device_id])
         .map((c) => ({ ref: c.ref, image_url: IMAGE_SOURCES[c.device_id] }));
+      track("simulation_started", { world, agent: useAgent, inject_base: injectBase });
       const kickRes = await fetch("/api/simulate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -196,6 +198,11 @@ export function SimViewer({
           return;
         }
         if (job.status === "done" && job.result) {
+          track("simulation_completed", {
+            world,
+            supported: job.result.supported,
+            polls,
+          });
           setResult(job.result);
           setPhase(job.result.supported ? "done" : "unsupported");
           return;
