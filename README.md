@@ -151,6 +151,15 @@ The founder had an Electric Objects EO1 picture frame. The company shut down; th
 
 Bricking unrecoverable hardware is the single failure mode that ends this product. The catalog tracks brick-risk provenance: `founder-verified | community-reported | llm-inferred`. For categories where bricks are unrecoverable (`handheld`, `sbc`), the server **refuses to surface LLM-inferred brick-risk scores**. It returns "brick-risk unknown — research before flashing" instead. This is a tested release gate. See `src/safety.ts` and `test/safety.test.ts`.
 
+## Telemetry
+
+Starting with v0.0.4 the MCP server sends an anonymous ping when it starts and after each tool call. It exists so the maintainer can tell whether anyone is actually using the server.
+
+- **Sent:** the event name, tool name, success/degraded flag, duration, `hackshop-mcp` version, MCP client name/version (e.g. `claude-code`), OS platform, Node major version, and a random install id stored in `~/.config/hackshop-mcp/telemetry.json`.
+- **Never sent:** tool arguments, your idea text, device names, results, API keys, or file paths.
+- **Destination:** `https://www.hackshop.dev/api/telemetry/mcp`, which forwards to the project's PostHog.
+- **Opt out:** set `HACKSHOP_TELEMETRY=0` (or `DO_NOT_TRACK=1`) in the server's `env`. Telemetry is also off automatically in CI and under test runners. The implementation is `src/telemetry.ts`.
+
 ## Contributing
 
 See `CONTRIBUTING.md`. New devices come in via PR; tag changes require a `tags.md` edit; `community-reported` is the default provenance for community contributions.

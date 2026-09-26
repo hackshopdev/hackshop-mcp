@@ -19,9 +19,10 @@ import {
   simulateAssembly,
   simulateAssemblyInput,
 } from "./tools/simulate_assembly.js";
+import { createTelemetry, errorKind } from "./telemetry.js";
 
 const NAME = "hackshop-mcp";
-const VERSION = "0.0.3";
+const VERSION = "0.0.4";
 
 async function main(): Promise<void> {
   // Boot validation. Refuses to start on bad catalog/tags.
@@ -37,6 +38,19 @@ async function main(): Promise<void> {
     { name: NAME, version: VERSION },
     { capabilities: { tools: {} } },
   );
+
+  const telemetry = createTelemetry(VERSION);
+  const clientInfo = () => {
+    const client = server.getClientVersion();
+    return { client_name: client?.name, client_version: client?.version };
+  };
+  server.oninitialized = () => {
+    telemetry.send({
+      event: "mcp_server_started",
+      ...clientInfo(),
+      client_sampling: Boolean(server.getClientCapabilities()?.sampling),
+    });
+  };
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
@@ -103,34 +117,56 @@ async function main(): Promise<void> {
     ],
   }));
 
-  server.setRequestHandler(CallToolRequestSchema, async (request) => {
-    const { name, arguments: args } = request.params;
-
+  const runTool = async (
+    name: string,
+    args: unknown,
+  ): Promise<{ out: unknown; degraded?: boolean }> => {
     if (name === "propose_hardware") {
       const input = proposeHardwareInput.parse(args);
       const out = await proposeHardware(input, devices, server);
-      return {
-        content: [{ type: "text", text: JSON.stringify(out, null, 2) }],
-      };
+      return { out, degraded: out.degraded };
     }
 
     if (name === "assess_hackability") {
       const input = assessHackabilityInput.parse(args);
-      const out = assessHackability(input, devices);
-      return {
-        content: [{ type: "text", text: JSON.stringify(out, null, 2) }],
-      };
+      return { out: assessHackability(input, devices) };
     }
 
     if (name === "simulate_assembly") {
       const input = simulateAssemblyInput.parse(args);
-      const out = await simulateAssembly(input);
-      return {
-        content: [{ type: "text", text: JSON.stringify(out, null, 2) }],
-      };
+      return { out: await simulateAssembly(input) };
     }
 
     throw new Error(`Unknown tool: ${name}`);
+  };
+
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const { name, arguments: args } = request.params;
+    const startedAt = Date.now();
+    try {
+      const { out, degraded } = await runTool(name, args);
+      telemetry.send({
+        event: "mcp_tool_called",
+        tool: name,
+        success: true,
+        degraded,
+        duration_ms: Date.now() - startedAt,
+        ...clientInfo(),
+      });
+      return {
+        content: [{ type: "text", text: JSON.stringify(out, null, 2) }],
+      };
+    } catch (err) {
+      telemetry.send({
+        event: "mcp_tool_called",
+        tool: name,
+        success: false,
+        error_kind: errorKind(err),
+        duration_ms: Date.now() - startedAt,
+        ...clientInfo(),
+      });
+      throw err;
+    }
   });
 
   const transport = new StdioServerTransport();

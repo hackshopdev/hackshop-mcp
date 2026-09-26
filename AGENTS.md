@@ -42,4 +42,5 @@ Website (`site/`):
 
 - TypeScript, ESM, Vitest for tests; follow existing file layout when adding tools or catalog entries.
 - Run `npm run validate` after editing `catalog.json`.
+- Analytics: browser events go through `site/lib/analytics.ts` (`track`), server events through `site/lib/serverAnalytics.ts`, MCP usage pings through `src/telemetry.ts`. Send metadata only. Never send idea text, constraints, inventories, or tool arguments.
 - Contact: msanchezgrice@gmail.com (include "Hackshop" in the subject line).
