@@ -73,6 +73,12 @@ baseline runs once, no retries):
 fly secrets set ANTHROPIC_API_KEY=sk-ant-...
 ```
 
+Optional — enable CAD generation by installing the `cad` extra in the image
+(`pip install -e ".[cad]"` or the uv equivalent). This adds build123d and the
+OpenCascade wheel, so the image will be noticeably larger; without it, the
+worker still boots and `/cad/generate` returns a clear 501 while simulation
+routes continue to run.
+
 Smoke test:
 
 ```bash

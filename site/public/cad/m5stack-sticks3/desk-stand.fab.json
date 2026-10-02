@@ -1,0 +1,98 @@
+{
+  "alternatives": [
+    {
+      "process": "Order a print",
+      "services": [
+        {
+          "name": "JLC3DP",
+          "url": "https://jlc3dp.com/"
+        },
+        {
+          "name": "Craftcloud",
+          "url": "https://craftcloud3d.com/"
+        }
+      ]
+    },
+    {
+      "note": "STEP is included, but this part is designed for printing; machining or sheet metal would need a redesign.",
+      "process": "CNC / sheet metal from STEP",
+      "services": [
+        {
+          "name": "Xometry",
+          "url": "https://www.xometry.com/"
+        },
+        {
+          "name": "SendCutSend",
+          "url": "https://sendcutsend.com/"
+        }
+      ]
+    }
+  ],
+  "bbox_mm": [
+    32.0,
+    45.0,
+    53.93
+  ],
+  "caveats": [
+    "Dimensions from a drawing source (https://docs.m5stack.com/en/core/StickS3). Print once and check the fit before batch printing.",
+    "Assumes a straight USB-C cable with an overmold no larger than 12.5 x 7 mm.",
+    "Bottom USB-C clearance assumes a straight cable.",
+    "Dimensions from a drawing source (https://docs.m5stack.com/en/core/StickS3).",
+    "Corner radius R3. Hole positions were measured off the drawing; confirm against a unit."
+  ],
+  "checks": {
+    "buttons_clear": null,
+    "cradle_supports": null,
+    "device_fits": true,
+    "front_clear": true,
+    "plug_clear": true,
+    "stable": true,
+    "valid_solid": true,
+    "volume_ok": true
+  },
+  "device_id": "m5stack-sticks3",
+  "device_name": "M5Stack StickS3",
+  "est_filament_m": 5.496,
+  "est_mass_g_pla": 16.39,
+  "files": {
+    "fab": "desk-stand.fab.json",
+    "step": "desk-stand.step",
+    "stl": "desk-stand.stl",
+    "svg": "desk-stand.svg"
+  },
+  "generator": "hackshop_sim.cad 0.1.0 / build123d 0.13.0",
+  "params": {
+    "base_thickness": 4.0,
+    "cable_d": 4.5,
+    "clearance": 0.4,
+    "edge_fillet": 1.0,
+    "lip_height": 3.0,
+    "plug_length": 22.0,
+    "plug_overmold": [
+      12.5,
+      7.0
+    ],
+    "side_margin": 4.0,
+    "tilt_deg": 15.0,
+    "wall": 3.0
+  },
+  "part": "desk-stand",
+  "print": {
+    "infill_pct": 20,
+    "layer_mm": 0.2,
+    "material": "PLA or PETG",
+    "orientation": "On its side, no supports",
+    "process": "FDM",
+    "supports": false
+  },
+  "source_dims": {
+    "h": 48.0,
+    "overrides": {},
+    "size_confidence": "drawing",
+    "source_url": "https://docs.m5stack.com/en/core/StickS3",
+    "t": 15.0,
+    "w": 24.0
+  },
+  "title": "Printable desk stand",
+  "volume_cm3": 13.218
+}

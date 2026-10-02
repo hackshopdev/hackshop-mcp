@@ -15,6 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 agent = ["anthropic>=0.39"]
+cad = ["build123d>=0.13.0"]
 dev = ["pytest>=8.0"]
 
 [build-system]
@@ -22,7 +23,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["hackshop_sim"]
+
+[tool.setuptools.packages.find]
+include = ["hackshop_sim*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
