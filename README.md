@@ -14,7 +14,7 @@ Hackshop now knows about Meta's Muse Gadgets SDK: ESP32 boards and Linux machine
 
 ## Status
 
-v0.0.3 is published on npm (`npx hackshop-mcp`); `main` is ahead of it and adds `plan_gadget` (unreleased). Four tools (`propose_hardware`, `assess_hackability`, `plan_gadget`, `simulate_assembly`), 80 devices. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
+v0.0.4 — published on npm. Install with `npx hackshop-mcp` or add it to your MCP client config. Four tools (`propose_hardware`, `assess_hackability`, `plan_gadget`, `simulate_assembly`), 80 devices. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
 
 ## Install in 30 seconds
 
