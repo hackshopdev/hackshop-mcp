@@ -1,0 +1,430 @@
+[
+  {
+    "id": "muse-esp32",
+    "name": "Muse Gadgets: ESP32 Device SDK",
+    "vendor": "Meta",
+    "kind": "agent-gadget",
+    "launched": "2026-10-02",
+    "homepage": "https://gadgets.muse.ai/",
+    "sdk_repo": "https://github.com/facebookincubator/muse-gadget-sdk",
+    "sdk_path": "esp32",
+    "docs_url": "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+    "license": "Apache-2.0 (third-party exceptions listed in the repo README; the Jollybot avatar is not covered)",
+    "summary": "Open-source ESP32 firmware that turns an off-the-shelf board into a device for Muse, Meta's personal AI agent. The board pairs to the Muse app over BLE, joins Wi-Fi and holds an encrypted session to your Muse VM.",
+    "toolchain": "ESP-IDF v6.0.1 only (other versions unsupported); macOS or Linux host.",
+    "requires": [
+      "A Muse account and the Muse app (iOS/Android) with Settings > Devices > Developer mode on",
+      "An SDK token (mgst_...) from gadgets.muse.ai > Account > SDK tokens",
+      "One of the supported boards below"
+    ],
+    "setup_steps": [
+      "Get an SDK token at https://gadgets.muse.ai/settings/sdk-tokens (never commit it or paste it into a public repo).",
+      "Install ESP-IDF v6.0.1: git clone -b v6.0.1 --recursive https://github.com/espressif/esp-idf.git ~/esp/esp-idf-v6 && ~/esp/esp-idf-v6/install.sh esp32c5,esp32s3,esp32c6,esp32 && . ~/esp/esp-idf-v6/export.sh",
+      "git clone https://github.com/facebookincubator/muse-gadget-sdk && cd muse-gadget-sdk/esp32",
+      "Set the token: idf.py menuconfig > ESP32 Device SDK > Muse Gadgets SDK token (or CONFIG_GADGET_SDK_TOKEN in the build's sdkconfig).",
+      "Build and flash with the board's command below, then idf.py -p PORT flash monitor. If flashing can't connect: hold BOOT, tap RESET, release BOOT.",
+      "In the Muse app: Settings > Devices > Add Device, pick MuseGadget-XXXXXX, press the board's button when the light breathes blue. Green = connected."
+    ],
+    "agent_quickstart": "curl -fsSL https://dev.meta.ai/install.sh | sh && git clone https://github.com/facebookincubator/muse-gadget-sdk && cd muse-gadget-sdk/esp32 && muse --disable-sandbox   # then: \"Build this firmware for my <board> and flash it.\" Any coding agent that reads AGENTS.md can do the same.",
+    "tiers": [
+      {
+        "id": "full-ui",
+        "label": "Full UI",
+        "description": "LVGL animated avatar, push-to-talk and on-device settings; over-the-air updates on."
+      },
+      {
+        "id": "status",
+        "label": "Status",
+        "description": "Status on a light, LED ring, e-paper or simple screen; over-the-air updates off."
+      }
+    ],
+    "caveats": [
+      "Boards without PSRAM (classic ESP32, ESP32-C6) run without the home-network tunnel; Muse can still reach and control them.",
+      "The home-network tunnel lets Muse reach devices on your LAN that expose a local HTTP API. Treat it like giving the agent a foothold on your network.",
+      "Pairing has no manufacturer verification and can't prevent an active man-in-the-middle attack.",
+      "Builds are signed with the included development key and never enable Secure Boot. Enable NVS encryption (CONFIG_HOMEHUB_NVS_ENCRYPTION).",
+      "Custom ESP32 commands are not a documented API yet: the command set (display.draw_url, sensors.read, camera.capture, ...) is hardcoded in main/app.c."
+    ],
+    "terms": {
+      "url": "https://gadgets.muse.ai/sdk-terms",
+      "summary": "Personal, non-commercial use with your own Muse account. A token can be linked to at most 50 devices. You may not put it in any device you sell, advertise, or list publicly or in a marketplace or app store; other distribution needs Meta's written permission. Provided as-is; Meta can change, withdraw or revoke access at any time.",
+      "personal_noncommercial_only": true,
+      "max_devices_per_token": 50,
+      "selling_allowed": false,
+      "revocable": true
+    },
+    "community_url": "https://discord.gg/3bhjCkZdd6",
+    "boards": [
+      {
+        "device_id": "espressif-esp32-c5-devkitc-1",
+        "support": "official",
+        "tier": "status",
+        "kind": "light",
+        "build": "idf.py build",
+        "features": {
+          "home_tunnel": true,
+          "images": "none",
+          "push_to_talk": "none",
+          "audio": "none",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": "no",
+          "round_display": false
+        },
+        "note": "Status light and button. Muse's recommended starting point."
+      },
+      {
+        "device_id": "ideaspark-esp32-1-9-lcd",
+        "support": "official",
+        "tier": "status",
+        "kind": "status-screen",
+        "build": "tools/board.sh ideaspark build",
+        "features": {
+          "home_tunnel": false,
+          "images": "color",
+          "push_to_talk": "none",
+          "audio": "none",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": "no",
+          "round_display": false
+        },
+        "note": "No PSRAM, so no home-network tunnel; draws images straight to the screen."
+      },
+      {
+        "device_id": "seeed-sensecap-indicator",
+        "support": "official",
+        "tier": "status",
+        "kind": "status-screen",
+        "build": "tools/board.sh sensecap-indicator build",
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "none",
+          "audio": "none",
+          "touch": true,
+          "camera": false,
+          "air_sensors": true,
+          "ota": false,
+          "battery": "no",
+          "round_display": false
+        },
+        "note": "Air sensors only on D1S/D1Pro (temp/humidity via the bundled Grove AHT20)."
+      },
+      {
+        "device_id": "seeed-reterminal-e1001",
+        "support": "official",
+        "tier": "status",
+        "kind": "e-paper",
+        "build": "tools/board.sh reterminal-e1001 build",
+        "features": {
+          "home_tunnel": true,
+          "images": "black-and-white",
+          "push_to_talk": "none",
+          "audio": "none",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": "yes",
+          "round_display": false
+        },
+        "note": "Status text and black-and-white images on 7.5\" e-paper."
+      },
+      {
+        "device_id": "home-assistant-voice-pe",
+        "support": "official",
+        "tier": "status",
+        "kind": "light",
+        "build": "tools/board.sh home-assistant-voice build",
+        "features": {
+          "home_tunnel": true,
+          "images": "none",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": "no",
+          "round_display": false
+        },
+        "note": "Status on the LED ring, push-to-talk, dial as volume."
+      },
+      {
+        "device_id": "waveshare-esp32-s3-touch-amoled-1-75c",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build s3",
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": true,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "optional",
+          "round_display": true
+        },
+        "note": "Round AMOLED avatar; best desk object."
+      },
+      {
+        "device_id": "aipi-lite",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build aipi",
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "yes",
+          "round_display": false
+        },
+        "note": "Two-button menu."
+      },
+      {
+        "device_id": "waveshare-esp32-c6-touch-amoled-1-8",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build c6",
+        "features": {
+          "home_tunnel": false,
+          "images": "none",
+          "push_to_talk": "text",
+          "audio": "speaker-mic",
+          "touch": true,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "optional",
+          "round_display": false
+        },
+        "note": "No PSRAM: voice notes go over the control session and replies come back as scrolling text."
+      },
+      {
+        "device_id": "seeed-sensecap-watcher",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build watcher",
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": true,
+          "camera": true,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "yes",
+          "round_display": true
+        },
+        "note": "camera.capture returns a JPEG (CONFIG_MUSE_WATCHER_CAMERA=y)."
+      },
+      {
+        "device_id": "m5stack-sticks3",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build sticks3",
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "yes",
+          "round_display": false
+        },
+        "note": "8 MB flash variant of the Muse partition layout."
+      },
+      {
+        "device_id": "m5stack-stickc-plus2",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build plus2",
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "buzzer-mic",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "yes",
+          "round_display": false
+        },
+        "eol": true,
+        "note": "End of life at M5Stack; buzzer only, so no spoken replies."
+      }
+    ],
+    "sources": [
+      "https://gadgets.muse.ai/",
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/README.md",
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md",
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md",
+      "https://gadgets.muse.ai/sdk-terms",
+      "https://www.engadget.com/2276312/meta-muse-gadgets-open-source-smart-home-link/"
+    ],
+    "last_verified": "2026-10-02"
+  },
+  {
+    "id": "muse-linux",
+    "name": "Muse Gadgets: Linux Device SDK",
+    "vendor": "Meta",
+    "kind": "agent-gadget",
+    "launched": "2026-10-02",
+    "homepage": "https://gadgets.muse.ai/",
+    "sdk_repo": "https://github.com/facebookincubator/muse-gadget-sdk",
+    "sdk_path": "linux",
+    "docs_url": "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/linux",
+    "license": "Apache-2.0",
+    "summary": "A Python service (musegadget) that turns a Linux box with Bluetooth LE into a Muse gadget. Muse gets shell, file and health commands on the machine and can push messages back to you.",
+    "toolchain": "Python 3.9+, BlueZ, python3-dbus and python3-gi; Raspberry Pi OS Bullseye+, Debian 11+ or Ubuntu 22.04+ (32- or 64-bit); sudo.",
+    "requires": [
+      "A Muse account and the Muse app with Developer mode on",
+      "An SDK token (mgst_...) from gadgets.muse.ai",
+      "A Linux machine with Bluetooth LE on your network"
+    ],
+    "setup_steps": [
+      "curl -fsSL https://raw.githubusercontent.com/facebookincubator/muse-gadget-sdk/main/linux/install.sh -o install.sh",
+      "Read it first: less install.sh",
+      "bash install.sh --sdk-token mgst_...   (installs to /opt/musegadget and starts the musegadget systemd service)",
+      "Pair from the Muse app within 10 minutes (device shows as MuseGadgetXXXXXX); re-pair later with sudo musegadget pair.",
+      "Optional: push messages to Muse from scripts with musegadget send-user-msg \"...\""
+    ],
+    "agent_quickstart": "Ask Muse (or any coding agent on the box) things like: \"Install Home Assistant on my Pi and tell me how to open it.\"",
+    "commands": [
+      "system.run",
+      "file.read",
+      "file.write",
+      "device.health"
+    ],
+    "extending": "Add a spec to COMMAND_SPECS in linux/src/musegadget/executor.py (description, required/optional params with type + description, optional timeout_ms), handle it in Executor.run returning ok(payload) or error(message), then restart the service.",
+    "tiers": [
+      {
+        "id": "linux",
+        "label": "Linux",
+        "description": "Shell, file and health commands; scripts can message you through Muse."
+      }
+    ],
+    "caveats": [
+      "Commands run as the install user with exactly that account's permissions. If it can sudo, so can Muse. Use a dedicated low-privilege user (--run-as USER) unless you need more.",
+      "Messages from the device are capped at 256 KB; command output is cut at 96 KB per stream.",
+      "Muse labels it a community device; it is not a supported Meta product."
+    ],
+    "terms": {
+      "url": "https://gadgets.muse.ai/sdk-terms",
+      "summary": "Same token terms as the ESP32 SDK: personal and non-commercial, at most 50 devices per token, no selling or public listing, revocable at any time.",
+      "personal_noncommercial_only": true,
+      "max_devices_per_token": 50,
+      "selling_allowed": false,
+      "revocable": true
+    },
+    "community_url": "https://discord.gg/3bhjCkZdd6",
+    "boards": [
+      {
+        "device_id": "raspberry-pi-5",
+        "support": "official",
+        "tier": "linux",
+        "kind": "linux",
+        "build": "bash install.sh --sdk-token mgst_...",
+        "features": {
+          "ble_builtin": true
+        },
+        "note": "Featured on gadgets.muse.ai."
+      },
+      {
+        "device_id": "raspberry-pi-4b",
+        "support": "official",
+        "tier": "linux",
+        "kind": "linux",
+        "build": "bash install.sh --sdk-token mgst_...",
+        "features": {
+          "ble_builtin": true
+        },
+        "note": "Listed in the Linux SDK README."
+      },
+      {
+        "device_id": "raspberry-pi-zero-2w",
+        "support": "official",
+        "tier": "linux",
+        "kind": "linux",
+        "build": "bash install.sh --sdk-token mgst_...",
+        "features": {
+          "ble_builtin": true
+        },
+        "note": "Listed in the Linux SDK README; slow but enough for shell and file commands."
+      },
+      {
+        "device_id": "dell-wyse-5070",
+        "support": "possible",
+        "tier": "linux",
+        "kind": "linux",
+        "build": "bash install.sh --sdk-token mgst_...",
+        "features": {
+          "ble_builtin": false
+        },
+        "note": "Not on Meta's list. Meets the stated requirements on Debian/Ubuntu if it has Bluetooth LE; most units need a USB BLE adapter."
+      },
+      {
+        "device_id": "hp-t620-plus",
+        "support": "possible",
+        "tier": "linux",
+        "kind": "linux",
+        "build": "bash install.sh --sdk-token mgst_...",
+        "features": {
+          "ble_builtin": false
+        },
+        "note": "Not on Meta's list. Add a USB Bluetooth LE adapter."
+      },
+      {
+        "device_id": "intel-nuc",
+        "support": "possible",
+        "tier": "linux",
+        "kind": "linux",
+        "build": "bash install.sh --sdk-token mgst_...",
+        "features": {
+          "ble_builtin": null
+        },
+        "note": "Not on Meta's list. Many NUCs ship with Bluetooth; check yours."
+      },
+      {
+        "device_id": "lenovo-thinkcentre-tiny",
+        "support": "possible",
+        "tier": "linux",
+        "kind": "linux",
+        "build": "bash install.sh --sdk-token mgst_...",
+        "features": {
+          "ble_builtin": null
+        },
+        "note": "Not on Meta's list. Bluetooth depends on the Wi-Fi card fitted; add a USB BLE adapter if missing."
+      }
+    ],
+    "sources": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/linux/README.md",
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/linux/AGENTS.md",
+      "https://gadgets.muse.ai/sdk-terms"
+    ],
+    "last_verified": "2026-10-02"
+  }
+]

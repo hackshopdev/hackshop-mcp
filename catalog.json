@@ -1641,5 +1641,609 @@
     "est_used_price_usd_max": 55,
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2
+  },
+  {
+    "id": "espressif-esp32-c5-devkitc-1",
+    "name": "Espressif ESP32-C5-DevKitC-1",
+    "category": "sbc",
+    "idea_fit_tags": [
+      "sbc",
+      "iot",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c5/esp32-c5-devkitc-1/user_guide.html"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Muse Gadgets' recommended starter board: status light + button only, no screen. Dual-band Wi-Fi 6, BLE, Thread/Zigbee, 8MB flash + 4/8MB PSRAM, so it gets Muse's home-network tunnel. Cheapest way to give Muse a physical presence or a local-network foothold.",
+    "est_used_price_usd_min": 15,
+    "est_used_price_usd_max": 20,
+    "image_url": "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c5/_images/esp32-c5-devkitc-1-isometric_v1.1.png",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "physical": {
+      "orientation": "flat",
+      "shape": "board",
+      "size_mm": {
+        "w": 25.4,
+        "h": 60.1,
+        "t": null
+      },
+      "size_confidence": "drawing",
+      "size_note": "PCB 53.6 x 25.4 mm; module antenna overhangs 6.5 mm (60.1 total). Thickness incl. headers not published.",
+      "comes_in_case": false,
+      "mass_g": null,
+      "usb": {
+        "type": "usb-c",
+        "count": 2,
+        "faces": [
+          "bottom"
+        ],
+        "note": "UART + native USB on the short edge opposite the antenna."
+      },
+      "mounting": "No mounting holes on the dimension drawing.",
+      "printables": [],
+      "source_url": "https://dl.espressif.com/dl/schematics/Dimension_esp32-c5-devkitc-1_v1.2_20250509.pdf"
+    }
+  },
+  {
+    "id": "ideaspark-esp32-1-9-lcd",
+    "name": "ideaspark ESP32 with 1.9\" LCD",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "iot",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://manuals.plus/ae/1005007181435830"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Classic ESP32 (no PSRAM) with a 1.9\" 170x320 ST7789 LCD. Muse shows status and draws images straight to the screen, but there is no home-network tunnel. Needs chip rev 3.0+ for signed apps (the D0WD-V3 qualifies). Cheap, bare PCB, no case.",
+    "est_used_price_usd_min": 12,
+    "est_used_price_usd_max": 18,
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "physical": {
+      "orientation": "upright",
+      "shape": "board",
+      "size_mm": {
+        "w": 31.5,
+        "h": 63.8,
+        "t": null
+      },
+      "size_confidence": "published",
+      "size_note": "Listed as 2.51 x 1.24 in. Thickness and USB edge not published; display active area 24.91 x 41.49 mm.",
+      "comes_in_case": false,
+      "mass_g": null,
+      "usb": {
+        "type": "usb-c",
+        "count": 1,
+        "faces": [],
+        "note": "CH340 USB-C; edge not stated in any source."
+      },
+      "mounting": null,
+      "printables": [],
+      "source_url": "https://manuals.plus/ae/1005007181435830"
+    }
+  },
+  {
+    "id": "seeed-sensecap-indicator",
+    "name": "Seeed SenseCAP Indicator (D1 series)",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "sensor",
+      "kiosk",
+      "ambient",
+      "iot",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://wiki.seeedstudio.com/Sensor/SenseCAP/SenseCAP_Indicator/Get_started_with_SenseCAP_Indicator/",
+      "https://github.com/Seeed-Solution/SenseCAP_Indicator_ESP32"
+    ],
+    "community_size_bucket": "active",
+    "notes": "4\" 480x480 touchscreen (ESP32-S3 + RP2040) in a finished case with kickstand. Muse: status screen + images. D1S/D1Pro add CO2, tVOC and temp/humidity that Muse can read with sensors.read; D1 has no sensors. Buzzer only, no mic/speaker.",
+    "est_used_price_usd_min": 49,
+    "est_used_price_usd_max": 89,
+    "image_url": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/_/1/_1_5.png",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "physical": {
+      "orientation": "upright",
+      "shape": "box",
+      "size_mm": {
+        "w": 93,
+        "h": 97,
+        "t": 18
+      },
+      "size_confidence": "published",
+      "size_note": "From TTN device repository and a Seeed dimension graphic, not a Seeed spec table.",
+      "comes_in_case": true,
+      "mass_g": null,
+      "usb": {
+        "type": "usb-c",
+        "count": 2,
+        "faces": [
+          "bottom",
+          "back"
+        ],
+        "note": "One on the bottom edge next to microSD, one in the back kickstand recess."
+      },
+      "mounting": "Fold-out kickstand and keyhole wall slot (no dimensions published).",
+      "printables": [],
+      "source_url": "https://www.thethingsnetwork.org/device-repository/devices/seeed/sensecap-indicator/"
+    }
+  },
+  {
+    "id": "seeed-reterminal-e1001",
+    "name": "Seeed reTerminal E1001 (7.5\" e-paper)",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "e-ink",
+      "framed-art",
+      "ambient",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://wiki.seeedstudio.com/getting_started_with_reterminal_e1001/",
+      "https://github.com/Seeed-Projects/OSHW-reTerminal-Series-E-D"
+    ],
+    "community_size_bucket": "small",
+    "notes": "7.5\" 800x480 black-and-white e-paper, ESP32-S3, 2000mAh battery, temp/humidity sensor, ships with a stand. Muse shows status text and black-and-white images. The color E1002 appears on gadgets.muse.ai but only the E1001 is in the SDK's board list.",
+    "est_used_price_usd_min": 69,
+    "est_used_price_usd_max": 79,
+    "image_url": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-104991002-reterminal-e1001-epaper-display.jpg",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "physical": {
+      "orientation": "upright",
+      "shape": "box",
+      "size_mm": {
+        "w": 176,
+        "h": 120,
+        "t": 17
+      },
+      "size_confidence": "published",
+      "size_note": "17 mm thick without the included stand, 53 mm deep with it.",
+      "comes_in_case": true,
+      "mass_g": null,
+      "usb": {
+        "type": "usb-c",
+        "count": 1,
+        "faces": [
+          "left"
+        ],
+        "note": "USB-C on the left edge (per CNX teardown)."
+      },
+      "mounting": "Wall hole on the back; embedded nuts for the included stand.",
+      "printables": [],
+      "source_url": "https://wiki.seeedstudio.com/getting_started_with_reterminal_e1001/"
+    }
+  },
+  {
+    "id": "home-assistant-voice-pe",
+    "name": "Home Assistant Voice Preview Edition",
+    "category": "speaker",
+    "idea_fit_tags": [
+      "voice",
+      "audio-out",
+      "input",
+      "iot",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://github.com/esphome/home-assistant-voice-pe",
+      "https://www.home-assistant.io/voice-pe/"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "ESP32-S3 + XMOS voice puck: dual mics, speaker, 3.5mm out, LED ring, rotary dial, hardware mute. Under Muse it is push-to-talk with status on the LED ring and the dial as volume. Flashing Muse replaces the ESPHome firmware; reflash ESPHome to go back to Home Assistant.",
+    "est_used_price_usd_min": 69,
+    "est_used_price_usd_max": 69,
+    "image_url": "https://www.home-assistant.io/images/voice-pe/vpe-top.webp",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "physical": {
+      "orientation": "flat",
+      "shape": "box",
+      "size_mm": {
+        "w": 84,
+        "h": 84,
+        "t": 21
+      },
+      "size_confidence": "published",
+      "size_note": "Square puck that sits flat; LED ring and dial on the top face.",
+      "comes_in_case": true,
+      "mass_g": 96,
+      "usb": {
+        "type": "usb-c",
+        "count": 1,
+        "faces": [
+          "top"
+        ],
+        "note": "On the rear side wall next to the 3.5mm jack (\"top\" = far edge for flat devices)."
+      },
+      "mounting": null,
+      "printables": [],
+      "source_url": "https://www.home-assistant.io/voice-pe/"
+    }
+  },
+  {
+    "id": "waveshare-esp32-s3-touch-amoled-1-75c",
+    "name": "Waveshare ESP32-S3-Touch-AMOLED-1.75C (round)",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "voice",
+      "audio-out",
+      "ambient",
+      "creative-coding",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://docs.waveshare.com/ESP32-S3-Touch-AMOLED-1.75C",
+      "https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.75C"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Round 1.75\" 466x466 touch AMOLED in a CNC aluminum case (the C SKU). ESP32-S3, 8MB PSRAM, dual mics, speaker, IMU. Full Muse UI: animated avatar, push-to-talk, settings, images. The closest DIY match to a Muse Charm on your desk. Optional internal battery.",
+    "est_used_price_usd_min": 40,
+    "est_used_price_usd_max": 42,
+    "image_url": "https://www.waveshare.com/img/devkit/ESP32-S3-Touch-AMOLED-1.75C/ESP32-S3-Touch-AMOLED-1.75C-details-1.jpg",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "physical": {
+      "orientation": "upright",
+      "shape": "round",
+      "size_mm": {
+        "w": 55.0,
+        "h": 55.0,
+        "t": 15.05
+      },
+      "size_confidence": "drawing",
+      "size_note": "55.00 mm diameter; glass 48.96, active area 43.76.",
+      "comes_in_case": true,
+      "mass_g": null,
+      "usb": {
+        "type": "usb-c",
+        "count": 1,
+        "faces": [
+          "bottom"
+        ],
+        "note": "USB-C at 6 o'clock; PWR/BOOT buttons on the right edge at ~2 and ~4 o'clock."
+      },
+      "mounting": null,
+      "printables": [
+        "desk-stand"
+      ],
+      "source_url": "https://www.waveshare.com/img/devkit/ESP32-S3-Touch-AMOLED-1.75C/ESP32-S3-Touch-AMOLED-1.75C-details-size.jpg"
+    }
+  },
+  {
+    "id": "aipi-lite",
+    "name": "AIPI Lite",
+    "category": "speaker",
+    "idea_fit_tags": [
+      "voice",
+      "audio-out",
+      "display",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://aipi.com/pages/manual",
+      "https://github.com/sticks918/AIPI-Lite-ESPHome"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Palm-size ESP32-S3 voice buddy (X-ORIGIN / AIPI Labs) with a 128x128 LCD, mic, speaker and a snap-on 450mAh battery. Full Muse UI with push-to-talk, two-button menu and images. No official firmware repo; community ESPHome port exists.",
+    "est_used_price_usd_min": 36,
+    "est_used_price_usd_max": 36,
+    "image_url": "https://aipi.com/cdn/shop/files/AIPI_Lite_Blue_Device_450mAh_Battery_Shopify_Variant_1x1_MobileSafe_v2.png",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "physical": {
+      "orientation": "upright",
+      "shape": "box",
+      "size_mm": {
+        "w": 55.5,
+        "h": 47.5,
+        "t": null
+      },
+      "size_confidence": "approximate",
+      "size_note": "Manual lists 55.5 x 47.5 x 7.8 mm, likely without the snap-on battery module; which side is width is not stated.",
+      "comes_in_case": true,
+      "mass_g": null,
+      "usb": {
+        "type": "usb-c",
+        "count": 1,
+        "faces": [],
+        "note": "Edge not stated; the battery module plugs into it."
+      },
+      "mounting": "Magnets in the case.",
+      "printables": [],
+      "source_url": "https://static.aipi.com/AIPI_InstructionBook/AIPI_InstructionBook.html"
+    }
+  },
+  {
+    "id": "waveshare-esp32-c6-touch-amoled-1-8",
+    "name": "Waveshare ESP32-C6-Touch-AMOLED-1.8",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "voice",
+      "wearable",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://docs.waveshare.com/ESP32-C6-Touch-AMOLED-1.8",
+      "https://github.com/waveshareteam/ESP32-C6-Touch-AMOLED-1.8"
+    ],
+    "community_size_bucket": "small",
+    "notes": "1.8\" 368x448 touch AMOLED in a case, ESP32-C6, mic + speaker, IMU, RTC. No PSRAM: full Muse UI, but push-to-talk replies scroll past as text, no images and no home-network tunnel. Cheapest full-UI board.",
+    "est_used_price_usd_min": 29,
+    "est_used_price_usd_max": 30,
+    "image_url": "https://www.waveshare.com/img/devkit/ESP32-C6-Touch-AMOLED-1.8/ESP32-C6-Touch-AMOLED-1.8-1.jpg",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "physical": {
+      "orientation": "upright",
+      "shape": "box",
+      "size_mm": {
+        "w": 37.6,
+        "h": 45.2,
+        "t": 15.0
+      },
+      "size_confidence": "drawing",
+      "size_note": "Portrait. Display window 28.70 x 34.94 mm.",
+      "comes_in_case": true,
+      "mass_g": null,
+      "usb": {
+        "type": "usb-c",
+        "count": 1,
+        "faces": [
+          "right"
+        ],
+        "note": "USB-C on the right long edge, with PWR/BOOT buttons and the TF slot."
+      },
+      "mounting": "4 back-cover screws on a 27.60 mm square (drawing label 4*R1.80; hole size unconfirmed).",
+      "printables": [
+        "desk-stand"
+      ],
+      "source_url": "https://docs.waveshare.com/assets/images/ESP32-C6-Touch-AMOLED-1.8-size-567e74ffd49f34e5d3d0e9ef419fcb30.webp"
+    }
+  },
+  {
+    "id": "seeed-sensecap-watcher",
+    "name": "Seeed SenseCAP Watcher",
+    "category": "sensor",
+    "idea_fit_tags": [
+      "sensor",
+      "display",
+      "voice",
+      "iot",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://wiki.seeedstudio.com/watcher_hardware_overview/",
+      "https://github.com/Seeed-Studio/OSHW-SenseCAP-Watcher"
+    ],
+    "community_size_bucket": "small",
+    "notes": "ESP32-S3 + Himax vision chip, 5MP camera, 1.45\" round touch LCD, mic, speaker, scroll wheel. Full Muse UI plus camera.capture, so Muse can look at a room or a 3D printer. Camera and on-device vision mean high privacy exposure; place it deliberately.",
+    "est_used_price_usd_min": 55,
+    "est_used_price_usd_max": 61,
+    "image_url": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-113991315-sensecap-watcher-w1-a_1.jpg",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "physical": {
+      "orientation": "upright",
+      "shape": "box",
+      "size_mm": {
+        "w": 69,
+        "h": 65,
+        "t": 20
+      },
+      "size_confidence": "conflicting",
+      "size_note": "Seeed lists 69 x 65 x 20; Make: lists 64 x 68 x 19.5; which side is which is not stated.",
+      "comes_in_case": true,
+      "mass_g": null,
+      "usb": {
+        "type": "usb-c",
+        "count": 2,
+        "faces": [
+          "back",
+          "bottom"
+        ],
+        "note": "Back port is power only; bottom port is power + programming."
+      },
+      "mounting": "Ships with a bracket, base plate and 1/4\" adapter set.",
+      "printables": [],
+      "source_url": "https://www.seeed.cc/product/sensecap-watcher-the-physical-ai-agent-for-smarter-spaces"
+    }
+  },
+  {
+    "id": "m5stack-sticks3",
+    "name": "M5Stack StickS3",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "voice",
+      "wearable",
+      "input",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://docs.m5stack.com/en/core/StickS3",
+      "https://github.com/m5stack/M5Unified"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Pocket ESP32-S3 stick (8MB PSRAM) with 1.14\" LCD, mic, 1W speaker, IMU, IR TX/RX, 250mAh battery, magnetic back. Full Muse UI: push-to-talk, two-button menu, images. Successor to the StickC Plus2 and the best pocket remote for Muse.",
+    "est_used_price_usd_min": 22,
+    "est_used_price_usd_max": 22,
+    "image_url": "https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/1207/K150-stickS3_main-products_01.webp",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2,
+    "physical": {
+      "orientation": "upright",
+      "shape": "box",
+      "size_mm": {
+        "w": 24.0,
+        "h": 48.0,
+        "t": 15.0
+      },
+      "size_confidence": "drawing",
+      "size_note": "Corner radius R3. Hole positions were measured off the drawing; confirm against a unit.",
+      "corner_radius_mm": 3,
+      "comes_in_case": true,
+      "mass_g": 20.0,
+      "usb": {
+        "type": "usb-c",
+        "count": 1,
+        "faces": [
+          "bottom"
+        ],
+        "note": "USB-C on the bottom short edge next to the HY2.0 (Grove) port; 16-pin Hat2 header on top."
+      },
+      "mounting": "2x M2 threaded holes on the back, 18 mm apart, ~8.5 mm above the bottom edge.",
+      "printables": [
+        "desk-stand"
+      ],
+      "source_url": "https://docs.m5stack.com/en/core/StickS3"
+    }
+  },
+  {
+    "id": "m5stack-stickc-plus2",
+    "name": "M5Stack StickC Plus2",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "wearable",
+      "input",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://docs.m5stack.com/en/core/M5StickC%20PLUS2",
+      "https://github.com/m5stack/M5StickCPlus2"
+    ],
+    "community_size_bucket": "active",
+    "notes": "ESP32 stick (2MB PSRAM) with 1.14\" LCD, mic, buzzer, IMU, IR, 200mAh battery. Full Muse UI with push-to-talk, but buzzer only, so replies can't be spoken on-device. M5Stack lists it as end-of-life; buy the StickS3 unless you already own one.",
+    "est_used_price_usd_min": 15,
+    "est_used_price_usd_max": 20,
+    "image_url": "https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/512/K016-P2.webp",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 2,
+    "physical": {
+      "orientation": "upright",
+      "shape": "box",
+      "size_mm": {
+        "w": 24.0,
+        "h": 48.0,
+        "t": 13.5
+      },
+      "size_confidence": "published",
+      "size_note": "Corner radius R3.",
+      "corner_radius_mm": 3,
+      "comes_in_case": true,
+      "mass_g": 16.7,
+      "usb": {
+        "type": "usb-c",
+        "count": 1,
+        "faces": [
+          "bottom"
+        ],
+        "note": "USB-C on the bottom short edge next to the HY2.0 port; 8-pin HAT header on top."
+      },
+      "mounting": "Two hole pairs on the back, 16 mm c-c (figures from the StickC Plus drawing).",
+      "printables": [
+        "desk-stand"
+      ],
+      "source_url": "https://docs.m5stack.com/en/core/M5StickC%20PLUS2"
+    }
+  },
+  {
+    "id": "raspberry-pi-5",
+    "name": "Raspberry Pi 5",
+    "category": "sbc",
+    "idea_fit_tags": [
+      "sbc",
+      "kiosk",
+      "creative-coding",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 1,
+    "brick_risk": 1,
+    "brick_provenance": "llm-inferred",
+    "last_verified": "2026-10-02",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/linux",
+      "https://www.raspberrypi.com/documentation/"
+    ],
+    "community_size_bucket": "thriving",
+    "notes": "The board gadgets.muse.ai features for the Muse Linux SDK: install script, systemd service, and Muse gets shell, file and health commands as your user. Good host for Home Assistant plus a Muse bridge. Anything Muse runs here runs with your account's permissions.",
+    "est_used_price_usd_min": 50,
+    "est_used_price_usd_max": 120,
+    "est_setup_hours_min": 0.5,
+    "est_setup_hours_max": 2
   }
 ]
