@@ -4,6 +4,7 @@ import type { DeviceEntry } from "../catalog/schema.js";
 import { applyBrickRiskSafety } from "../safety.js";
 import { sampleJson, type SamplingDiagnostics } from "../sampling.js";
 import { buildLinks, type DeviceLinks } from "../links.js";
+import { agentPlatformsFor, type AgentPlatform } from "../platforms/index.js";
 
 export const proposeHardwareInput = z.object({
   idea: z.string().min(3, "idea is too short").max(2000, "idea is too long"),
@@ -27,6 +28,7 @@ export interface Proposal {
   notes: string;
   links: DeviceLinks;
   ebay_query_suggestion: string;
+  agent_platforms: AgentPlatform[];
 }
 
 export interface ProposeOutput {
@@ -56,6 +58,7 @@ Rules:
 - Only pick from the candidate list provided. Do not invent devices.
 - "why_this_fits" must mention the user's idea explicitly. No generic praise.
 - Respect explicit constraints in the idea: if the user says "e-paper preferred", prioritize devices with the "e-ink" tag. If the user says "low power", prioritize "low-power" tagged devices.
+- If the idea mentions Muse, Meta's agent, or giving an AI agent a physical body, prefer devices marked \`agent:\` and say which tier (full UI vs status) and that Muse SDK tokens are personal/non-commercial.
 - If candidates are weak for the idea, say so in the rationale rather than padding with bad picks.
 - Display HATs (Waveshare, Pimoroni Inky) require a host SBC; if you propose one, also propose a Pi Zero W (raspberry-pi-zero-2w) as the driver.`;
 
@@ -78,6 +81,10 @@ const TAG_ALIASES: Record<string, string[]> = {
   "music": ["audio-out"],
   "mic": ["voice"],
   "microphone": ["voice"],
+  "muse": ["agent-gadget"],
+  "ai agent": ["agent-gadget"],
+  "agent body": ["agent-gadget"],
+  "assistant": ["agent-gadget"],
 };
 
 function expandIdeaTerms(idea: string): Set<string> {
@@ -93,10 +100,17 @@ function expandIdeaTerms(idea: string): Set<string> {
 
 function candidateContext(catalog: DeviceEntry[]): string {
   return catalog
-    .map(
-      (d) =>
-        `- id: ${d.id} | name: ${d.name} | category: ${d.category} | tags: ${d.idea_fit_tags.join(", ")} | notes: ${d.notes}`,
-    )
+    .map((d) => {
+      const agentSuffix = safeAgentPlatformsFor(d.id)
+        .map((platform) => {
+          const label = platform.support === "possible"
+            ? "possible"
+            : platform.tier;
+          return ` | agent: ${platform.platform_id} ${label}`;
+        })
+        .join("");
+      return `- id: ${d.id} | name: ${d.name} | category: ${d.category} | tags: ${d.idea_fit_tags.join(", ")} | notes: ${d.notes}${agentSuffix}`;
+    })
     .join("\n");
 }
 
@@ -222,5 +236,14 @@ function buildProposal(device: DeviceEntry, whyThisFits: string): Proposal {
     ebay_query_suggestion: links.ebay_search_url.includes("_nkw=")
       ? decodeURIComponent(links.ebay_search_url.split("_nkw=")[1]?.split("&")[0] ?? "")
       : device.name,
+    agent_platforms: safeAgentPlatformsFor(device.id),
   };
+}
+
+function safeAgentPlatformsFor(deviceId: string): AgentPlatform[] {
+  try {
+    return agentPlatformsFor(deviceId);
+  } catch {
+    return [];
+  }
 }

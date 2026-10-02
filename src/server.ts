@@ -6,6 +6,8 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { loadCatalog } from "./catalog/load.js";
+import { loadPlatforms } from "./platforms/load.js";
+import { setLoadedPlatforms } from "./platforms/index.js";
 import { probeSamplingSupport } from "./sampling.js";
 import {
   proposeHardware,
@@ -19,6 +21,11 @@ import {
   simulateAssembly,
   simulateAssemblyInput,
 } from "./tools/simulate_assembly.js";
+import {
+  NEED_VALUES,
+  planGadget,
+  planGadgetInput,
+} from "./tools/plan_gadget.js";
 import { createTelemetry, errorKind } from "./telemetry.js";
 
 const NAME = "hackshop-mcp";
@@ -27,8 +34,10 @@ const VERSION = "0.0.4";
 async function main(): Promise<void> {
   // Boot validation. Refuses to start on bad catalog/tags.
   const { devices, tags } = loadCatalog();
+  const platforms = loadPlatforms(devices);
+  setLoadedPlatforms(platforms);
   process.stderr.write(
-    `[hackshop-mcp] Catalog loaded: ${devices.length} devices, ${tags.size} tags.\n`,
+    `[hackshop-mcp] Catalog loaded: ${devices.length} devices, ${tags.size} tags, ${platforms.length} platforms.\n`,
   );
 
   // Note: sampling is a CLIENT capability, not a server one. We don't declare
@@ -95,6 +104,47 @@ async function main(): Promise<void> {
         },
       },
       {
+        name: "plan_gadget",
+        description:
+          "Plan a physical gadget for an AI agent (Meta Muse Gadgets today). Given an idea, returns the best supported boards with tier, what works on each (voice, images, touch, camera, sensors, home-network tunnel), build commands, setup steps, Muse SDK terms, and printable stand/enclosure files when available. Deterministic: no LLM or network calls.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            idea: {
+              type: "string",
+              description: "Gadget idea or use case.",
+            },
+            platform: {
+              type: "string",
+              enum: ["muse-esp32", "muse-linux", "any"],
+              description: "Optional platform filter. Defaults to any.",
+            },
+            budget_usd: {
+              type: "number",
+              description: "Optional hardware budget in USD.",
+            },
+            owned_device_ids: {
+              type: "array",
+              items: { type: "string" },
+              description: "Catalog device ids the user already owns.",
+            },
+            needs: {
+              type: "array",
+              items: {
+                type: "string",
+                enum: NEED_VALUES,
+              },
+              description: "Optional explicit needs; otherwise inferred from idea.",
+            },
+            limit: {
+              type: "number",
+              description: "Number of picks to return, 1-5. Defaults to 3.",
+            },
+          },
+          required: ["idea"],
+        },
+      },
+      {
         name: "simulate_assembly",
         description:
           "Drop a proposed robot Assembly into a MuJoCo physics world and run a bounded navigation rollout. Returns whether it reached the goal plus honest failure telemetry (stuck/tipped/collisions/heading-oscillation), a natural-language post-mortem, and artifact URLs (rendered mp4, scene.xml, control.py, telemetry.json). Today simulates the diff-drive 'navigate' slice; other goal kinds return an honest 'unsupported'. Requires a running sim-worker (SIM_WORKER_URL).",
@@ -130,6 +180,11 @@ async function main(): Promise<void> {
     if (name === "assess_hackability") {
       const input = assessHackabilityInput.parse(args);
       return { out: assessHackability(input, devices) };
+    }
+
+    if (name === "plan_gadget") {
+      const input = planGadgetInput.parse(args);
+      return { out: planGadget(input, devices) };
     }
 
     if (name === "simulate_assembly") {

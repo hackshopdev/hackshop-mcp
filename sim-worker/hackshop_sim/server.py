@@ -11,7 +11,8 @@ CORS is open so the Next.js app (any origin) can play artifacts directly.
 from __future__ import annotations
 
 import os
-from typing import Optional
+from pathlib import Path
+from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -57,6 +58,24 @@ def _with_urls(job: jobs.Job, request: Request) -> dict:
     return payload
 
 
+def _catalog_path() -> Path:
+    return Path(
+        os.environ.get("HACKSHOP_CATALOG_PATH")
+        or Path(__file__).resolve().parents[2] / "catalog.json"
+    )
+
+
+def _cad_urls(files: dict[str, Any], run_id: str, request: Request) -> dict[str, Any]:
+    base = _base_url(request)
+    urls: dict[str, Any] = {}
+    for key, value in files.items():
+        if isinstance(value, list):
+            urls[key] = [f"{base}/artifacts/cad/{run_id}/{item}" for item in value]
+        else:
+            urls[key] = f"{base}/artifacts/cad/{run_id}/{value}"
+    return urls
+
+
 @app.get("/healthz")
 def healthz() -> dict:
     info = {"ok": True}
@@ -78,6 +97,45 @@ def simulate(req: SimulateRequest, request: Request) -> dict:
     else:
         job = jobs.run_async(req.assembly, opts, req.build_plan, req.media)
     return _with_urls(job, request)
+
+
+@app.post("/cad/generate")
+def generate_cad(body: dict[str, Any], request: Request) -> dict:
+    try:
+        from .cad import Build123dUnavailable, import_build123d
+
+        import_build123d()
+        from .cad.generate import CadGenerationError, dims_from_request, generate_package, run_hash
+    except Build123dUnavailable as exc:
+        raise HTTPException(status_code=501, detail=str(exc)) from exc
+    except ImportError as exc:
+        raise HTTPException(status_code=501, detail=f"CAD generation is unavailable: {exc}") from exc
+
+    part_name = body.get("part")
+    if part_name not in {"desk-stand", "enclosure"}:
+        raise HTTPException(status_code=422, detail="part must be desk-stand or enclosure")
+    try:
+        dims = dims_from_request(body, _catalog_path())
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except CadGenerationError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    run_id = run_hash(body)
+    out_dir = jobs.RUNS_DIR / "cad" / run_id
+    try:
+        metadata = generate_package(
+            dims,
+            str(part_name),
+            out_dir,
+            body.get("params") or {},
+        )
+    except CadGenerationError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    metadata = dict(metadata)
+    metadata["artifact_urls"] = _cad_urls(metadata["files"], run_id, request)
+    metadata["run_id"] = f"cad/{run_id}"
+    return metadata
 
 
 @app.get("/simulate/{job_id}")

@@ -29,6 +29,7 @@ These are the only tags valid for `idea_fit_tags` in `catalog.json`. Adding a ne
 - `low-power` — battery-friendly, sub-1W ideal
 
 ## Form / Use
+- `agent-gadget` — officially supported as a body for an AI agent (e.g. Muse Gadgets SDK); see platforms.json
 - `retrogaming` — handheld / console for emulation
 - `handheld` — battery, portable
 - `network` — router/switch repurposing

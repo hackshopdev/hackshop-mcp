@@ -1,0 +1,117 @@
+{
+  "generator": "hackshop_sim.cad 0.1.0 / build123d 0.13.0",
+  "parts": [
+    {
+      "bbox_mm": [
+        32.0,
+        43.5,
+        54.124
+      ],
+      "checks": {
+        "buttons_clear": null,
+        "cradle_supports": null,
+        "device_fits": true,
+        "front_clear": true,
+        "plug_clear": true,
+        "stable": true,
+        "valid_solid": true,
+        "volume_ok": true
+      },
+      "device_id": "m5stack-stickc-plus2",
+      "device_name": "M5Stack StickC Plus2",
+      "files": {
+        "fab": "/cad/m5stack-stickc-plus2/desk-stand.fab.json",
+        "step": "/cad/m5stack-stickc-plus2/desk-stand.step",
+        "stl": "/cad/m5stack-stickc-plus2/desk-stand.stl",
+        "svg": "/cad/m5stack-stickc-plus2/desk-stand.svg"
+      },
+      "part": "desk-stand",
+      "title": "Printable desk stand",
+      "volume_cm3": 12.874
+    },
+    {
+      "bbox_mm": [
+        32.0,
+        45.0,
+        53.93
+      ],
+      "checks": {
+        "buttons_clear": null,
+        "cradle_supports": null,
+        "device_fits": true,
+        "front_clear": true,
+        "plug_clear": true,
+        "stable": true,
+        "valid_solid": true,
+        "volume_ok": true
+      },
+      "device_id": "m5stack-sticks3",
+      "device_name": "M5Stack StickS3",
+      "files": {
+        "fab": "/cad/m5stack-sticks3/desk-stand.fab.json",
+        "step": "/cad/m5stack-sticks3/desk-stand.step",
+        "stl": "/cad/m5stack-sticks3/desk-stand.stl",
+        "svg": "/cad/m5stack-sticks3/desk-stand.svg"
+      },
+      "part": "desk-stand",
+      "title": "Printable desk stand",
+      "volume_cm3": 13.218
+    },
+    {
+      "bbox_mm": [
+        38.6,
+        45.0,
+        33.594
+      ],
+      "checks": {
+        "buttons_clear": null,
+        "cradle_supports": null,
+        "device_fits": true,
+        "front_clear": true,
+        "plug_clear": true,
+        "stable": true,
+        "valid_solid": true,
+        "volume_ok": true
+      },
+      "device_id": "waveshare-esp32-c6-touch-amoled-1-8",
+      "device_name": "Waveshare ESP32-C6-Touch-AMOLED-1.8",
+      "files": {
+        "fab": "/cad/waveshare-esp32-c6-touch-amoled-1-8/desk-stand.fab.json",
+        "step": "/cad/waveshare-esp32-c6-touch-amoled-1-8/desk-stand.step",
+        "stl": "/cad/waveshare-esp32-c6-touch-amoled-1-8/desk-stand.stl",
+        "svg": "/cad/waveshare-esp32-c6-touch-amoled-1-8/desk-stand.svg"
+      },
+      "part": "desk-stand",
+      "title": "Printable desk stand",
+      "volume_cm3": 12.106
+    },
+    {
+      "bbox_mm": [
+        44.0,
+        45.05,
+        57.981
+      ],
+      "checks": {
+        "buttons_clear": true,
+        "cradle_supports": true,
+        "device_fits": true,
+        "front_clear": true,
+        "plug_clear": true,
+        "stable": true,
+        "valid_solid": true,
+        "volume_ok": true
+      },
+      "device_id": "waveshare-esp32-s3-touch-amoled-1-75c",
+      "device_name": "Waveshare ESP32-S3-Touch-AMOLED-1.75C (round)",
+      "files": {
+        "fab": "/cad/waveshare-esp32-s3-touch-amoled-1-75c/desk-stand.fab.json",
+        "step": "/cad/waveshare-esp32-s3-touch-amoled-1-75c/desk-stand.step",
+        "stl": "/cad/waveshare-esp32-s3-touch-amoled-1-75c/desk-stand.stl",
+        "svg": "/cad/waveshare-esp32-s3-touch-amoled-1-75c/desk-stand.svg"
+      },
+      "part": "desk-stand",
+      "title": "Printable desk stand",
+      "volume_cm3": 19.739
+    }
+  ]
+}

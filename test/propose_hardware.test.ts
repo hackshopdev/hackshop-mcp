@@ -1,4 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { loadCatalog } from "../src/catalog/load.js";
+import { setLoadedPlatforms } from "../src/platforms/index.js";
+import { Platforms } from "../src/platforms/schema.js";
 import {
   proposeHardware,
   proposeHardwareInput,
@@ -184,6 +189,28 @@ describe("propose_hardware happy path", () => {
 
     expect(out.proposals).toHaveLength(1);
     expect(out.proposals[0]?.id).toBe("rpi-4b");
+  });
+
+  it("adds agent platform annotations to proposals", async () => {
+    setLoadedPlatforms(
+      Platforms.parse(JSON.parse(readFileSync(join(process.cwd(), "platforms.json"), "utf8"))),
+    );
+    const { devices } = loadCatalog();
+    const sampler = makeMockServer({
+      reply: JSON.stringify({
+        picks: [{ id: "m5stack-sticks3", why_this_fits: "a tiny Muse companion" }],
+        rationale: "Muse gadget.",
+      }),
+    });
+
+    const out = await proposeHardware(
+      { idea: "tiny Muse assistant body" },
+      devices,
+      sampler.server as any,
+    );
+
+    expect(out.proposals[0]?.agent_platforms[0]?.platform_id).toBe("muse-esp32");
+    expect(out.proposals[0]?.agent_platforms[0]?.tier).toBe("full-ui");
   });
 });
 

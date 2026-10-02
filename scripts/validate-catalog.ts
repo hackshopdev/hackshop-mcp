@@ -3,11 +3,13 @@
 // Run via `npm run validate`. Used in CI / pre-publish.
 
 import { loadCatalog } from "../src/catalog/load.js";
+import { loadPlatforms } from "../src/platforms/load.js";
 
 try {
   const { devices, tags } = loadCatalog();
+  const platforms = loadPlatforms(devices);
   console.log(
-    `OK: ${devices.length} devices, ${tags.size} tags, all schema-valid, no tag drift.`,
+    `OK: ${devices.length} devices, ${tags.size} tags, ${platforms.length} platforms, all schema-valid, no tag/platform drift.`,
   );
   process.exit(0);
 } catch (err) {
