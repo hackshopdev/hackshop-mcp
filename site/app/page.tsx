@@ -20,6 +20,9 @@ export default function Home() {
           <Link className="badge" href="/templates" data-testid="nav-templates">
             {TEMPLATE_COUNT} templates
           </Link>
+          <Link className="badge" href="/muse" data-testid="nav-muse">
+            Muse boards
+          </Link>
           <Link className="badge" href="/inventory" data-testid="nav-inventory">
             Your inventory
           </Link>

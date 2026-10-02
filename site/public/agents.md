@@ -10,6 +10,7 @@ Given a natural-language project idea (plus optional budget, constraints, and ow
 
 - `/` — home and live demo form ("Propose hardware" is the primary action).
 - `/templates` — pre-filled project templates.
+- `/muse` — read-only Muse Gadgets board comparison; printable downloads are static files under `/cad/`.
 - `/inventory` — manage a localStorage list of hardware the user already owns.
 - `/resources` — editorial field guides; individual posts at `/resources/{slug}`.
 - `/about`, `/contact`, `/privacy`, `/terms` — informational/legal pages.

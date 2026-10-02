@@ -6,6 +6,7 @@
 
 - [Home](https://www.hackshop.dev/): Live demo — describe a project idea and get hardware proposals with hack difficulty, brick risk, community size, used-market price ranges, and setup-time estimates.
 - [Templates](https://www.hackshop.dev/templates): Pre-filled project templates (old phone as a clock, e-paper calendar, Roomba as a robot, etc.).
+- [Muse boards](https://www.hackshop.dev/muse): Which boards work with Meta's Muse Gadgets SDK, compared, with printable stands.
 - [Inventory](https://www.hackshop.dev/inventory): Mark hardware you already own (stored in browser localStorage) so proposals can reuse it.
 - [Field guides](https://www.hackshop.dev/resources): Editorial guides on hacking and repurposing consumer hardware.
 
@@ -27,6 +28,7 @@ hackshop is also an MCP (Model Context Protocol) server usable from Claude Deskt
 }
 ```
 
+- Use `plan_gadget` for Muse Gadgets board recommendations, SDK token caveats, and printable stand links.
 - [Source on GitHub](https://github.com/msanchezgrice/hackshop-mcp): Open source, MIT-licensed.
 - [npm package](https://www.npmjs.com/package/hackshop-mcp): Published as `hackshop-mcp`.
 - [Suggest a device](https://github.com/msanchezgrice/hackshop-mcp/issues): Catalog contributions via GitHub issues.

@@ -157,10 +157,30 @@ export const IMAGE_SOURCES: Record<string, string> = {
     "https://cdn-shop.adafruit.com/970x728/5691-00.jpg",
   "adafruit-vl53l4cd":
     "https://cdn-shop.adafruit.com/970x728/5396-00.jpg",
+  "aipi-lite":
+    "https://aipi.com/cdn/shop/files/AIPI_Lite_Blue_Device_450mAh_Battery_Shopify_Variant_1x1_MobileSafe_v2.png",
+  "espressif-esp32-c5-devkitc-1":
+    "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c5/_images/esp32-c5-devkitc-1-isometric_v1.1.png",
+  "home-assistant-voice-pe":
+    "https://www.home-assistant.io/images/voice-pe/vpe-top.webp",
+  "m5stack-stickc-plus2":
+    "https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/512/K016-P2.webp",
+  "m5stack-sticks3":
+    "https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/1207/K150-stickS3_main-products_01.webp",
+  "seeed-reterminal-e1001":
+    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-104991002-reterminal-e1001-epaper-display.jpg",
+  "seeed-sensecap-indicator":
+    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/_/1/_1_5.png",
+  "seeed-sensecap-watcher":
+    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-113991315-sensecap-watcher-w1-a_1.jpg",
   "seeed-xiao-esp32s3":
     "https://cdn-shop.adafruit.com/970x728/5426-00.jpg",
   "seeed-xiao-nrf52840-sense":
     "https://cdn-shop.adafruit.com/970x728/5304-00.jpg",
+  "waveshare-esp32-c6-touch-amoled-1-8":
+    "https://www.waveshare.com/img/devkit/ESP32-C6-Touch-AMOLED-1.8/ESP32-C6-Touch-AMOLED-1.8-1.jpg",
+  "waveshare-esp32-s3-touch-amoled-1-75c":
+    "https://www.waveshare.com/img/devkit/ESP32-S3-Touch-AMOLED-1.75C/ESP32-S3-Touch-AMOLED-1.75C-details-1.jpg",
   "m5stack-core2":
     "https://shop.m5stack.com/cdn/shop/files/1_b5359a18-c82e-484f-8879-7d560bea0e66_1200x1200.webp?v=1683770131",
   "m5stack-cardputer":

@@ -31,10 +31,106 @@ export interface Template {
     | "robotics"
     | "network"
     | "compute"
-    | "retro";
+    | "retro"
+    | "agents";
 }
 
 export const TEMPLATES: Template[] = [
+  // ─── AI AGENT GADGETS ─────────────────────────────────────────────────
+  {
+    slug: "muse-desk-orb",
+    title: "A desk orb that shows what Muse is doing",
+    blurb:
+      "Round AMOLED avatar on your desk: push-to-talk, spoken replies and images from Muse, in a printed stand.",
+    prompt:
+      "Give my Muse AI agent a body on my desk: a round screen that shows its avatar and status, push-to-talk with spoken replies, and shows images Muse sends me. USB powered, sits on a desk stand.",
+    difficulty: 2,
+    est_cost_usd: { min: 40, max: 45 },
+    est_setup_hours_min: 1,
+    est_setup_hours_max: 3,
+    viability: "iffy",
+    viability_note:
+      "Waveshare ESP32-S3-Touch-AMOLED-1.75C is on Meta's Muse Gadgets full-UI list, but the SDK launched Oct 2, 2026 and is provided as-is. Hackshop's printable stand uses Waveshare's drawing; print once to check fit.",
+    category: "agents",
+  },
+  {
+    slug: "muse-pocket-remote",
+    title: "Pocket push-to-talk remote for Muse",
+    blurb: "M5Stack StickS3 on a keychain or desk dock: press, talk, hear Muse answer.",
+    prompt:
+      "A pocket-sized push-to-talk remote for my Muse AI agent with a small screen and a speaker, battery powered, plus a desk dock to charge it.",
+    difficulty: 2,
+    est_cost_usd: { min: 22, max: 25 },
+    est_setup_hours_min: 1,
+    est_setup_hours_max: 2,
+    viability: "iffy",
+    viability_note:
+      "StickS3 is on the full-UI list with speaker and mic. The older StickC Plus2 also works but only has a buzzer, so replies can't be spoken.",
+    category: "agents",
+  },
+  {
+    slug: "muse-epaper-status-board",
+    title: "E-paper status board Muse can draw on",
+    blurb: '7.5" reTerminal E1001 on the wall showing Muse\'s status and black-and-white images.',
+    prompt:
+      "A wall-mounted e-paper board my Muse AI agent can update with status text and black-and-white images, battery powered, low refresh.",
+    difficulty: 2,
+    est_cost_usd: { min: 69, max: 79 },
+    est_setup_hours_min: 1,
+    est_setup_hours_max: 3,
+    viability: "iffy",
+    viability_note:
+      "Status tier: no voice, black-and-white images only. The color E1002 is shown on gadgets.muse.ai but only the E1001 is in the SDK's board list.",
+    category: "agents",
+  },
+  {
+    slug: "muse-air-quality-reporter",
+    title: "Air-quality sensor Muse can read",
+    blurb:
+      "SenseCAP Indicator D1S/D1Pro reports CO2, tVOC, temperature and humidity when Muse asks.",
+    prompt:
+      "An indoor air-quality display that my Muse AI agent can read on demand (CO2, tVOC, temperature, humidity) and that shows status on a touchscreen.",
+    difficulty: 2,
+    est_cost_usd: { min: 49, max: 89 },
+    est_setup_hours_min: 1,
+    est_setup_hours_max: 3,
+    viability: "iffy",
+    viability_note:
+      "Muse reads all sensors with sensors.read, but only the D1S and D1Pro have the CO2/tVOC sensors; the base D1 has none.",
+    category: "agents",
+  },
+  {
+    slug: "muse-printer-watcher",
+    title: "A camera Muse can use to check your 3D printer",
+    blurb: "SenseCAP Watcher on a stand: Muse can grab a frame and tell you if a print failed.",
+    prompt:
+      "Give my Muse AI agent a camera pointed at my 3D printer so it can check on long prints, with a small screen and push-to-talk.",
+    difficulty: 2,
+    est_cost_usd: { min: 55, max: 61 },
+    est_setup_hours_min: 1,
+    est_setup_hours_max: 3,
+    viability: "iffy",
+    viability_note:
+      "Watcher is full-UI with camera.capture. A camera plus mic in your home is a real privacy surface: point it only at the printer.",
+    category: "agents",
+  },
+  {
+    slug: "muse-linux-mini-pc",
+    title: "Revive an old mini PC as Muse's home-server hands",
+    blurb:
+      "Muse Linux SDK on a thrift-store thin client: shell, files and Home Assistant, with a USB Bluetooth dongle.",
+    prompt:
+      "Turn an old thin client or mini PC into a Muse gadget that can run commands, manage files and host Home Assistant, using the Muse Linux SDK.",
+    difficulty: 3,
+    est_cost_usd: { min: 40, max: 100 },
+    est_setup_hours_min: 1,
+    est_setup_hours_max: 3,
+    viability: "experimental",
+    viability_note:
+      "Meta lists Raspberry Pi 3B+/4/5/Zero 2 W and says other Linux machines with Bluetooth LE work. Thin clients aren't on the list and usually need a USB BLE adapter. Muse runs commands as your user: use a dedicated account.",
+    category: "agents",
+  },
+
   // ─── DISPLAY / AMBIENT ────────────────────────────────────────────────
   {
     slug: "old-phone-as-clock",
@@ -400,6 +496,7 @@ export const VERIFIED_TEMPLATE_COUNT = TEMPLATES.filter(
 ).length;
 
 export const TEMPLATE_CATEGORIES: Record<Template["category"], string> = {
+  agents: "AI Agent Gadgets",
   display: "Display & Ambient",
   audio: "Audio",
   camera: "Cameras & Sensors",
