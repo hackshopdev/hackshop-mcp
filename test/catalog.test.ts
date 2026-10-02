@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Catalog, DeviceEntry } from "../src/catalog/schema.js";
+import { Catalog, DeviceEntry, Physical } from "../src/catalog/schema.js";
 import { loadCatalog, parseTags } from "../src/catalog/load.js";
 
 const validEntry = {
@@ -45,6 +45,50 @@ describe("catalog schema", () => {
   it("rejects more than 8 tags", () => {
     const tags = Array(9).fill("display");
     expect(() => DeviceEntry.parse({ ...validEntry, idea_fit_tags: tags })).toThrow();
+  });
+
+  it("accepts all real catalog entries, including physical blocks", () => {
+    const { devices } = loadCatalog();
+    expect(Catalog.parse(devices)).toHaveLength(devices.length);
+    expect(devices.some((device) => device.physical)).toBe(true);
+  });
+
+  it("rejects printable parts when thickness is unknown", () => {
+    expect(() =>
+      Physical.parse({
+        orientation: "upright",
+        shape: "board",
+        size_mm: { w: 10, h: 20, t: null },
+        size_confidence: "published",
+        comes_in_case: false,
+        mass_g: null,
+        usb: null,
+        mounting: null,
+        printables: ["desk-stand"],
+        source_url: "https://example.com/device",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects bad USB face enums", () => {
+    expect(() =>
+      Physical.parse({
+        orientation: "upright",
+        shape: "board",
+        size_mm: { w: 10, h: 20, t: 5 },
+        size_confidence: "drawing",
+        comes_in_case: false,
+        mass_g: null,
+        usb: {
+          type: "usb-c",
+          count: 1,
+          faces: ["diagonal"],
+        },
+        mounting: null,
+        printables: [],
+        source_url: "https://example.com/device",
+      }),
+    ).toThrow();
   });
 });
 

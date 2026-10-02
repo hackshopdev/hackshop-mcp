@@ -1,4 +1,9 @@
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { loadCatalog } from "../src/catalog/load.js";
+import { setLoadedPlatforms } from "../src/platforms/index.js";
+import { Platforms } from "../src/platforms/schema.js";
 import { assessHackability } from "../src/tools/assess_hackability.js";
 import type { DeviceEntry } from "../src/catalog/schema.js";
 
@@ -76,5 +81,19 @@ describe("assess_hackability", () => {
     expect(out.device?.links.hackaday_search_url).toContain("hackaday.com");
     expect(out.device?.links.reddit_search_url).toContain("reddit.com");
     expect(out.device?.links.google_search_url).toContain("google.com");
+  });
+
+  it("includes agent platforms, physical metadata and printables for Muse boards", () => {
+    setLoadedPlatforms(
+      Platforms.parse(JSON.parse(readFileSync(join(process.cwd(), "platforms.json"), "utf8"))),
+    );
+    const { devices } = loadCatalog();
+
+    const out = assessHackability({ device_name: "StickS3" }, devices);
+
+    expect(out.found).toBe(true);
+    expect(out.device?.agent_platforms[0]?.tier).toBe("full-ui");
+    expect(out.device?.physical).toBeTruthy();
+    expect(out.device?.printables[0]?.part).toBe("desk-stand");
   });
 });

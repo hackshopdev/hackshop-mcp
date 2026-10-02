@@ -10,6 +10,7 @@
   "files": [
     "dist",
     "catalog.json",
+    "platforms.json",
     "tags.md",
     "examples",
     "README.md",

@@ -71,7 +71,8 @@
           "air_sensors": false,
           "ota": false,
           "battery": "no",
-          "round_display": false
+          "round_display": false,
+          "display_in": null
         },
         "note": "Status light and button. Muse's recommended starting point."
       },
@@ -91,7 +92,8 @@
           "air_sensors": false,
           "ota": false,
           "battery": "no",
-          "round_display": false
+          "round_display": false,
+          "display_in": 1.9
         },
         "note": "No PSRAM, so no home-network tunnel; draws images straight to the screen."
       },
@@ -111,7 +113,8 @@
           "air_sensors": true,
           "ota": false,
           "battery": "no",
-          "round_display": false
+          "round_display": false,
+          "display_in": 3.95
         },
         "note": "Air sensors only on D1S/D1Pro (temp/humidity via the bundled Grove AHT20)."
       },
@@ -131,7 +134,8 @@
           "air_sensors": false,
           "ota": false,
           "battery": "yes",
-          "round_display": false
+          "round_display": false,
+          "display_in": 7.5
         },
         "note": "Status text and black-and-white images on 7.5\" e-paper."
       },
@@ -151,7 +155,8 @@
           "air_sensors": false,
           "ota": false,
           "battery": "no",
-          "round_display": false
+          "round_display": false,
+          "display_in": null
         },
         "note": "Status on the LED ring, push-to-talk, dial as volume."
       },
@@ -171,7 +176,8 @@
           "air_sensors": false,
           "ota": true,
           "battery": "optional",
-          "round_display": true
+          "round_display": true,
+          "display_in": 1.75
         },
         "note": "Round AMOLED avatar; best desk object."
       },
@@ -191,9 +197,10 @@
           "air_sensors": false,
           "ota": true,
           "battery": "yes",
-          "round_display": false
+          "round_display": false,
+          "display_in": null
         },
-        "note": "Two-button menu."
+        "note": "Palm-size voice buddy with a snap-on battery and a two-button menu."
       },
       {
         "device_id": "waveshare-esp32-c6-touch-amoled-1-8",
@@ -211,7 +218,8 @@
           "air_sensors": false,
           "ota": true,
           "battery": "optional",
-          "round_display": false
+          "round_display": false,
+          "display_in": 1.8
         },
         "note": "No PSRAM: voice notes go over the control session and replies come back as scrolling text."
       },
@@ -231,7 +239,8 @@
           "air_sensors": false,
           "ota": true,
           "battery": "yes",
-          "round_display": true
+          "round_display": true,
+          "display_in": 1.45
         },
         "note": "camera.capture returns a JPEG (CONFIG_MUSE_WATCHER_CAMERA=y)."
       },
@@ -251,9 +260,10 @@
           "air_sensors": false,
           "ota": true,
           "battery": "yes",
-          "round_display": false
+          "round_display": false,
+          "display_in": 1.14
         },
-        "note": "8 MB flash variant of the Muse partition layout."
+        "note": "Pocket stick with speaker, mic, IMU and battery; the best push-to-talk remote."
       },
       {
         "device_id": "m5stack-stickc-plus2",
@@ -271,7 +281,8 @@
           "air_sensors": false,
           "ota": true,
           "battery": "yes",
-          "round_display": false
+          "round_display": false,
+          "display_in": 1.14
         },
         "eol": true,
         "note": "End of life at M5Stack; buzzer only, so no spoken replies."
@@ -349,7 +360,8 @@
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
         "features": {
-          "ble_builtin": true
+          "ble_builtin": true,
+          "compute": "standard"
         },
         "note": "Featured on gadgets.muse.ai."
       },
@@ -360,7 +372,8 @@
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
         "features": {
-          "ble_builtin": true
+          "ble_builtin": true,
+          "compute": "standard"
         },
         "note": "Listed in the Linux SDK README."
       },
@@ -371,7 +384,8 @@
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
         "features": {
-          "ble_builtin": true
+          "ble_builtin": true,
+          "compute": "light"
         },
         "note": "Listed in the Linux SDK README; slow but enough for shell and file commands."
       },
@@ -382,7 +396,8 @@
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
         "features": {
-          "ble_builtin": false
+          "ble_builtin": false,
+          "compute": "desktop"
         },
         "note": "Not on Meta's list. Meets the stated requirements on Debian/Ubuntu if it has Bluetooth LE; most units need a USB BLE adapter."
       },
@@ -393,7 +408,8 @@
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
         "features": {
-          "ble_builtin": false
+          "ble_builtin": false,
+          "compute": "desktop"
         },
         "note": "Not on Meta's list. Add a USB Bluetooth LE adapter."
       },
@@ -404,7 +420,8 @@
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
         "features": {
-          "ble_builtin": null
+          "ble_builtin": null,
+          "compute": "desktop"
         },
         "note": "Not on Meta's list. Many NUCs ship with Bluetooth; check yours."
       },
@@ -415,7 +432,8 @@
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
         "features": {
-          "ble_builtin": null
+          "ble_builtin": null,
+          "compute": "desktop"
         },
         "note": "Not on Meta's list. Bluetooth depends on the Wi-Fi card fitted; add a USB BLE adapter if missing."
       }

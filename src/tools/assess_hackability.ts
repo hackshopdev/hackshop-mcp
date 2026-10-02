@@ -2,6 +2,12 @@ import { z } from "zod";
 import type { DeviceEntry } from "../catalog/schema.js";
 import { applyBrickRiskSafety } from "../safety.js";
 import { buildLinks, type DeviceLinks } from "../links.js";
+import {
+  agentPlatformsFor,
+  printablesFor,
+  type AgentPlatform,
+  type Printable,
+} from "../platforms/index.js";
 
 export const assessHackabilityInput = z.object({
   device_name: z.string().min(1).max(200),
@@ -25,6 +31,9 @@ export interface AssessOutput {
     last_verified: string;
     notes: string;
     links: DeviceLinks;
+    agent_platforms: AgentPlatform[];
+    physical: DeviceEntry["physical"] | null;
+    printables: Printable[];
   };
   message?: string;
 }
@@ -76,6 +85,7 @@ export function assessHackability(
 
   const safety = applyBrickRiskSafety(match);
   const links = buildLinks(match);
+  const agentPlatforms = safeAgentPlatformsFor(match.id);
 
   // Derive hackability from a real signal rather than hardcoding true: a device
   // is "hackable" if it has firmware/community resources OR its difficulty is
@@ -98,6 +108,17 @@ export function assessHackability(
       last_verified: match.last_verified,
       notes: match.notes,
       links,
+      agent_platforms: agentPlatforms,
+      physical: match.physical ?? null,
+      printables: printablesFor(match),
     },
   };
+}
+
+function safeAgentPlatformsFor(deviceId: string): AgentPlatform[] {
+  try {
+    return agentPlatformsFor(deviceId);
+  } catch {
+    return [];
+  }
 }

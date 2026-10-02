@@ -8,11 +8,13 @@ You describe a project. The agent surfaces 3-5 hackable hardware options you wou
 
 A tinkerer has an idea. The idea would be cooler with the right piece of hardware attached: an old screen, an abandoned smart speaker, a bricked frame, a hackable handheld. The tinkerer doesn't know what hardware exists, what's hackable, or what would creatively *fit* the idea. So the idea stays purely software, or gets paired with a Raspberry Pi.
 
-This is a hardware-knowledge layer on top of LLMs. Three tools, 68 hand-vetted devices, one closed-set tag vocabulary, and a brick-risk safety rule that won't let the agent fabricate a score for hardware classes where bricks are unrecoverable. The third tool — `simulate_assembly` — drops a proposed robot into a MuJoCo physics world and tells you, honestly, whether it would actually move.
+This is a hardware-knowledge layer on top of LLMs. Four tools, 80 researched devices, one closed-set tag vocabulary, and a brick-risk safety rule that won't let the agent fabricate a score for hardware classes where bricks are unrecoverable. `simulate_assembly` drops a proposed robot into a MuJoCo physics world and tells you, honestly, whether it would actually move.
+
+Hackshop now knows about Meta's Muse Gadgets SDK: ESP32 boards and Linux machines that can become a physical body for Muse, Meta's personal AI agent. Muse recommendations include the SDK tier, setup path, supported features, printable stand/enclosure links when available, and the required terms caveat: personal, non-commercial use only, at most 50 devices per token, no selling or public marketplace listing, and revocable access.
 
 ## Status
 
-v0.0.3 — published on npm. Install with `npx hackshop-mcp` or add to your MCP client config. Three tools (`propose_hardware`, `assess_hackability`, `simulate_assembly`), 68 hand-vetted devices. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
+v0.0.3 is published on npm (`npx hackshop-mcp`); `main` is ahead of it and adds `plan_gadget` (unreleased). Four tools (`propose_hardware`, `assess_hackability`, `plan_gadget`, `simulate_assembly`), 80 devices. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
 
 ## Install in 30 seconds
 
@@ -53,6 +55,18 @@ Returns 3-5 hardware proposals, each with:
 
 Lookup by id, exact name, or substring. Returns the same shape as a single proposal. Use when you have a device in mind and want to verify hackability before searching for one to buy.
 
+### `plan_gadget(idea, platform?, budget_usd?, owned_device_ids?, needs?, limit?)`
+
+Deterministically plans a physical gadget for an AI agent, with Meta Muse Gadgets as the first supported platform. It infers needs such as voice, screen, camera, air sensors, e-paper, round display, home-network tunnel, or Linux control; ranks supported boards; and returns:
+
+- `inferred_needs` and ranked `picks`
+- each pick's Muse platform, support level, tier, score, concrete `why`, gaps, price label, firmware/build links, setup steps, and caveats
+- `fabrication.printables` with STL/STEP/SVG/fab.json URLs when a stand or enclosure exists
+- Muse SDK `terms` for every platform represented in the picks
+- concrete `next_steps`
+
+This tool does not call an LLM and does not use the network. It never suggests selling Muse devices; the Muse SDK token terms are personal and non-commercial.
+
 ### `simulate_assembly(assembly)`
 
 Takes an **Assembly IR** — `{ idea, components[{ref,device_id,name,role}], edges[], goal{kind,spec,success_metric}, world{template,goal_xy?} }` (build it from the site's assembly output or by hand) — drops it into a MuJoCo physics world, and runs a **bounded, synchronous** rollout (`duration_s` ≤ 10, default 8) on the sim-worker. It returns:
@@ -88,7 +102,7 @@ The `simulate_assembly` MCP tool above is the bounded, single-call entry point i
 - TypeScript + `@modelcontextprotocol/sdk`
 - LLM reasoning delegated to the host via `sampling/createMessage` first; falls back to a direct Anthropic API call (`@anthropic-ai/sdk`) when `ANTHROPIC_API_KEY` is set and the host lacks sampling
 - `simulate_assembly` calls out to a separate Python MuJoCo **sim-worker** over HTTP (`SIM_WORKER_URL`); the worker isn't bundled in the npm package
-- Catalog stored as `catalog.json` in the repo (JSON, version-controllable, 68 devices in v0.0.3 — growing)
+- Catalog stored as `catalog.json` in the repo (JSON, version-controllable, 80 devices and growing)
 - Tag vocabulary in `tags.md`, validated at boot — server refuses to start on tag drift
 - eBay integration is **not** in this server. Compose with [`ebay-mcp`](https://github.com/YosefHayim/ebay-mcp) at the host level.
 

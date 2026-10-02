@@ -32,7 +32,8 @@
       "sbc",
       "low-power",
       "creative-coding",
-      "kiosk"
+      "kiosk",
+      "agent-gadget"
     ],
     "hack_difficulty": 1,
     "brick_risk": 1,
@@ -58,7 +59,8 @@
       "low-power",
       "creative-coding",
       "kiosk",
-      "iot"
+      "iot",
+      "agent-gadget"
     ],
     "hack_difficulty": 1,
     "brick_risk": 1,
