@@ -23,6 +23,7 @@ export interface Template {
   // (e.g., "old phone as clock") where the build cost dominates.
   est_setup_hours_min?: number;
   est_setup_hours_max?: number;
+  device_id?: string;
   category:
     | "display"
     | "audio"
@@ -51,6 +52,7 @@ export const TEMPLATES: Template[] = [
     viability: "iffy",
     viability_note:
       "Waveshare ESP32-S3-Touch-AMOLED-1.75C is on Meta's Muse Gadgets full-UI list, but the SDK launched Oct 2, 2026 and is provided as-is. Hackshop's printable stand uses Waveshare's drawing; print once to check fit.",
+    device_id: "waveshare-esp32-s3-touch-amoled-1-75c",
     category: "agents",
   },
   {
@@ -66,6 +68,7 @@ export const TEMPLATES: Template[] = [
     viability: "iffy",
     viability_note:
       "StickS3 is on the full-UI list with speaker and mic. The older StickC Plus2 also works but only has a buzzer, so replies can't be spoken.",
+    device_id: "m5stack-sticks3",
     category: "agents",
   },
   {
@@ -81,6 +84,7 @@ export const TEMPLATES: Template[] = [
     viability: "iffy",
     viability_note:
       "Status tier: no voice, black-and-white images only. The color E1002 is shown on gadgets.muse.ai but only the E1001 is in the SDK's board list.",
+    device_id: "seeed-reterminal-e1001",
     category: "agents",
   },
   {
@@ -97,6 +101,7 @@ export const TEMPLATES: Template[] = [
     viability: "iffy",
     viability_note:
       "Muse reads all sensors with sensors.read, but only the D1S and D1Pro have the CO2/tVOC sensors; the base D1 has none.",
+    device_id: "seeed-sensecap-indicator",
     category: "agents",
   },
   {
@@ -112,6 +117,7 @@ export const TEMPLATES: Template[] = [
     viability: "iffy",
     viability_note:
       "Watcher is full-UI with camera.capture. A camera plus mic in your home is a real privacy surface: point it only at the printer.",
+    device_id: "seeed-sensecap-watcher",
     category: "agents",
   },
   {
@@ -128,6 +134,7 @@ export const TEMPLATES: Template[] = [
     viability: "experimental",
     viability_note:
       "Meta lists Raspberry Pi 3B+/4/5/Zero 2 W and says other Linux machines with Bluetooth LE work. Thin clients aren't on the list and usually need a USB BLE adapter. Muse runs commands as your user: use a dedicated account.",
+    device_id: "dell-wyse-5070",
     category: "agents",
   },
 

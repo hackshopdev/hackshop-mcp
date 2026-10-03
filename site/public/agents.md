@@ -11,6 +11,9 @@ Given a natural-language project idea (plus optional budget, constraints, and ow
 - `/` — home and live demo form ("Propose hardware" is the primary action).
 - `/templates` — pre-filled project templates.
 - `/muse` — read-only Muse Gadgets board comparison; printable downloads are static files under `/cad/`.
+- `/build/{device_id}` — parts list, build steps, printable files, and agent handoff for a device.
+- `/build/{device_id}/build.md` — agent-ready build brief for that device.
+- `/projects` and `/projects/{id}` — user build drafts stored locally, with optional account sync when sign-in is configured.
 - `/inventory` — manage a localStorage list of hardware the user already owns.
 - `/resources` — editorial field guides; individual posts at `/resources/{slug}`.
 - `/about`, `/contact`, `/privacy`, `/terms` — informational/legal pages.
@@ -22,11 +25,12 @@ Given a natural-language project idea (plus optional budget, constraints, and ow
 - The demo form on `/` POSTs to `/api/propose` and is rate limited to 5 requests/hour/IP; treat it as a scarce resource and do not retry in a loop. Forms are tagged with `data-agent-form`, and the primary submit button carries `data-agent-action="propose-hardware"`.
 - Buttons carrying `data-agent-danger` (e.g. "Clear all" on `/inventory`) delete user data stored in the browser — do not activate them without explicit user confirmation.
 - Inventory state lives in browser localStorage only; there are no accounts, logins, or checkout flows on this site.
+- Build project drafts work signed-out in localStorage. If sign-in is configured, sync only stores project metadata, checklist state, parts state, and notes.
 - Purchases happen off-site (eBay, manufacturer stores). Do not attempt to complete any external purchase on the user's behalf.
 
 ## Programmatic access
 
-The recommended integration is the MCP server (`npx -y hackshop-mcp`), documented in the README at https://github.com/msanchezgrice/hackshop-mcp. The site's `/api/*` routes back the UI, are disallowed to crawlers in robots.txt, and may change without notice.
+The recommended integration is the MCP server (`npx -y hackshop-mcp`), documented in the README at https://github.com/msanchezgrice/hackshop-mcp. Use `get_build_plan` or `/build/<device_id>/build.md` for deterministic build briefs. The site's `/api/*` routes back the UI, are disallowed to crawlers in robots.txt, and may change without notice.
 
 ## Contact
 

@@ -38,7 +38,7 @@ import { siteUrlFromEnv } from "./site-url.js";
 import { createTelemetry, errorKind } from "./telemetry.js";
 
 const NAME = "hackshop-mcp";
-const VERSION = "0.0.4";
+const VERSION = "0.0.5";
 
 export function createToolRunner(context: {
   devices: DeviceEntry[];

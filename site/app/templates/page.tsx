@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StartBuildButton } from "@/components/StartBuildButton";
 import { pageMetadata } from "@/lib/page-metadata";
 import {
   TEMPLATES,
@@ -81,21 +82,43 @@ function ProjectCard({ t }: { t: Template }) {
         <strong style={{ color: "var(--fg)" }}>Why this works: </strong>
         {t.viability_note}
       </p>
-      <Link
-        href={`/?idea=${encodeURIComponent(t.prompt)}`}
-        style={{
-          display: "inline-block",
-          padding: "8px 14px",
-          background: "var(--accent)",
-          color: "#fff",
-          fontSize: 14,
-          fontWeight: 600,
-          borderRadius: 6,
-          textDecoration: "none",
-        }}
-      >
-        Try this idea →
-      </Link>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <Link
+          href={`/?idea=${encodeURIComponent(t.prompt)}`}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            minHeight: 40,
+            padding: "8px 14px",
+            background: "var(--accent)",
+            color: "#fff",
+            fontSize: 14,
+            fontWeight: 600,
+            borderRadius: 6,
+            textDecoration: "none",
+          }}
+        >
+          Try this idea →
+        </Link>
+        {t.device_id ? (
+          <StartBuildButton
+            deviceId={t.device_id}
+            idea={t.prompt}
+            source="template"
+            style={{
+              minHeight: 40,
+              padding: "8px 14px",
+              background: "transparent",
+              color: "var(--fg)",
+              border: "1px solid var(--accent)",
+              borderRadius: 6,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          />
+        ) : null}
+      </div>
     </article>
   );
 }

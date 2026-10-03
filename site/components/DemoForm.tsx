@@ -7,6 +7,7 @@ import type { ProposeResponse } from "@/lib/types";
 import type { AssemblyResponse } from "@/lib/assembly";
 import { AssemblyPanel } from "./AssemblyPanel";
 import { SimViewer } from "./SimViewer";
+import { StartBuildButton } from "./StartBuildButton";
 import { loadInventory } from "@/lib/inventory";
 import { track } from "@/lib/analytics";
 import {
@@ -754,6 +755,23 @@ function DemoFormInner() {
                       Firmware: {new URL(url).hostname.replace("www.", "")}
                     </a>
                   ))}
+                  <StartBuildButton
+                    deviceId={p.id}
+                    idea={idea.trim()}
+                    source="proposal"
+                    style={{
+                      fontSize: 12,
+                      padding: "4px 10px",
+                      minHeight: 40,
+                      borderRadius: 4,
+                      background: "var(--accent)",
+                      color: "#fff",
+                      border: 0,
+                      cursor: "pointer",
+                      fontWeight: 600,
+                    }}
+                  />
+                  <a href={`/build/${p.id}`}>Build steps</a>
                   <button
                     type="button"
                     onClick={async () => {
