@@ -1,0 +1,108 @@
+.box {
+  min-width: 0;
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  background: #121212;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 1px solid #2a2a2a;
+  scrollbar-width: none;
+}
+
+.tab,
+.tabActive {
+  flex: 0 0 auto;
+  padding: 14px 18px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #a3a39d;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tabActive {
+  border-bottom-color: #ff7a00;
+  color: #f4f4f2;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+}
+
+.code {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  background: #0b0b0b;
+  color: #f4f4f2;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.copy {
+  align-self: flex-start;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid #f4f4f2;
+  border-radius: 10px;
+  background: #f4f4f2;
+  color: #111;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.steps {
+  margin: 0;
+  padding-left: 18px;
+  color: #b9b9b4;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 18px 18px;
+  border-top: 1px solid #222;
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid #2f2f2f;
+  border-radius: 999px;
+  background: #181818;
+  font-size: 13px;
+}
+
+.tool code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #ffb066;
+  font-size: 13px;
+}
+
+.tool em {
+  color: #8c8c86;
+  font-style: normal;
+}

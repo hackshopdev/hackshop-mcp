@@ -72,6 +72,7 @@ describe("buildPlan", () => {
       "flash",
       "pair",
       "print",
+      "assemble",
       "try",
     ]);
     expect(plan.steps.find((step) => step.id === "flash")?.body_md).toContain(
@@ -83,9 +84,22 @@ describe("buildPlan", () => {
     expect(plan.steps.flatMap((step) => step.commands)).toContain(
       "tools/muse/board.sh build sticks3",
     );
-    expect(plan.agent_brief_md.length).toBeLessThan(8 * 1024);
+    expect(plan.agent_brief_md.length).toBeLessThan(12 * 1024);
     expect(plan.agent_brief_md).toContain("mgst_YOUR_TOKEN");
+    expect(plan.agent_brief_md).toContain("Shopping list (ask before buying)");
+    expect(plan.agent_brief_md).toContain("## Assemble");
     expect(plan.agent_brief_md).not.toMatch(/mgst_[A-Za-z0-9]{8,}/);
+    expect(plan.shopping_list.est_total_usd).toBe(30);
+    expect(plan.shopping_list.purchase_policy).toMatch(/explicit approval/);
+    expect(plan.assembly.map((step) => step.action)).toEqual([
+      "print",
+      "place",
+      "route_cable",
+      "power",
+      "flash",
+      "pair",
+      "verify",
+    ]);
     expect(plan.urls).toEqual({
       build_page: `${SITE_URL}/build/m5stack-sticks3`,
       build_md: `${SITE_URL}/build/m5stack-sticks3/build.md`,
@@ -98,6 +112,7 @@ describe("buildPlan", () => {
 
     expect(plan.steps.map((step) => step.id)).toEqual([
       "parts",
+      "assemble",
       "token",
       "install",
       "pair",
@@ -133,7 +148,7 @@ describe("buildPlan", () => {
     const plan = planFor("kobo-clara-hd");
 
     expect(plan.platform_id).toBeNull();
-    expect(plan.steps.map((step) => step.id)).toEqual(["parts", "research", "try"]);
+    expect(plan.steps.map((step) => step.id)).toEqual(["parts", "research", "assemble", "try"]);
     expect(plan.steps.map((step) => step.id)).not.toContain("token");
     expect(plan.steps.find((step) => step.id === "research")?.links.length).toBeGreaterThan(0);
   });

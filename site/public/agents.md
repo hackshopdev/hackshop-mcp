@@ -1,37 +1,44 @@
-# hackshop — agent guide
+# hackshop agent operating manual
 
-hackshop (hackshop-mcp) is an open-source MCP server and website that maps a project idea to hackable, repurposable, or protocol-native hardware. Canonical URL: https://www.hackshop.dev
+You are helping your human build a physical body for you (an AI agent). Muse is the first supported agent platform. Use Hackshop to plan the body, produce a shopping list, and walk through assembly, flashing and pairing. Never buy anything without explicit human approval.
 
-## What the product does
+## Flow
 
-Given a natural-language project idea (plus optional budget, constraints, and owned inventory), hackshop returns 3-5 hardware candidates with hack difficulty, brick-risk rating, community size, used-market price range, estimated setup time, live eBay search links, firmware repos, step-by-step how-to guides, and AI-generated architecture diagrams.
+1. Intake: ask at most 4 questions about size, interaction, sensing and budget. If you call `plan_gadget` and it returns `questions`, use those options to refine the next call.
+2. Plan: call `plan_gadget` through MCP or `POST /api/plan`. Let the human choose from the picks.
+3. Build: call `get_build_plan`, fetch `/build/<device_id>/plan.json`, or read `/build/<device_id>/build.md`.
+4. Shopping list: show `shopping_list.items`, estimated total and `purchase_policy`. You may add items to a cart only if the human asks, and you must stop before checkout.
+5. Assemble: follow `assembly` in order. Treat `robot.feasible=false` steps as human/app/software steps.
+6. Flash and pair: use the exact commands and pairing text in the build plan. Keep `mgst_YOUR_TOKEN` as the placeholder unless the human provides a real token privately.
+7. Save it: tell the human to click Start a build on the build page so their progress is saved.
 
-## Key routes
+## Endpoints
 
-- `/` — home and live demo form ("Propose hardware" is the primary action).
-- `/templates` — pre-filled project templates.
-- `/muse` — read-only Muse Gadgets board comparison; printable downloads are static files under `/cad/`.
-- `/build/{device_id}` — parts list, build steps, printable files, and agent handoff for a device.
-- `/build/{device_id}/build.md` — agent-ready build brief for that device.
-- `/projects` and `/projects/{id}` — user build drafts stored locally, with optional account sync when sign-in is configured.
-- `/inventory` — manage a localStorage list of hardware the user already owns.
-- `/resources` — editorial field guides; individual posts at `/resources/{slug}`.
-- `/about`, `/contact`, `/privacy`, `/terms` — informational/legal pages.
-- `/llms.txt`, `/agents.md`, `/.well-known/agent-card.json`, `/.well-known/ai-agent.json` — agent-facing protocol files.
+- MCP: `https://www.hackshop.dev/mcp`
+- Planner API: `POST /api/plan` or `GET /api/plan?idea=...&budget_usd=...`
+- Build JSON: `/build/<device_id>/plan.json`
+- Build brief: `/build/<device_id>/build.md`
+- Muse boards: `/muse`
+- Agent guide: `/agents.md`
+- Discovery: `/.well-known/mcp.json`, `/.well-known/agent-card.json`, `/.well-known/ai-agent.json`
 
-## How agents should interact
+## MCP tools
 
-- Read content freely on all public pages listed above.
-- The demo form on `/` POSTs to `/api/propose` and is rate limited to 5 requests/hour/IP; treat it as a scarce resource and do not retry in a loop. Forms are tagged with `data-agent-form`, and the primary submit button carries `data-agent-action="propose-hardware"`.
-- Buttons carrying `data-agent-danger` (e.g. "Clear all" on `/inventory`) delete user data stored in the browser — do not activate them without explicit user confirmation.
-- Inventory state lives in browser localStorage only; there are no accounts, logins, or checkout flows on this site.
-- Build project drafts work signed-out in localStorage. If sign-in is configured, sync only stores project metadata, checklist state, parts state, and notes.
-- Purchases happen off-site (eBay, manufacturer stores). Do not attempt to complete any external purchase on the user's behalf.
+- `plan_gadget`: choose Muse boards, report fit/notes/warnings/questions, and link build pages.
+- `get_build_plan`: return parts, shopping list, assembly steps, commands and agent brief.
+- `assess_hackability`: look up a catalog device and report firmware, brick risk, build page and agent-platform support.
 
-## Programmatic access
+## Example
 
-The recommended integration is the MCP server (`npx -y hackshop-mcp`), documented in the README at https://github.com/msanchezgrice/hackshop-mcp. Use `get_build_plan` or `/build/<device_id>/build.md` for deterministic build briefs. The site's `/api/*` routes back the UI, are disallowed to crawlers in robots.txt, and may change without notice.
+Human: go to hackshop.dev and help me build you a body.  
+Agent: I will ask four quick questions: pocket, desk, wall/fridge or hidden?  
+Human: desk, I want to talk to it, no camera, under $50.  
+Agent: I call `plan_gadget` with voice, desk and budget 50.  
+Agent: Best pick is M5Stack StickS3; it is within budget and has push-to-talk with spoken replies.  
+Human: choose that one.  
+Agent: I fetch `/build/m5stack-sticks3/plan.json`, show the shopping list, and ask before buying.  
+Agent: After approval, I follow `assembly`, flash the firmware, pair it in Muse, then ask you to click Start a build.
 
-## Contact
+## Safety
 
-msanchezgrice@gmail.com — include "Hackshop" in the subject line.
+Hackshop has no checkout. Purchases happen off-site, and only after the human approves the exact items and total. Sign-in is optional; it only syncs saved builds across devices. Controls marked `data-agent-danger` delete local browser data; use them only after explicit confirmation.

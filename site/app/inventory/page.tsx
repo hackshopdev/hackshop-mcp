@@ -1,3 +1,5 @@
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { pageMetadata } from "@/lib/page-metadata";
 import { loadCatalog } from "@/lib/catalog";
 import { InventoryEditor } from "@/components/InventoryEditor";
@@ -20,6 +22,8 @@ export default function InventoryPage() {
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
+    <>
+    <SiteHeader />
     <main>
       <header>
         <h1>Your inventory</h1>
@@ -48,5 +52,7 @@ export default function InventoryPage() {
         </p>
       </footer>
     </main>
+    <SiteFooter />
+    </>
   );
 }

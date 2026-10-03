@@ -659,3 +659,34 @@
     background: linear-gradient(90deg, rgba(23, 23, 23, 0), var(--panel));
   }
 }
+
+.plannerPanel {
+  margin-top: 28px;
+  padding: 28px;
+  border: 1px solid rgba(255, 122, 0, 0.3);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #171310 0%, var(--panel) 120px);
+  scroll-margin-top: 80px;
+}
+
+.tableStart {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tableStart:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .plannerPanel {
+    padding: 18px;
+  }
+}

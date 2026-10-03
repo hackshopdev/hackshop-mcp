@@ -1,0 +1,108 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid #242424;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "brand links cta";
+  align-items: center;
+  gap: 24px;
+  width: min(1120px, calc(100% - 32px));
+  min-height: 64px;
+  margin: 0 auto;
+}
+
+.brand {
+  grid-area: brand;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #f4f4f2;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.mark {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: #ff7a00;
+  box-shadow: 0 0 14px rgba(255, 122, 0, 0.55);
+}
+
+.links {
+  grid-area: links;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 22px;
+  min-width: 0;
+  font-size: 15px;
+}
+
+.links a {
+  color: #c9c9c4;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.links a:hover {
+  color: #fff;
+}
+
+.projectNav {
+  white-space: nowrap;
+}
+
+.cta {
+  grid-area: cta;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: #ff7a00;
+  color: #111 !important;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cta:hover {
+  background: #ff8f2b;
+}
+
+@media (max-width: 760px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand cta"
+      "links links";
+    gap: 6px 12px;
+    padding: 10px 0 0;
+  }
+
+  .links {
+    justify-content: flex-start;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 4px 0 10px;
+    scrollbar-width: none;
+  }
+
+  .links::-webkit-scrollbar {
+    display: none;
+  }
+}

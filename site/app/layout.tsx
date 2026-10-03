@@ -6,14 +6,13 @@ import { clerkEnabled } from "../lib/auth-config";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.hackshop.dev"),
-  title:
-    "hackshop-mcp — an AI agent that knows what hardware is hackable, repurposable, or protocol-native",
+  title: "hackshop: give your AI agent a body",
   description:
-    "An open-source MCP server that maps a project idea to hackable, repurposable, or protocol-native hardware. Tell your AI agent what you want to build; it returns 3-5 candidates with brick-risk, firmware links, and live eBay searches.",
+    "Build a small gadget for your AI agent. Pick a Muse-supported board, get the parts with store links, and start a build with steps your agent can follow.",
   openGraph: {
-    title: "hackshop-mcp",
+    title: "hackshop: give your AI agent a body",
     description:
-      "Hardware-literate AI scout for tinkerers. Idea-to-hardware mapping via MCP.",
+      "Pick a board, get the parts and build steps, or point your agent at hackshop.dev. Starts with Meta's Muse Gadgets.",
     type: "website",
     url: "https://www.hackshop.dev",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Hackshop" }],
@@ -35,7 +34,7 @@ const jsonLd = {
       name: "Hackshop",
       url: "https://www.hackshop.dev",
       description:
-        "An open-source MCP server that maps a project idea to hackable, repurposable, or protocol-native hardware.",
+        "Helps people and their AI agents build physical gadgets: board picks, parts, build and assembly steps. Starts with Meta's Muse Gadgets.",
       email: "msanchezgrice@gmail.com",
     },
     {
@@ -44,7 +43,7 @@ const jsonLd = {
       url: "https://www.hackshop.dev",
       name: "hackshop",
       description:
-        "Tell your AI agent what you want to build; it returns 3-5 hardware candidates with brick-risk, firmware links, and live eBay searches.",
+        "Give your AI agent a body: pick a board, get the parts and build steps, or point your agent at hackshop.dev.",
       publisher: { "@id": "https://www.hackshop.dev/#org" },
     },
   ],

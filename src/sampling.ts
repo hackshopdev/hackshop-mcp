@@ -31,12 +31,23 @@ export async function sampleJson<T>(opts: {
   userPrompt: string;
   maxTokens?: number;
   diagnostics?: SamplingDiagnostics;
+  hostSamplingTimeoutMs?: number;
 }): Promise<T | null> {
-  const { server, systemPrompt, userPrompt, maxTokens = 1500, diagnostics } = opts;
+  const {
+    server,
+    systemPrompt,
+    userPrompt,
+    maxTokens = 1500,
+    diagnostics,
+    hostSamplingTimeoutMs,
+  } = opts;
+  const hostSamplingDeadline = hostSamplingTimeoutMs === undefined
+    ? undefined
+    : Date.now() + hostSamplingTimeoutMs;
 
   const tryHostSampling = async (): Promise<T | null> => {
     try {
-      const response = await server.createMessage({
+      const response = await withTimeout(server.createMessage({
         systemPrompt,
         messages: [
           {
@@ -49,7 +60,7 @@ export async function sampleJson<T>(opts: {
           intelligencePriority: 0.6,
           speedPriority: 0.4,
         },
-      });
+      }), remainingHostSamplingMs(hostSamplingDeadline));
       const content = response.content;
       if (content.type !== "text") return null;
       return parseJsonLoose<T>(content.text);
@@ -108,6 +119,26 @@ export async function sampleJson<T>(opts: {
   }
 
   return null;
+}
+
+function remainingHostSamplingMs(deadline: number | undefined): number | undefined {
+  if (deadline === undefined) return undefined;
+  return Math.max(1, deadline - Date.now());
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number | undefined): Promise<T> {
+  if (timeoutMs === undefined) return promise;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((_resolve, reject) => {
+        timeout = setTimeout(() => reject(new Error("host sampling timed out")), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeout) clearTimeout(timeout);
+  }
 }
 
 // Strip a possible markdown code fence around JSON. Tolerant of whitespace

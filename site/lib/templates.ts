@@ -1,8 +1,9 @@
 // Project templates that prime the propose_hardware tool.
 //
 // Each entry includes a `viability` field documenting whether the underlying
-// hack is real (community-verified path), iffy (works but with caveats), or
-// experimental (worth trying but expect to bushwhack). The viability note is
+// hack is real (community-verified path), official (the board is supported by
+// the vendor's own SDK, e.g. Meta's Muse Gadgets), iffy (works but with
+// caveats), or experimental (worth trying but expect to bushwhack). The viability note is
 // surfaced on the templates page so users can see what they're getting into
 // before clicking through to the agent.
 
@@ -12,7 +13,7 @@ export interface Template {
   blurb: string;            // one-line teaser shown on cards
   prompt: string;           // submitted to /api/propose
   difficulty: 1 | 2 | 3 | 4 | 5;
-  viability: "verified" | "iffy" | "experimental";
+  viability: "verified" | "official" | "iffy" | "experimental";
   viability_note: string;   // why I gave that rating
   // Estimated total parts cost (used market) for the typical build, USD.
   // Excludes shipping and tools you probably already own. Conservative
@@ -49,7 +50,7 @@ export const TEMPLATES: Template[] = [
     est_cost_usd: { min: 40, max: 45 },
     est_setup_hours_min: 1,
     est_setup_hours_max: 3,
-    viability: "iffy",
+    viability: "official",
     viability_note:
       "Waveshare ESP32-S3-Touch-AMOLED-1.75C is on Meta's Muse Gadgets full-UI list, but the SDK launched Oct 2, 2026 and is provided as-is. Hackshop's printable stand uses Waveshare's drawing; print once to check fit.",
     device_id: "waveshare-esp32-s3-touch-amoled-1-75c",
@@ -65,7 +66,7 @@ export const TEMPLATES: Template[] = [
     est_cost_usd: { min: 22, max: 25 },
     est_setup_hours_min: 1,
     est_setup_hours_max: 2,
-    viability: "iffy",
+    viability: "official",
     viability_note:
       "StickS3 is on the full-UI list with speaker and mic. The older StickC Plus2 also works but only has a buzzer, so replies can't be spoken.",
     device_id: "m5stack-sticks3",
@@ -81,7 +82,7 @@ export const TEMPLATES: Template[] = [
     est_cost_usd: { min: 69, max: 79 },
     est_setup_hours_min: 1,
     est_setup_hours_max: 3,
-    viability: "iffy",
+    viability: "official",
     viability_note:
       "Status tier: no voice, black-and-white images only. The color E1002 is shown on gadgets.muse.ai but only the E1001 is in the SDK's board list.",
     device_id: "seeed-reterminal-e1001",
@@ -98,7 +99,7 @@ export const TEMPLATES: Template[] = [
     est_cost_usd: { min: 49, max: 89 },
     est_setup_hours_min: 1,
     est_setup_hours_max: 3,
-    viability: "iffy",
+    viability: "official",
     viability_note:
       "Muse reads all sensors with sensors.read, but only the D1S and D1Pro have the CO2/tVOC sensors; the base D1 has none.",
     device_id: "seeed-sensecap-indicator",
@@ -114,7 +115,7 @@ export const TEMPLATES: Template[] = [
     est_cost_usd: { min: 55, max: 61 },
     est_setup_hours_min: 1,
     est_setup_hours_max: 3,
-    viability: "iffy",
+    viability: "official",
     viability_note:
       "Watcher is full-UI with camera.capture. A camera plus mic in your home is a real privacy surface: point it only at the printer.",
     device_id: "seeed-sensecap-watcher",

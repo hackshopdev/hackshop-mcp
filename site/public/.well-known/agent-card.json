@@ -1,25 +1,36 @@
 {
   "name": "hackshop",
-  "description": "An open-source MCP server and website that maps a project idea to hackable, repurposable, or protocol-native hardware, returning 3-5 candidates with brick-risk ratings, firmware links, live eBay searches, step-by-step how-tos, and AI-generated architecture diagrams.",
+  "description": "Agent-first hardware planner for building a physical Muse body for an AI agent, including intake questions, board selection, shopping list, machine-readable assembly, flashing and pairing.",
   "url": "https://www.hackshop.dev",
   "capabilities": [
-    "hardware-proposal",
+    "muse-gadget-planning",
+    "agent-body-intake",
+    "shopping-list-with-approval-policy",
+    "machine-readable-assembly",
     "hackability-assessment",
-    "brick-risk-rating",
-    "firmware-and-community-links",
-    "live-ebay-search",
-    "how-to-guide-generation",
-    "architecture-diagram-generation",
-    "assembly-planning",
-    "build-simulation"
+    "firmware-and-community-links"
   ],
-  "protocols": ["mcp"],
+  "protocols": ["mcp", "https"],
+  "mcp": {
+    "url": "https://www.hackshop.dev/mcp",
+    "transport": "streamable-http",
+    "tools": ["plan_gadget", "get_build_plan", "assess_hackability"],
+    "resources": [
+      "hackshop://muse/boards",
+      "hackshop://muse/sdk-terms",
+      "hackshop://catalog/tags"
+    ],
+    "prompts": ["plan-muse-gadget"]
+  },
   "links": {
     "homepage": "https://www.hackshop.dev",
+    "muse": "https://www.hackshop.dev/muse",
+    "planner_api": "https://www.hackshop.dev/api/plan",
     "documentation": "https://github.com/msanchezgrice/hackshop-mcp",
     "npm": "https://www.npmjs.com/package/hackshop-mcp",
     "llms_txt": "https://www.hackshop.dev/llms.txt",
     "agents_md": "https://www.hackshop.dev/agents.md",
-    "ai_agent_manifest": "https://www.hackshop.dev/.well-known/ai-agent.json"
+    "ai_agent_manifest": "https://www.hackshop.dev/.well-known/ai-agent.json",
+    "mcp_manifest": "https://www.hackshop.dev/.well-known/mcp.json"
   }
 }

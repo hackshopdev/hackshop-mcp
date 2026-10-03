@@ -1,6 +1,11 @@
 import Link from "next/link";
-import { ProjectNav } from "@/components/ProjectNav";
+import { GadgetPlanner } from "@/components/GadgetPlanner";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { StartBuildButton } from "@/components/StartBuildButton";
+import { TellMyAgent } from "@/components/TellMyAgent";
+import { GENERAL_AGENT_PROMPT } from "@/lib/agent-prompts";
+import { boardPath } from "@/lib/board-slugs";
 import { hasImage } from "@/lib/image-sources";
 import { getMusePageData, type MuseBoardRow } from "@/lib/muse-page";
 import { pageMetadata } from "@/lib/page-metadata";
@@ -10,7 +15,6 @@ import styles from "./muse.module.css";
 const DESCRIPTION =
   "Which ESP32 boards and Linux boxes work with Meta's Muse Gadgets SDK, what you get on each (voice, images, touch, camera, home-network tunnel), how to build one, the SDK token terms, and free printable stands.";
 
-const IDEA = "Build a Muse gadget for my desk that I can talk to";
 const SITE_URL = "https://www.hackshop.dev";
 
 export const metadata = pageMetadata(
@@ -54,25 +58,12 @@ export default function MusePage() {
 
   return (
     <main className={styles.page}>
+      <SiteHeader />
       <div className={styles.shell}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-
-        <nav className={styles.nav} aria-label="Primary">
-          <Link className={styles.brand} href="/">
-            Hackshop
-          </Link>
-          <div className={styles.navLinks}>
-            <Link href="/muse">Muse boards</Link>
-            <ProjectNav />
-            <Link href="/resources">Resources</Link>
-          </div>
-          <Link className={styles.button} href="/?utm_source=muse&utm_medium=nav">
-            Ask the hardware scout
-          </Link>
-        </nav>
 
         <header className={styles.hero}>
           <p className={styles.eyebrow}>
@@ -85,11 +76,12 @@ export default function MusePage() {
             each one can do.
           </p>
           <div className={styles.heroActions}>
-            <Link className={styles.button} href={`/?idea=${encodeURIComponent(IDEA)}`}>
-              Plan a gadget
-            </Link>
-            <a className={styles.secondaryButton} href={data.esp32.platform.sdk_repo}>
-              Muse Gadgets SDK
+            <a className={styles.button} href="#start">
+              Start a build
+            </a>
+            <TellMyAgent prompt={GENERAL_AGENT_PROMPT} surface="muse_hero" />
+            <a className={styles.secondaryButton} href="#compare">
+              Compare the boards
             </a>
           </div>
           <p className={styles.verifyLine}>
@@ -100,13 +92,13 @@ export default function MusePage() {
         <section className={styles.section} aria-labelledby="how-to-start">
           <div className={styles.sectionHeader}>
             <p className={styles.eyebrow}>How to start</p>
-            <h2 id="how-to-start">Pick a board, save the build, then hand it off</h2>
+            <h2 id="how-to-start">Pick a board, start a build, hand it to your agent</h2>
           </div>
           <div className={styles.startGrid}>
             {[
-              ["1", "Pick a board", "Compare the supported Muse ESP32 and Linux boards below. Not sure? The M5Stack StickS3 is the cheapest Full UI board."],
-              ["2", "Start a build", "Each board has a Start a build button. It saves the parts list, print files and a step checklist to My builds."],
-              ["3", "Hand it to your agent", "Copy the brief or open the build in Claude, ChatGPT, Codex, Cursor or Muse Code. Order the parts from the store links."],
+              ["1", "Describe it or pick a board", "Tell the planner below what you want, or compare the boards further down. Not sure? The M5Stack StickS3 is the cheapest Full UI board."],
+              ["2", "Start a build", "It saves the parts list with store links, print files and a step checklist to My builds. You can also save just the idea and pick a board later."],
+              ["3", "Tell your agent", "Copy the prompt or open the build in Claude, ChatGPT, Codex, Cursor or Muse Code. It walks you through ordering, assembly, flashing and pairing."],
             ].map(([number, title, body]) => (
               <article className={styles.faqItem} key={number}>
                 <span className={styles.smallPill}>{number}</span>
@@ -115,16 +107,12 @@ export default function MusePage() {
               </article>
             ))}
           </div>
-          <div className={styles.startActions}>
-            <Link className={styles.button} href="/build/m5stack-sticks3">
-              Start with the StickS3
-            </Link>
-            <a className={styles.secondaryButton} href="#compare">
-              Compare the boards
-            </a>
-            <Link className={styles.secondaryButton} href="/projects">
-              My builds
-            </Link>
+          <div className={styles.plannerPanel} id="start">
+            <GadgetPlanner
+              source="muse"
+              readQuery
+              subhead="Describe the Muse gadget you want. We'll pick boards that can do it, then save it to My builds."
+            />
           </div>
         </section>
 
@@ -158,14 +146,16 @@ export default function MusePage() {
                     <tr key={row.device.id}>
                       <th scope="row">
                         <div>
-                          {row.docsUrl ? (
-                            <a href={row.docsUrl}>{row.device.name}</a>
-                          ) : (
-                            row.device.name
-                          )}
+                          <Link href={boardPath(row.device.id) ?? `/build/${row.device.id}`}>
+                            {row.device.name}
+                          </Link>
                         </div>
-                        <div className={styles.mutedLine} style={{ marginTop: 4 }}>
-                          <Link href={`/build/${row.device.id}`}>Plan →</Link>
+                        <div style={{ marginTop: 6 }}>
+                          <StartBuildButton
+                            className={styles.tableStart}
+                            deviceId={row.device.id}
+                            source="muse_table"
+                          />
                         </div>
                       </th>
                       <td>
@@ -273,13 +263,13 @@ export default function MusePage() {
             Each package includes an STL for printing, STEP for CAD/CNC, and a
             fab.json file with print settings and checks.
           </p>
-          <p>Regenerate with your own measurements:</p>
-          <pre className={styles.codeBlock}>
-            <code>
-              python -m hackshop_sim.cad.generate --device &lt;id&gt; --part
-              desk-stand --t &lt;mm&gt;
-            </code>
-          </pre>
+          <p>
+            Need a stand for a board that doesn&apos;t have one yet?{" "}
+            <a href="https://github.com/msanchezgrice/hackshop-mcp/issues/new?title=Printable%20stand%20request">
+              Request one
+            </a>
+            .
+          </p>
           <div className={styles.serviceGrid}>
             {services.map((service) => (
               <a key={`${service.process}-${service.name}`} href={service.url}>
@@ -350,26 +340,39 @@ export default function MusePage() {
 
         <section className={styles.section} aria-labelledby="templates">
           <div className={styles.sectionHeader}>
-            <p className={styles.eyebrow}>Start from a prompt</p>
-            <h2 id="templates">Templates teaser</h2>
+            <p className={styles.eyebrow}>Start from an idea</p>
+            <h2 id="templates">Gadget ideas</h2>
           </div>
           <div className={styles.templateGrid}>
             {museTemplates.map((template) => (
-              <Link
-                className={styles.templateCard}
-                href={`/?idea=${encodeURIComponent(template.prompt)}`}
-                key={template.slug}
-              >
-                <span className={styles.smallPill}>{template.viability}</span>
+              <article className={styles.templateCard} key={template.slug}>
+                <span className={styles.smallPill}>{viabilityLabel(template.viability)}</span>
                 <h3>{template.title}</h3>
                 <p>{template.blurb}</p>
-              </Link>
+                {template.device_id ? (
+                  <StartBuildButton
+                    className={styles.button}
+                    deviceId={template.device_id}
+                    idea={template.prompt}
+                    source="muse_template"
+                    label="Start this build"
+                  />
+                ) : null}
+              </article>
             ))}
           </div>
         </section>
       </div>
+      <SiteFooter />
     </main>
   );
+}
+
+function viabilityLabel(viability: string): string {
+  if (viability === "official") return "Official SDK";
+  if (viability === "verified") return "Community verified";
+  if (viability === "iffy") return "Works with caveats";
+  return "Experimental";
 }
 
 function BoardGroup({ title, rows }: { title: string; rows: MuseBoardRow[] }) {
@@ -420,6 +423,9 @@ function BoardCard({ row }: { row: MuseBoardRow }) {
           <Link className={styles.secondaryButton} href={`/build/${row.device.id}`}>
             Build steps
           </Link>
+          {boardPath(row.device.id) ? (
+            <Link href={boardPath(row.device.id) ?? "#"}>Board details</Link>
+          ) : null}
           {row.device.firmware_links.map((link) => (
             <a href={link} key={link}>
               {linkLabel(link)}
@@ -461,7 +467,19 @@ function BoardCard({ row }: { row: MuseBoardRow }) {
             </div>
           ))
         ) : (
-          <p className={styles.mutedLine}>{row.fabricationNote}</p>
+          <p className={styles.mutedLine}>
+            {row.fabricationNote}
+            {row.fabricationNote.startsWith("No printable stand yet") ? (
+              <>
+                {" "}
+                <a
+                  href={`https://github.com/msanchezgrice/hackshop-mcp/issues/new?title=${encodeURIComponent(`Printable stand for ${row.device.name}`)}`}
+                >
+                  Request one
+                </a>
+              </>
+            ) : null}
+          </p>
         )}
       </div>
     </article>

@@ -32,11 +32,11 @@ Website (`site/`):
 
 ## How agents should interact
 
-- The site has no accounts, login, or checkout. Purchases happen off-site (eBay, manufacturer stores); never attempt to complete a purchase on a user's behalf.
-- The demo on `/` POSTs to `/api/propose`, rate limited to 5 requests/hour/IP — do not loop or retry it. `/api/*` routes are disallowed in robots.txt and back the UI only.
+- The site has no checkout. Purchases happen off-site (manufacturer stores, eBay); never complete a purchase on a user's behalf without their explicit approval of the exact items and total. Optional Clerk sign-in only syncs saved builds.
+- The Muse planner on `/` and `/muse` POSTs to `/api/plan` (deterministic, no LLM). The hardware scout POSTs to `/api/propose`, rate limited to 5 requests/hour/IP; do not loop or retry it. Agents should follow `/agents.md`.
 - Controls tagged `data-agent-danger` (e.g. "Clear all" on `/inventory`) delete user data in browser localStorage — require explicit user confirmation.
-- Agent-facing protocol files served by the site: `/llms.txt`, `/agents.md`, `/.well-known/agent-card.json`, `/.well-known/ai-agent.json`.
-- Preferred programmatic integration: the MCP server itself (`npx -y hackshop-mcp`, requires `ANTHROPIC_API_KEY`).
+- Agent-facing protocol files served by the site: `/llms.txt`, `/agents.md`, `/.well-known/mcp.json`, `/.well-known/agent-card.json`, `/.well-known/ai-agent.json`.
+- Preferred programmatic integration: the hosted MCP server at `https://www.hackshop.dev/mcp`, or `npx -y hackshop-mcp` locally (`ANTHROPIC_API_KEY` is optional).
 
 ## Conventions
 

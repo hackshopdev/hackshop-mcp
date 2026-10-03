@@ -6,7 +6,8 @@ import { buildPlanForDevice, deviceNameFor } from "@/lib/build-plan-data";
 import type { Project } from "@/lib/projects/types";
 import { listProjects, removeProject } from "@/lib/projects/store";
 import { PROJECTS_CHANGED_EVENT } from "@/lib/projects/local";
-import { ProjectNav } from "./ProjectNav";
+import { SiteFooter } from "./SiteFooter";
+import { SiteHeader } from "./SiteHeader";
 import styles from "./build.module.css";
 
 export function ProjectsIndexClient() {
@@ -31,24 +32,22 @@ export function ProjectsIndexClient() {
 
   return (
     <main className={styles.page}>
+      <SiteHeader />
       <div className={styles.shell}>
-        <nav className={styles.nav} aria-label="Primary">
-          <Link className={styles.brand} href="/">
-            Hackshop
-          </Link>
-          <div className={styles.navLinks}>
-            <Link href="/muse">Muse boards</Link>
-            <Link href="/templates">Templates</Link>
-            <ProjectNav />
-          </div>
-        </nav>
 
         <header className={styles.projectsHero}>
           <p className={styles.eyebrow}>Saved projects</p>
           <h1>My builds</h1>
           <p className={styles.summary}>
-            Drafts, parts status, step checklists, notes, and agent handoffs.
+            Ideas and builds you&apos;ve saved: parts status, step checklists,
+            notes and agent handoffs. Saved in this browser; sign in to keep
+            them on all your devices.
           </p>
+          <div className={styles.actions} style={{ marginTop: 16 }}>
+            <Link className={styles.primaryButton} href="/#start">
+              Start a build
+            </Link>
+          </div>
         </header>
 
         <section className={styles.projectList} aria-live="polite">
@@ -62,8 +61,10 @@ export function ProjectsIndexClient() {
                     <Link href={`/projects/${project.id}`}>{project.title}</Link>
                   </h2>
                   <p className={styles.muted} style={{ margin: "6px 0 0" }}>
-                    {deviceNameFor(project.device_ids[0] ?? "") ?? "Unknown device"} ·{" "}
-                    {progressLabel(project)} · Updated {relativeTime(project.updated_at)}
+                    {project.device_ids.length === 0
+                      ? "Idea · no board yet"
+                      : `${deviceNameFor(project.device_ids[0] ?? "") ?? "Unknown device"} · ${progressLabel(project)}`}{" "}
+                    · Updated {relativeTime(project.updated_at)}
                   </p>
                 </div>
                 <div className={styles.pillRow}>
@@ -108,6 +109,7 @@ export function ProjectsIndexClient() {
           ))}
         </section>
       </div>
+      <SiteFooter />
     </main>
   );
 }
@@ -116,13 +118,13 @@ function EmptyState() {
   return (
     <div className={styles.panel}>
       <h2>No builds yet</h2>
-      <p className={styles.muted}>Start from a known Muse board or describe an idea.</p>
+      <p className={styles.muted}>Describe a gadget and start a build, or save just the idea and pick a board later.</p>
       <div className={styles.actions}>
-        <Link className={styles.primaryButton} href="/muse#compare">
-          Start from a Muse board
+        <Link className={styles.primaryButton} href="/#start">
+          Start a build
         </Link>
-        <Link className={styles.secondaryButton} href="/">
-          Describe an idea
+        <Link className={styles.secondaryButton} href="/muse#compare">
+          Browse the boards
         </Link>
       </div>
     </div>

@@ -23,7 +23,7 @@
       "git clone https://github.com/facebookincubator/muse-gadget-sdk && cd muse-gadget-sdk/esp32",
       "Set the token: idf.py menuconfig > ESP32 Device SDK > Muse Gadgets SDK token (or CONFIG_GADGET_SDK_TOKEN in the build's sdkconfig).",
       "Build and flash with the board's command below, then idf.py -p PORT flash monitor. If flashing can't connect: hold BOOT, tap RESET, release BOOT.",
-      "In the Muse app: Settings > Devices > Add Device, pick MuseGadget-XXXXXX, press the board's button when the light breathes blue. Green = connected."
+      "In the Muse app, turn on Settings > Devices > Developer mode, then Settings > Devices > Add Device (+). Pick MuseGadget-XXXXXX and press the board's button (BOOT on dev kits) when the light breathes blue. Green = connected."
     ],
     "agent_quickstart": "curl -fsSL https://dev.meta.ai/install.sh | sh && git clone https://github.com/facebookincubator/muse-gadget-sdk && cd muse-gadget-sdk/esp32 && muse --disable-sandbox   # then: \"Build this firmware for my <board> and flash it.\" Any coding agent that reads AGENTS.md can do the same.",
     "tiers": [
@@ -74,14 +74,15 @@
           "round_display": false,
           "display_in": null
         },
-        "note": "Status light and button. Muse's recommended starting point.",
+        "note": "Status light and button. Muse's recommended starting point. The direct `idf.py build` command is correct; `tools/board.sh devkit build` also works.",
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -115,7 +116,8 @@
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -149,7 +151,8 @@
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           },
           {
             "name": "Pick the D1S or D1Pro variant for air sensors",
@@ -190,7 +193,8 @@
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -224,14 +228,16 @@
             "qty": 1,
             "required": true,
             "note": "The Voice PE is USB-C powered; a phone charger that supplies 5 V / 2 A works.",
-            "search": "USB-C power adapter 5V 2A"
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           },
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -265,14 +271,16 @@
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           },
           {
             "name": "3.7 V Li-ion cell with MX1.25 connector",
             "qty": 1,
             "required": false,
             "note": "Optional, for cordless use. Buy the battery SKU or check the Waveshare wiki for the cell size before ordering one separately.",
-            "buy_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.75c.htm"
+            "buy_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.75c.htm",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -306,7 +314,8 @@
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -340,14 +349,16 @@
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           },
           {
             "name": "3.7 V Li-ion cell with MX1.25 connector",
             "qty": 1,
             "required": false,
             "note": "Optional. Waveshare recommends a thin cell around 3.85 x 24 x 28 mm; check the wiki before buying.",
-            "buy_url": "https://docs.waveshare.com/ESP32-C6-Touch-AMOLED-1.8"
+            "buy_url": "https://docs.waveshare.com/ESP32-C6-Touch-AMOLED-1.8",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -381,7 +392,8 @@
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -415,7 +427,8 @@
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -450,7 +463,8 @@
             "qty": 1,
             "required": true,
             "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
-            "search": "USB-C data cable"
+            "search": "USB-C data cable",
+            "est_price_usd": 8
           }
         ],
         "try_saying": [
@@ -483,7 +497,7 @@
     "summary": "A Python service (musegadget) that turns a Linux box with Bluetooth LE into a Muse gadget. Muse gets shell, file and health commands on the machine and can push messages back to you.",
     "toolchain": "Python 3.9+, BlueZ, python3-dbus and python3-gi; Raspberry Pi OS Bullseye+, Debian 11+ or Ubuntu 22.04+ (32- or 64-bit); sudo.",
     "requires": [
-      "A Muse account and the Muse app with Developer mode on",
+      "A Muse account and the Muse app with Settings > Devices > Developer mode on",
       "An SDK token (mgst_...) from gadgets.muse.ai",
       "A Linux machine with Bluetooth LE on your network"
     ],
@@ -491,7 +505,7 @@
       "curl -fsSL https://raw.githubusercontent.com/facebookincubator/muse-gadget-sdk/main/linux/install.sh -o install.sh",
       "Read it first: less install.sh",
       "bash install.sh --sdk-token mgst_...   (installs to /opt/musegadget and starts the musegadget systemd service)",
-      "Pair from the Muse app within 10 minutes (device shows as MuseGadgetXXXXXX); re-pair later with sudo musegadget pair.",
+      "In the Muse app, turn on Settings > Devices > Developer mode, then Settings > Devices > Add Device (+). Pick MuseGadget-XXXXXX within 10 minutes of install. Green = connected; re-pair later with sudo musegadget pair.",
       "Optional: push messages to Muse from scripts with musegadget send-user-msg \"...\""
     ],
     "agent_quickstart": "Ask Muse (or any coding agent on the box) things like: \"Install Home Assistant on my Pi and tell me how to open it.\"",
@@ -541,21 +555,24 @@
             "qty": 1,
             "required": true,
             "note": "The Pi 5 needs 5 V / 5 A for full USB power.",
-            "buy_url": "https://www.raspberrypi.com/products/27w-power-supply/"
+            "buy_url": "https://www.raspberrypi.com/products/27w-power-supply/",
+            "est_price_usd": 12
           },
           {
             "name": "microSD card, 32 GB or larger",
             "qty": 1,
             "required": true,
             "note": "Flash Raspberry Pi OS (Bookworm) with Raspberry Pi Imager.",
-            "search": "microSD 32GB A2"
+            "search": "microSD 32GB A2",
+            "est_price_usd": 10
           },
           {
             "name": "Case with active cooler",
             "qty": 1,
             "required": false,
             "note": "Recommended if it will also run Home Assistant.",
-            "search": "Raspberry Pi 5 case active cooler"
+            "search": "Raspberry Pi 5 case active cooler",
+            "est_price_usd": 12
           }
         ],
         "try_saying": [
@@ -580,14 +597,16 @@
             "qty": 1,
             "required": true,
             "note": "The official 15.3 W supply avoids undervoltage warnings.",
-            "buy_url": "https://www.raspberrypi.com/products/type-c-power-supply/"
+            "buy_url": "https://www.raspberrypi.com/products/type-c-power-supply/",
+            "est_price_usd": 10
           },
           {
             "name": "microSD card, 16 GB or larger",
             "qty": 1,
             "required": true,
             "note": "Flash Raspberry Pi OS with Raspberry Pi Imager.",
-            "search": "microSD 32GB A1"
+            "search": "microSD 32GB A1",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -612,14 +631,16 @@
             "qty": 1,
             "required": true,
             "note": "Use the PWR port, not the USB data port.",
-            "search": "Raspberry Pi micro USB power supply 2.5A"
+            "search": "Raspberry Pi micro USB power supply 2.5A",
+            "est_price_usd": 8
           },
           {
             "name": "microSD card, 16 GB or larger",
             "qty": 1,
             "required": true,
             "note": "Flash Raspberry Pi OS Lite (64-bit) with Raspberry Pi Imager.",
-            "search": "microSD 32GB A1"
+            "search": "microSD 32GB A1",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -644,14 +665,16 @@
             "qty": 1,
             "required": true,
             "note": "Most units have no Bluetooth; the Muse Linux SDK needs BLE to pair.",
-            "search": "USB Bluetooth 5.0 adapter Linux"
+            "search": "USB Bluetooth 5.0 adapter Linux",
+            "est_price_usd": 12
           },
           {
             "name": "USB stick for the Debian/Ubuntu installer",
             "qty": 1,
             "required": true,
             "note": "8 GB or larger.",
-            "search": "USB flash drive 16GB"
+            "search": "USB flash drive 16GB",
+            "est_price_usd": 6
           }
         ],
         "try_saying": [
@@ -676,14 +699,16 @@
             "qty": 1,
             "required": true,
             "note": "The Muse Linux SDK needs BLE to pair.",
-            "search": "USB Bluetooth 5.0 adapter Linux"
+            "search": "USB Bluetooth 5.0 adapter Linux",
+            "est_price_usd": 12
           },
           {
             "name": "USB stick for the Debian/Ubuntu installer",
             "qty": 1,
             "required": true,
             "note": "8 GB or larger.",
-            "search": "USB flash drive 16GB"
+            "search": "USB flash drive 16GB",
+            "est_price_usd": 6
           }
         ],
         "try_saying": [
@@ -708,7 +733,8 @@
             "qty": 1,
             "required": false,
             "note": "Many NUCs have Bluetooth built in; check with bluetoothctl list.",
-            "search": "USB Bluetooth 5.0 adapter Linux"
+            "search": "USB Bluetooth 5.0 adapter Linux",
+            "est_price_usd": 12
           }
         ],
         "try_saying": [
@@ -733,7 +759,8 @@
             "qty": 1,
             "required": false,
             "note": "Bluetooth depends on the Wi-Fi card fitted.",
-            "search": "USB Bluetooth 5.0 adapter Linux"
+            "search": "USB Bluetooth 5.0 adapter Linux",
+            "est_price_usd": 12
           }
         ],
         "try_saying": [
