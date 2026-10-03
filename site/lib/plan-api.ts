@@ -17,11 +17,19 @@ export interface PlanPick {
   agent_brief_url?: string;
 }
 
+export interface PlanQuestionOption {
+  label: string;
+  value: string;
+  needs?: string[];
+  budget_usd?: number;
+  size?: string;
+}
+
 export interface PlanQuestion {
   id: string;
   question: string;
   why?: string;
-  options: Array<{ label: string; value: string }>;
+  options: PlanQuestionOption[];
 }
 
 export interface PlanResponse {
@@ -36,6 +44,8 @@ export interface PlanResponse {
 export async function requestPlan(input: {
   idea: string;
   budget_usd?: number;
+  needs?: string[];
+  size?: string;
 }): Promise<PlanResponse> {
   const response = await fetch("/api/plan", {
     method: "POST",

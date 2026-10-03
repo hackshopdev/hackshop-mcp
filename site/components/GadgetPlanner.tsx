@@ -12,6 +12,7 @@ import {
   requestPlan,
   type PlanPick,
   type PlanQuestion,
+  type PlanQuestionOption,
   type PlanResponse,
 } from "@/lib/plan-api";
 import { ProductTile } from "./ProductTile";
@@ -60,18 +61,24 @@ export function GadgetPlanner({
   const ranQuery = useRef(false);
   const resultsRef = useRef<HTMLDivElement | null>(null);
 
-  const run = async (nextIdea = idea) => {
+  const run = async (
+    nextIdea = idea,
+    refine: { needs?: string[]; size?: string; budget?: string } = {},
+  ) => {
     const text = nextIdea.trim();
     if (text.length < 3) return;
     setStatus("loading");
     setError(null);
-    const budgetValue = Number(budget);
-    const hasBudget = budget.trim() !== "" && Number.isFinite(budgetValue) && budgetValue > 0;
+    const budgetText = refine.budget ?? budget;
+    const budgetValue = Number(budgetText);
+    const hasBudget = budgetText.trim() !== "" && Number.isFinite(budgetValue) && budgetValue > 0;
     track("plan_submitted", { has_budget: hasBudget, source });
     try {
       const data = await requestPlan({
         idea: text,
         ...(hasBudget ? { budget_usd: budgetValue } : {}),
+        ...(refine.needs && refine.needs.length > 0 ? { needs: refine.needs } : {}),
+        ...(refine.size ? { size: refine.size } : {}),
       });
       setResult(data);
       setStatus("done");
@@ -122,10 +129,17 @@ export function GadgetPlanner({
     router.push(`/projects/${saved.project.id}`);
   };
 
-  const answerQuestion = (option: { label: string }) => {
-    const next = `${idea.trim().replace(/[.\s]+$/, "")}. ${option.label}.`;
-    setIdea(next);
-    void run(next);
+  // Answers map straight to planner inputs: needs, size and budget.
+  const [answers, setAnswers] = useState<{ needs: string[]; size?: string }>({ needs: [] });
+  const answerQuestion = (option: PlanQuestionOption) => {
+    const base = answers.needs.length > 0 ? answers.needs : (result?.inferred_needs ?? []);
+    const needs = [...new Set([...base, ...(option.needs ?? [])])];
+    const size = option.size ?? answers.size;
+    const nextBudget = option.budget_usd !== undefined ? String(option.budget_usd) : budget;
+    if (option.budget_usd !== undefined) setBudget(nextBudget);
+    setAnswers({ needs, size });
+    track("plan_question_answered", { option: option.value, source });
+    void run(idea, { needs, size, budget: nextBudget });
   };
 
   const canSubmit = idea.trim().length >= 3 && status !== "loading";
@@ -141,6 +155,7 @@ export function GadgetPlanner({
         className={styles.form}
         onSubmit={(event) => {
           event.preventDefault();
+          setAnswers({ needs: [] });
           void run();
         }}
       >
@@ -205,6 +220,7 @@ export function GadgetPlanner({
             className={styles.chip}
             onClick={() => {
               setIdea(example);
+              setAnswers({ needs: [] });
               void run(example);
             }}
           >
@@ -251,8 +267,13 @@ function Results({
   source: string;
   mode: "start" | "attach";
   onUseBoard?: (deviceId: string) => void;
-  onAnswer: (option: { label: string }) => void;
+  onAnswer: (option: PlanQuestionOption) => void;
 }) {
+  const vague = result.inferred_needs.length === 0;
+  const questions =
+    result.questions && result.questions.length > 0 ? (
+      <Questions questions={result.questions} onAnswer={onAnswer} vague={vague} />
+    ) : null;
   return (
     <div className={styles.results}>
       <div className={styles.summary}>
@@ -277,9 +298,7 @@ function Results({
           {note}
         </div>
       ))}
-      {result.questions && result.questions.length > 0 ? (
-        <Questions questions={result.questions} onAnswer={onAnswer} />
-      ) : null}
+      {vague ? questions : null}
       <div className={styles.picks}>
         {result.picks.map((pick, index) => (
           <PickCard
@@ -293,6 +312,7 @@ function Results({
           />
         ))}
       </div>
+      {vague ? null : questions}
     </div>
   );
 }
@@ -300,13 +320,17 @@ function Results({
 function Questions({
   questions,
   onAnswer,
+  vague,
 }: {
   questions: PlanQuestion[];
-  onAnswer: (option: { label: string }) => void;
+  onAnswer: (option: PlanQuestionOption) => void;
+  vague: boolean;
 }) {
   return (
     <div className={styles.questions}>
-      <p className={styles.questionsTitle}>A few quick questions narrow it down:</p>
+      <p className={styles.questionsTitle}>
+        {vague ? "A few quick questions narrow it down:" : "Not quite right? Narrow it down:"}
+      </p>
       {questions.slice(0, 4).map((question) => (
         <div className={styles.question} key={question.id}>
           <span>{question.question}</span>

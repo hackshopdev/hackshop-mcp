@@ -172,11 +172,18 @@
 }
 
 .question {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px 12px;
   color: #c9c9c4;
   font-size: 15px;
+}
+
+@media (max-width: 640px) {
+  .question {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .picks {
