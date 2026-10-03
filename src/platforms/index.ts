@@ -1,5 +1,6 @@
 import type { DeviceEntry } from "../catalog/schema.js";
 import { loadCatalog } from "../catalog/load.js";
+import { siteUrlFromEnv } from "../site-url.js";
 import { loadPlatforms } from "./load.js";
 import type { Platform, PlatformBoard } from "./schema.js";
 
@@ -50,8 +51,8 @@ export function agentPlatformsFor(deviceId: string): AgentPlatform[] {
   return matches;
 }
 
-export function printablesFor(device: DeviceEntry): Printable[] {
-  const base = (process.env.HACKSHOP_SITE_URL ?? "https://www.hackshop.dev").replace(/\/$/, "");
+export function printablesFor(device: DeviceEntry, siteUrl = siteUrlFromEnv()): Printable[] {
+  const base = siteUrl.replace(/\/+$/, "");
   return (device.physical?.printables ?? []).map((part) => ({
     part,
     title: part === "desk-stand" ? "Printable desk stand" : "Printable enclosure",

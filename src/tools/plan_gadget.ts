@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { buildPlan } from "../build-plan/index.js";
 import type { DeviceEntry } from "../catalog/schema.js";
 import { getLoadedPlatforms, printablesFor, type Printable } from "../platforms/index.js";
 import type { Platform, PlatformBoard } from "../platforms/schema.js";
+import { siteUrlFromEnv } from "../site-url.js";
 
 export const NEED_VALUES = [
   "voice",
@@ -50,6 +52,8 @@ export interface PlanGadgetOutput {
     why: string;
     gaps: string[];
     price_label: string | null;
+    build_page_url: string;
+    agent_brief_url: string;
     links: string[];
     build_command: string;
     setup_steps: string[];
@@ -132,6 +136,7 @@ export function planGadget(
   catalog: DeviceEntry[],
 ): PlanGadgetOutput {
   const platforms = getLoadedPlatforms();
+  const siteUrl = siteUrlFromEnv();
   const catalogById = new Map(catalog.map((device) => [device.id, device]));
   const needs = input.needs ? orderNeeds(input.needs) : inferNeeds(input.idea);
   const inferredPreferences = inferPreferences(input.idea);
@@ -165,27 +170,40 @@ export function planGadget(
     return a.device.id.localeCompare(b.device.id);
   });
 
-  const picks = candidates.slice(0, input.limit).map((candidate) => ({
-    device_id: candidate.device.id,
-    name: candidate.device.name,
-    platform_id: candidate.platform.id,
-    platform_name: candidate.platform.name,
-    support: candidate.board.support,
-    tier: candidate.board.tier,
-    tier_label: candidate.tierLabel,
-    score: candidate.score,
-    why: buildWhy(candidate),
-    gaps: candidate.gaps,
-    price_label: priceLabel(candidate.device),
-    links: candidate.device.firmware_links,
-    build_command: candidate.board.build,
-    setup_steps: candidate.platform.setup_steps,
-    caveats: caveatsFor(candidate.platform, candidate.board),
-    fabrication: {
-      printables: printablesFor(candidate.device),
-      note: fabricationNote(candidate.device),
-    },
-  }));
+  const picks = candidates.slice(0, input.limit).map((candidate) => {
+    const printables = printablesFor(candidate.device, siteUrl);
+    const plan = buildPlan({
+      device: candidate.device,
+      platform: candidate.platform,
+      board: candidate.board,
+      printables,
+      siteUrl,
+    });
+
+    return {
+      device_id: candidate.device.id,
+      name: candidate.device.name,
+      platform_id: candidate.platform.id,
+      platform_name: candidate.platform.name,
+      support: candidate.board.support,
+      tier: candidate.board.tier,
+      tier_label: candidate.tierLabel,
+      score: candidate.score,
+      why: buildWhy(candidate),
+      gaps: candidate.gaps,
+      price_label: priceLabel(candidate.device),
+      build_page_url: plan.urls.build_page,
+      agent_brief_url: plan.urls.build_md,
+      links: candidate.device.firmware_links,
+      build_command: candidate.board.build,
+      setup_steps: candidate.platform.setup_steps,
+      caveats: plan.caveats,
+      fabrication: {
+        printables,
+        note: fabricationNote(candidate.device, printables),
+      },
+    };
+  });
 
   const pickedPlatforms = new Map<string, Platform>();
   for (const pick of picks) {
@@ -434,25 +452,8 @@ function priceLabel(device: DeviceEntry): string | null {
   return `~$${min ?? max}`;
 }
 
-function caveatsFor(platform: Platform, board: PlatformBoard): string[] {
-  const homeTunnel = board.features.home_tunnel;
-  const caveats = platform.caveats.filter((caveat) => {
-    const lower = caveat.toLowerCase();
-    const psramNoTunnel = lower.includes("without psram") || lower.includes("without the home-network tunnel");
-    const tunnelFoothold = lower.includes("home-network tunnel lets") || lower.includes("foothold on your network");
-    if (psramNoTunnel) return homeTunnel === false;
-    if (tunnelFoothold) return homeTunnel === true;
-    return true;
-  });
-
-  if (board.eol) caveats.push("End of life at the vendor");
-  if (board.support === "possible") caveats.push(board.note);
-  return caveats;
-}
-
-function fabricationNote(device: DeviceEntry): string {
+function fabricationNote(device: DeviceEntry, printables: Printable[]): string {
   const physical = device.physical;
-  const printables = printablesFor(device);
   if (printables.length > 0 && physical) {
     return `Print the stand: STL/STEP links above. Dimensions are from a ${physical.size_confidence} source; print once and check the fit.`;
   }

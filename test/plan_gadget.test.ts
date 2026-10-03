@@ -78,6 +78,32 @@ describe("plan_gadget", () => {
     expect(out.picks[0]?.caveats.join("\n")).toMatch(/USB BLE adapter|Bluetooth LE/);
   });
 
+  it("adds build page and agent brief URLs to picks", () => {
+    const previous = process.env.HACKSHOP_SITE_URL;
+    process.env.HACKSHOP_SITE_URL = "https://preview.example/";
+    try {
+      const out = run({
+        idea: "a keychain I can talk to Muse with",
+        budget_usd: 25,
+        limit: 1,
+      });
+
+      expect(out.picks[0]?.device_id).toBe("m5stack-sticks3");
+      expect(out.picks[0]?.build_page_url).toBe(
+        "https://preview.example/build/m5stack-sticks3",
+      );
+      expect(out.picks[0]?.agent_brief_url).toBe(
+        "https://preview.example/build/m5stack-sticks3/build.md",
+      );
+    } finally {
+      if (previous === undefined) {
+        delete process.env.HACKSHOP_SITE_URL;
+      } else {
+        process.env.HACKSHOP_SITE_URL = previous;
+      }
+    }
+  });
+
   it("always includes personal non-commercial Muse terms", () => {
     const out = run({ idea: "round orb on my desk that I can talk to" });
     expect(out.terms.length).toBeGreaterThan(0);

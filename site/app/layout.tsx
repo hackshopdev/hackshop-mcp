@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { GoogleAnalytics } from "../components/GoogleAnalytics";
+import { clerkEnabled } from "../lib/auth-config";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.hackshop.dev"),
@@ -53,16 +55,20 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const content = (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {children}
+      <GoogleAnalytics />
+    </>
+  );
+
   return (
     <html lang="en">
-      <body>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        {children}
-        <GoogleAnalytics />
-      </body>
+      <body>{clerkEnabled ? <ClerkProvider>{content}</ClerkProvider> : content}</body>
     </html>
   );
 }

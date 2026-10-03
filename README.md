@@ -14,7 +14,7 @@ Hackshop now knows about Meta's Muse Gadgets SDK: ESP32 boards and Linux machine
 
 ## Status
 
-v0.0.4 — published on npm. Install with `npx hackshop-mcp` or add it to your MCP client config. Four tools (`propose_hardware`, `assess_hackability`, `plan_gadget`, `simulate_assembly`), 80 devices. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
+v0.0.5 — published on npm. Install with `npx hackshop-mcp` or add it to your MCP client config. Five tools (`propose_hardware`, `assess_hackability`, `plan_gadget`, `get_build_plan`, `simulate_assembly`), 80 devices. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
 
 ## Install in 30 seconds
 
@@ -66,6 +66,10 @@ Deterministically plans a physical gadget for an AI agent, with Meta Muse Gadget
 - concrete `next_steps`
 
 This tool does not call an LLM and does not use the network. It never suggests selling Muse devices; the Muse SDK token terms are personal and non-commercial.
+
+### `get_build_plan(device_id)`
+
+Returns the full, deterministic build plan for one device: parts (with store or search links), numbered steps with exact commands, `try_saying` prompts, caveats, the Muse SDK terms, and `agent_brief_md`, a self-contained Markdown brief a coding agent can follow. It also returns the human page (`https://www.hackshop.dev/build/<device_id>`) and the raw brief (`/build/<device_id>/build.md`). It never buys anything; ordering parts is left to the human.
 
 ### `simulate_assembly(assembly)`
 

@@ -293,6 +293,25 @@
   gap: 18px;
 }
 
+.startGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.startActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .startGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .boardCard,
 .templateCard,
 .faqItem {

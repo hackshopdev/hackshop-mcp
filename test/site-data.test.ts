@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { Platforms } from "../site/lib/platform-types";
@@ -8,6 +8,19 @@ describe("site data mirrors", () => {
     for (const file of ["catalog.json", "tags.md", "platforms.json"]) {
       expect(readFileSync(join(process.cwd(), "site", file), "utf8")).toBe(
         readFileSync(join(process.cwd(), file), "utf8"),
+      );
+    }
+  });
+
+  it("keeps the site build-plan implementation byte-identical to the root copy", () => {
+    const sourceDir = join(process.cwd(), "src", "build-plan");
+    const siteDir = join(process.cwd(), "site", "lib", "build-plan");
+    const files = readdirSync(sourceDir).filter((file) => file.endsWith(".ts")).sort();
+
+    expect(files.length).toBeGreaterThan(0);
+    for (const file of files) {
+      expect(readFileSync(join(siteDir, file), "utf8")).toBe(
+        readFileSync(join(sourceDir, file), "utf8"),
       );
     }
   });

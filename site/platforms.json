@@ -74,7 +74,20 @@
           "round_display": false,
           "display_in": null
         },
-        "note": "Status light and button. Muse's recommended starting point."
+        "note": "Status light and button. Muse's recommended starting point.",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          }
+        ],
+        "try_saying": [
+          "What devices on my home network can you reach?",
+          "Blink the gadget's light when my build finishes."
+        ]
       },
       {
         "device_id": "ideaspark-esp32-1-9-lcd",
@@ -95,7 +108,20 @@
           "round_display": false,
           "display_in": 1.9
         },
-        "note": "No PSRAM, so no home-network tunnel; draws images straight to the screen."
+        "note": "No PSRAM, so no home-network tunnel; draws images straight to the screen.",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          }
+        ],
+        "try_saying": [
+          "Show a picture of a sunset on my gadget.",
+          "Put today's top three tasks on the gadget's screen."
+        ]
       },
       {
         "device_id": "seeed-sensecap-indicator",
@@ -116,7 +142,27 @@
           "round_display": false,
           "display_in": 3.95
         },
-        "note": "Air sensors only on D1S/D1Pro (temp/humidity via the bundled Grove AHT20)."
+        "note": "Air sensors only on D1S/D1Pro (temp/humidity via the bundled Grove AHT20).",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          },
+          {
+            "name": "Pick the D1S or D1Pro variant for air sensors",
+            "qty": 0,
+            "required": false,
+            "note": "The base D1 has no CO2/tVOC sensors; Muse can only read sensors the variant has.",
+            "buy_url": "https://www.seeedstudio.com/SenseCAP-Indicator-D1Pro-p-5644.html"
+          }
+        ],
+        "try_saying": [
+          "What's the CO2 level in my office right now?",
+          "Show my calendar for today on the Indicator."
+        ]
       },
       {
         "device_id": "seeed-reterminal-e1001",
@@ -137,7 +183,20 @@
           "round_display": false,
           "display_in": 7.5
         },
-        "note": "Status text and black-and-white images on 7.5\" e-paper."
+        "note": "Status text and black-and-white images on 7.5\" e-paper.",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          }
+        ],
+        "try_saying": [
+          "Put this week's family calendar on the e-paper board.",
+          "Show a black-and-white photo of the kids on the board."
+        ]
       },
       {
         "device_id": "home-assistant-voice-pe",
@@ -158,7 +217,27 @@
           "round_display": false,
           "display_in": null
         },
-        "note": "Status on the LED ring, push-to-talk, dial as volume."
+        "note": "Status on the LED ring, push-to-talk, dial as volume.",
+        "parts": [
+          {
+            "name": "USB-C power supply (5 V / 2 A)",
+            "qty": 1,
+            "required": true,
+            "note": "The Voice PE is USB-C powered; a phone charger that supplies 5 V / 2 A works.",
+            "search": "USB-C power adapter 5V 2A"
+          },
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          }
+        ],
+        "try_saying": [
+          "(Press the button) What's on my calendar tomorrow?",
+          "(Press the button) Turn the volume down."
+        ]
       },
       {
         "device_id": "waveshare-esp32-s3-touch-amoled-1-75c",
@@ -179,7 +258,27 @@
           "round_display": true,
           "display_in": 1.75
         },
-        "note": "Round AMOLED avatar; best desk object."
+        "note": "Round AMOLED avatar; best desk object.",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          },
+          {
+            "name": "3.7 V Li-ion cell with MX1.25 connector",
+            "qty": 1,
+            "required": false,
+            "note": "Optional, for cordless use. Buy the battery SKU or check the Waveshare wiki for the cell size before ordering one separately.",
+            "buy_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.75c.htm"
+          }
+        ],
+        "try_saying": [
+          "(Hold to talk) What are you working on?",
+          "Show me the image you just found."
+        ]
       },
       {
         "device_id": "aipi-lite",
@@ -200,7 +299,20 @@
           "round_display": false,
           "display_in": null
         },
-        "note": "Palm-size voice buddy with a snap-on battery and a two-button menu."
+        "note": "Palm-size voice buddy with a snap-on battery and a two-button menu.",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          }
+        ],
+        "try_saying": [
+          "(Hold to talk) Remind me to call the dentist at 3.",
+          "Show me today's weather icon."
+        ]
       },
       {
         "device_id": "waveshare-esp32-c6-touch-amoled-1-8",
@@ -221,7 +333,27 @@
           "round_display": false,
           "display_in": 1.8
         },
-        "note": "No PSRAM: voice notes go over the control session and replies come back as scrolling text."
+        "note": "No PSRAM: voice notes go over the control session and replies come back as scrolling text.",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          },
+          {
+            "name": "3.7 V Li-ion cell with MX1.25 connector",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Waveshare recommends a thin cell around 3.85 x 24 x 28 mm; check the wiki before buying.",
+            "buy_url": "https://docs.waveshare.com/ESP32-C6-Touch-AMOLED-1.8"
+          }
+        ],
+        "try_saying": [
+          "(Hold to talk) Summarize my unread email.",
+          "What's the status of the task you're running?"
+        ]
       },
       {
         "device_id": "seeed-sensecap-watcher",
@@ -242,7 +374,20 @@
           "round_display": true,
           "display_in": 1.45
         },
-        "note": "camera.capture returns a JPEG (CONFIG_MUSE_WATCHER_CAMERA=y)."
+        "note": "camera.capture returns a JPEG (CONFIG_MUSE_WATCHER_CAMERA=y).",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          }
+        ],
+        "try_saying": [
+          "Take a picture of my 3D printer and tell me if the print failed.",
+          "Is anyone at my desk right now?"
+        ]
       },
       {
         "device_id": "m5stack-sticks3",
@@ -263,7 +408,20 @@
           "round_display": false,
           "display_in": 1.14
         },
-        "note": "Pocket stick with speaker, mic, IMU and battery; the best push-to-talk remote."
+        "note": "Pocket stick with speaker, mic, IMU and battery; the best push-to-talk remote.",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          }
+        ],
+        "try_saying": [
+          "(Hold to talk) Add milk to the grocery list.",
+          "Show me the picture you made."
+        ]
       },
       {
         "device_id": "m5stack-stickc-plus2",
@@ -285,7 +443,20 @@
           "display_in": 1.14
         },
         "eol": true,
-        "note": "End of life at M5Stack; buzzer only, so no spoken replies."
+        "note": "End of life at M5Stack; buzzer only, so no spoken replies.",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable"
+          }
+        ],
+        "try_saying": [
+          "(Hold to talk) Add milk to the grocery list.",
+          "Show me the picture you made."
+        ]
       }
     ],
     "sources": [
@@ -363,7 +534,34 @@
           "ble_builtin": true,
           "compute": "standard"
         },
-        "note": "Featured on gadgets.muse.ai."
+        "note": "Featured on gadgets.muse.ai.",
+        "parts": [
+          {
+            "name": "Official 27 W USB-C power supply",
+            "qty": 1,
+            "required": true,
+            "note": "The Pi 5 needs 5 V / 5 A for full USB power.",
+            "buy_url": "https://www.raspberrypi.com/products/27w-power-supply/"
+          },
+          {
+            "name": "microSD card, 32 GB or larger",
+            "qty": 1,
+            "required": true,
+            "note": "Flash Raspberry Pi OS (Bookworm) with Raspberry Pi Imager.",
+            "search": "microSD 32GB A2"
+          },
+          {
+            "name": "Case with active cooler",
+            "qty": 1,
+            "required": false,
+            "note": "Recommended if it will also run Home Assistant.",
+            "search": "Raspberry Pi 5 case active cooler"
+          }
+        ],
+        "try_saying": [
+          "Install Home Assistant on my Pi and tell me how to open it.",
+          "How much disk space is left on the Pi?"
+        ]
       },
       {
         "device_id": "raspberry-pi-4b",
@@ -375,7 +573,27 @@
           "ble_builtin": true,
           "compute": "standard"
         },
-        "note": "Listed in the Linux SDK README."
+        "note": "Listed in the Linux SDK README.",
+        "parts": [
+          {
+            "name": "USB-C power supply (5.1 V / 3 A)",
+            "qty": 1,
+            "required": true,
+            "note": "The official 15.3 W supply avoids undervoltage warnings.",
+            "buy_url": "https://www.raspberrypi.com/products/type-c-power-supply/"
+          },
+          {
+            "name": "microSD card, 16 GB or larger",
+            "qty": 1,
+            "required": true,
+            "note": "Flash Raspberry Pi OS with Raspberry Pi Imager.",
+            "search": "microSD 32GB A1"
+          }
+        ],
+        "try_saying": [
+          "Install Home Assistant on my Pi and tell me how to open it.",
+          "Check the Pi's temperature and uptime."
+        ]
       },
       {
         "device_id": "raspberry-pi-zero-2w",
@@ -387,7 +605,27 @@
           "ble_builtin": true,
           "compute": "light"
         },
-        "note": "Listed in the Linux SDK README; slow but enough for shell and file commands."
+        "note": "Listed in the Linux SDK README; slow but enough for shell and file commands.",
+        "parts": [
+          {
+            "name": "Micro-USB power supply (5 V / 2.5 A)",
+            "qty": 1,
+            "required": true,
+            "note": "Use the PWR port, not the USB data port.",
+            "search": "Raspberry Pi micro USB power supply 2.5A"
+          },
+          {
+            "name": "microSD card, 16 GB or larger",
+            "qty": 1,
+            "required": true,
+            "note": "Flash Raspberry Pi OS Lite (64-bit) with Raspberry Pi Imager.",
+            "search": "microSD 32GB A1"
+          }
+        ],
+        "try_saying": [
+          "Check the Pi's temperature and uptime.",
+          "Message me if the garage sensor script stops."
+        ]
       },
       {
         "device_id": "dell-wyse-5070",
@@ -399,7 +637,27 @@
           "ble_builtin": false,
           "compute": "desktop"
         },
-        "note": "Not on Meta's list. Meets the stated requirements on Debian/Ubuntu if it has Bluetooth LE; most units need a USB BLE adapter."
+        "note": "Not on Meta's list. Meets the stated requirements on Debian/Ubuntu if it has Bluetooth LE; most units need a USB BLE adapter.",
+        "parts": [
+          {
+            "name": "USB Bluetooth LE adapter",
+            "qty": 1,
+            "required": true,
+            "note": "Most units have no Bluetooth; the Muse Linux SDK needs BLE to pair.",
+            "search": "USB Bluetooth 5.0 adapter Linux"
+          },
+          {
+            "name": "USB stick for the Debian/Ubuntu installer",
+            "qty": 1,
+            "required": true,
+            "note": "8 GB or larger.",
+            "search": "USB flash drive 16GB"
+          }
+        ],
+        "try_saying": [
+          "Set up a nightly backup of my photos folder on this box.",
+          "How much disk space is left?"
+        ]
       },
       {
         "device_id": "hp-t620-plus",
@@ -411,7 +669,27 @@
           "ble_builtin": false,
           "compute": "desktop"
         },
-        "note": "Not on Meta's list. Add a USB Bluetooth LE adapter."
+        "note": "Not on Meta's list. Add a USB Bluetooth LE adapter.",
+        "parts": [
+          {
+            "name": "USB Bluetooth LE adapter",
+            "qty": 1,
+            "required": true,
+            "note": "The Muse Linux SDK needs BLE to pair.",
+            "search": "USB Bluetooth 5.0 adapter Linux"
+          },
+          {
+            "name": "USB stick for the Debian/Ubuntu installer",
+            "qty": 1,
+            "required": true,
+            "note": "8 GB or larger.",
+            "search": "USB flash drive 16GB"
+          }
+        ],
+        "try_saying": [
+          "Set up a nightly backup of my photos folder on this box.",
+          "How much disk space is left?"
+        ]
       },
       {
         "device_id": "intel-nuc",
@@ -423,7 +701,20 @@
           "ble_builtin": null,
           "compute": "desktop"
         },
-        "note": "Not on Meta's list. Many NUCs ship with Bluetooth; check yours."
+        "note": "Not on Meta's list. Many NUCs ship with Bluetooth; check yours.",
+        "parts": [
+          {
+            "name": "USB Bluetooth LE adapter (only if yours has none)",
+            "qty": 1,
+            "required": false,
+            "note": "Many NUCs have Bluetooth built in; check with bluetoothctl list.",
+            "search": "USB Bluetooth 5.0 adapter Linux"
+          }
+        ],
+        "try_saying": [
+          "Install Home Assistant in Docker and tell me how to open it.",
+          "How much disk space is left?"
+        ]
       },
       {
         "device_id": "lenovo-thinkcentre-tiny",
@@ -435,7 +726,20 @@
           "ble_builtin": null,
           "compute": "desktop"
         },
-        "note": "Not on Meta's list. Bluetooth depends on the Wi-Fi card fitted; add a USB BLE adapter if missing."
+        "note": "Not on Meta's list. Bluetooth depends on the Wi-Fi card fitted; add a USB BLE adapter if missing.",
+        "parts": [
+          {
+            "name": "USB Bluetooth LE adapter (only if yours has none)",
+            "qty": 1,
+            "required": false,
+            "note": "Bluetooth depends on the Wi-Fi card fitted.",
+            "search": "USB Bluetooth 5.0 adapter Linux"
+          }
+        ],
+        "try_saying": [
+          "Install Home Assistant in Docker and tell me how to open it.",
+          "How much disk space is left?"
+        ]
       }
     ],
     "sources": [

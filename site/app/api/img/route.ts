@@ -15,7 +15,7 @@ export const maxDuration = 30;
 const FETCH_HEADERS: HeadersInit = {
   // Many CDNs (including Wikipedia's Varnish layer) reject default fetch UA.
   "User-Agent":
-    "Mozilla/5.0 hackshop-mcp/0.0.4 (+https://github.com/msanchezgrice/hackshop-mcp)",
+    "Mozilla/5.0 hackshop-mcp/0.0.5 (+https://github.com/msanchezgrice/hackshop-mcp)",
   Accept: "image/avif,image/webp,image/png,image/jpeg,image/*",
 };
 

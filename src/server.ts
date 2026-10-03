@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { realpathSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -6,8 +8,10 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { loadCatalog } from "./catalog/load.js";
+import type { DeviceEntry } from "./catalog/schema.js";
 import { loadPlatforms } from "./platforms/load.js";
 import { setLoadedPlatforms } from "./platforms/index.js";
+import type { Platform } from "./platforms/schema.js";
 import { probeSamplingSupport } from "./sampling.js";
 import {
   proposeHardware,
@@ -26,10 +30,56 @@ import {
   planGadget,
   planGadgetInput,
 } from "./tools/plan_gadget.js";
+import {
+  getBuildPlan,
+  getBuildPlanInput,
+} from "./tools/get_build_plan.js";
+import { siteUrlFromEnv } from "./site-url.js";
 import { createTelemetry, errorKind } from "./telemetry.js";
 
 const NAME = "hackshop-mcp";
-const VERSION = "0.0.4";
+const VERSION = "0.0.5";
+
+export function createToolRunner(context: {
+  devices: DeviceEntry[];
+  platforms: Platform[];
+  server?: Server;
+}): (name: string, args: unknown) => Promise<{ out: unknown; degraded?: boolean }> {
+  return async (name: string, args: unknown) => {
+    if (name === "propose_hardware") {
+      if (!context.server) {
+        throw new Error("propose_hardware requires an MCP server context");
+      }
+      const input = proposeHardwareInput.parse(args);
+      const out = await proposeHardware(input, context.devices, context.server);
+      return { out, degraded: out.degraded };
+    }
+
+    if (name === "assess_hackability") {
+      const input = assessHackabilityInput.parse(args);
+      return { out: assessHackability(input, context.devices) };
+    }
+
+    if (name === "plan_gadget") {
+      const input = planGadgetInput.parse(args);
+      return { out: planGadget(input, context.devices) };
+    }
+
+    if (name === "get_build_plan") {
+      const input = getBuildPlanInput.parse(args);
+      return {
+        out: getBuildPlan(input, context.devices, context.platforms, siteUrlFromEnv()),
+      };
+    }
+
+    if (name === "simulate_assembly") {
+      const input = simulateAssemblyInput.parse(args);
+      return { out: await simulateAssembly(input) };
+    }
+
+    throw new Error(`Unknown tool: ${name}`);
+  };
+}
 
 async function main(): Promise<void> {
   // Boot validation. Refuses to start on bad catalog/tags.
@@ -145,6 +195,21 @@ async function main(): Promise<void> {
         },
       },
       {
+        name: "get_build_plan",
+        description:
+          "Get a step-by-step build plan for a device: parts list with buy links, numbered steps with exact commands, what to say to it once it works, and an agent-ready Markdown brief you can follow directly. Deterministic, no network.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            device_id: {
+              type: "string",
+              description: "Catalog device id.",
+            },
+          },
+          required: ["device_id"],
+        },
+      },
+      {
         name: "simulate_assembly",
         description:
           "Drop a proposed robot Assembly into a MuJoCo physics world and run a bounded navigation rollout. Returns whether it reached the goal plus honest failure telemetry (stuck/tipped/collisions/heading-oscillation), a natural-language post-mortem, and artifact URLs (rendered mp4, scene.xml, control.py, telemetry.json). Today simulates the diff-drive 'navigate' slice; other goal kinds return an honest 'unsupported'. Requires a running sim-worker (SIM_WORKER_URL).",
@@ -167,33 +232,7 @@ async function main(): Promise<void> {
     ],
   }));
 
-  const runTool = async (
-    name: string,
-    args: unknown,
-  ): Promise<{ out: unknown; degraded?: boolean }> => {
-    if (name === "propose_hardware") {
-      const input = proposeHardwareInput.parse(args);
-      const out = await proposeHardware(input, devices, server);
-      return { out, degraded: out.degraded };
-    }
-
-    if (name === "assess_hackability") {
-      const input = assessHackabilityInput.parse(args);
-      return { out: assessHackability(input, devices) };
-    }
-
-    if (name === "plan_gadget") {
-      const input = planGadgetInput.parse(args);
-      return { out: planGadget(input, devices) };
-    }
-
-    if (name === "simulate_assembly") {
-      const input = simulateAssemblyInput.parse(args);
-      return { out: await simulateAssembly(input) };
-    }
-
-    throw new Error(`Unknown tool: ${name}`);
-  };
+  const runTool = createToolRunner({ devices, platforms, server });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
@@ -250,7 +289,20 @@ async function main(): Promise<void> {
   process.stderr.write(`[hackshop-mcp] ${NAME} v${VERSION} ready.\n`);
 }
 
-main().catch((err) => {
-  process.stderr.write(`[hackshop-mcp] Fatal: ${(err as Error).message}\n`);
-  process.exit(1);
-});
+function isDirectRun(): boolean {
+  const entry = process.argv[1];
+  if (!entry) return false;
+  if (import.meta.url === pathToFileURL(entry).href) return true;
+  try {
+    return import.meta.url === pathToFileURL(realpathSync(entry)).href;
+  } catch {
+    return false;
+  }
+}
+
+if (isDirectRun()) {
+  main().catch((err) => {
+    process.stderr.write(`[hackshop-mcp] Fatal: ${(err as Error).message}\n`);
+    process.exit(1);
+  });
+}

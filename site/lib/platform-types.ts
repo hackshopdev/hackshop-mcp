@@ -4,6 +4,15 @@ const KebabId = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "id must be kebab
 const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "date must be YYYY-MM-DD");
 const FeatureValue = z.union([z.boolean(), z.string(), z.number(), z.null()]);
 
+export const PlatformBoardPart = z.object({
+  name: z.string().min(1),
+  qty: z.number().int().min(0),
+  required: z.boolean(),
+  note: z.string().min(1),
+  buy_url: z.string().url().optional(),
+  search: z.string().min(1).optional(),
+});
+
 export const PlatformBoard = z.object({
   device_id: z.string().min(1),
   support: z.enum(["official", "possible"]),
@@ -13,6 +22,8 @@ export const PlatformBoard = z.object({
   eol: z.boolean().optional(),
   note: z.string().min(1),
   features: z.record(FeatureValue),
+  parts: z.array(PlatformBoardPart).default([]),
+  try_saying: z.array(z.string().min(1)).default([]),
 });
 
 export const Platform = z.object({
@@ -57,3 +68,4 @@ export const Platforms = z.array(Platform).min(1);
 
 export type Platform = z.infer<typeof Platform>;
 export type PlatformBoard = z.infer<typeof PlatformBoard>;
+export type PlatformBoardPart = z.infer<typeof PlatformBoardPart>;

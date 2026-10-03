@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { editorialPosts } from "@/lib/editorial";
+import { platformBuildDeviceIds } from "@/lib/build-plan-data";
 const site = "https://www.hackshop.dev";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -20,6 +21,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.85,
     },
+    ...platformBuildDeviceIds().map((deviceId) => ({
+      url: `${site}/build/${deviceId}`,
+      lastModified: museUpdated,
+      changeFrequency: "monthly" as const,
+      priority: 0.72,
+    })),
     ...["templates", "inventory"].map((path) => ({
       url: `${site}/${path}`,
       lastModified: updated,

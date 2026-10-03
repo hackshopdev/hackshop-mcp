@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ProjectNav } from "@/components/ProjectNav";
+import { StartBuildButton } from "@/components/StartBuildButton";
 import { hasImage } from "@/lib/image-sources";
 import { getMusePageData, type MuseBoardRow } from "@/lib/muse-page";
 import { pageMetadata } from "@/lib/page-metadata";
@@ -64,6 +66,7 @@ export default function MusePage() {
           </Link>
           <div className={styles.navLinks}>
             <Link href="/muse">Muse boards</Link>
+            <ProjectNav />
             <Link href="/resources">Resources</Link>
           </div>
           <Link className={styles.button} href="/?utm_source=muse&utm_medium=nav">
@@ -94,6 +97,37 @@ export default function MusePage() {
           </p>
         </header>
 
+        <section className={styles.section} aria-labelledby="how-to-start">
+          <div className={styles.sectionHeader}>
+            <p className={styles.eyebrow}>How to start</p>
+            <h2 id="how-to-start">Pick a board, save the build, then hand it off</h2>
+          </div>
+          <div className={styles.startGrid}>
+            {[
+              ["1", "Pick a board", "Compare the supported Muse ESP32 and Linux boards below. Not sure? The M5Stack StickS3 is the cheapest Full UI board."],
+              ["2", "Start a build", "Each board has a Start a build button. It saves the parts list, print files and a step checklist to My builds."],
+              ["3", "Hand it to your agent", "Copy the brief or open the build in Claude, ChatGPT, Codex, Cursor or Muse Code. Order the parts from the store links."],
+            ].map(([number, title, body]) => (
+              <article className={styles.faqItem} key={number}>
+                <span className={styles.smallPill}>{number}</span>
+                <h3>{title}</h3>
+                <p>{body}</p>
+              </article>
+            ))}
+          </div>
+          <div className={styles.startActions}>
+            <Link className={styles.button} href="/build/m5stack-sticks3">
+              Start with the StickS3
+            </Link>
+            <a className={styles.secondaryButton} href="#compare">
+              Compare the boards
+            </a>
+            <Link className={styles.secondaryButton} href="/projects">
+              My builds
+            </Link>
+          </div>
+        </section>
+
         <section className={styles.section} aria-labelledby="compare">
           <div className={styles.sectionHeader}>
             <p className={styles.eyebrow}>ESP32 device SDK</p>
@@ -123,11 +157,16 @@ export default function MusePage() {
                   {data.esp32.boards.map((row) => (
                     <tr key={row.device.id}>
                       <th scope="row">
-                        {row.docsUrl ? (
-                          <a href={row.docsUrl}>{row.device.name}</a>
-                        ) : (
-                          row.device.name
-                        )}
+                        <div>
+                          {row.docsUrl ? (
+                            <a href={row.docsUrl}>{row.device.name}</a>
+                          ) : (
+                            row.device.name
+                          )}
+                        </div>
+                        <div className={styles.mutedLine} style={{ marginTop: 4 }}>
+                          <Link href={`/build/${row.device.id}`}>Plan →</Link>
+                        </div>
                       </th>
                       <td>
                         <TierPill row={row} />
@@ -373,6 +412,14 @@ function BoardCard({ row }: { row: MuseBoardRow }) {
           <code>{row.board.build}</code>
         </pre>
         <div className={styles.linkRow}>
+          <StartBuildButton
+            className={styles.button}
+            deviceId={row.device.id}
+            source="muse_card"
+          />
+          <Link className={styles.secondaryButton} href={`/build/${row.device.id}`}>
+            Build steps
+          </Link>
           {row.device.firmware_links.map((link) => (
             <a href={link} key={link}>
               {linkLabel(link)}

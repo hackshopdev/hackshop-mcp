@@ -1,0 +1,481 @@
+import type {
+  BuildPlan,
+  BuildPlanPart,
+  BuildPlanStep,
+  DeviceEntry,
+  Platform,
+  PlatformBoard,
+  PlatformBoardPart,
+  Printable,
+} from "./types.js";
+
+export function buildPlan(input: {
+  device: DeviceEntry;
+  platform: Platform | null;
+  board: PlatformBoard | null;
+  printables: Printable[];
+  siteUrl: string;
+}): BuildPlan {
+  const urls = buildUrls(input.device.id, input.siteUrl, input.platform !== null);
+  const tierLabel = input.platform && input.board
+    ? tierLabelFor(input.platform, input.board)
+    : null;
+  const parts = buildParts(input.device, input.board, input.printables);
+  const trySaying = input.board?.try_saying ?? [];
+  const caveats = input.platform && input.board
+    ? platformCaveatsFor(input.platform, input.board)
+    : [];
+  const terms = input.platform
+    ? { summary: input.platform.terms.summary, url: input.platform.terms.url }
+    : null;
+  const summary = buildSummary(input.device, input.platform, tierLabel);
+  const steps = buildSteps({
+    device: input.device,
+    platform: input.platform,
+    board: input.board,
+    parts,
+    printables: input.printables,
+    trySaying,
+    urls,
+  });
+  const planBase = {
+    device_id: input.device.id,
+    name: input.device.name,
+    platform_id: input.platform?.id ?? null,
+    tier_label: tierLabel,
+    summary,
+    est_cost_label: moneyRange(input.device.est_used_price_usd_min, input.device.est_used_price_usd_max),
+    est_time_label: hoursRange(input.device.est_setup_hours_min, input.device.est_setup_hours_max),
+    parts,
+    steps,
+    try_saying: trySaying,
+    caveats,
+    terms,
+    urls,
+  };
+
+  return {
+    ...planBase,
+    agent_brief_md: buildAgentBrief({
+      ...planBase,
+      device: input.device,
+      platform: input.platform,
+    }),
+  };
+}
+
+export function buildUrls(
+  deviceId: string,
+  siteUrl: string,
+  includeMusePage: boolean,
+): BuildPlan["urls"] {
+  const base = normalizeSiteUrl(siteUrl);
+  return {
+    build_page: `${base}/build/${deviceId}`,
+    build_md: `${base}/build/${deviceId}/build.md`,
+    muse_page: includeMusePage ? `${base}/muse` : null,
+  };
+}
+
+export function platformCaveatsFor(platform: Platform, board: PlatformBoard): string[] {
+  const homeTunnel = board.features.home_tunnel;
+  const caveats = platform.caveats.filter((caveat) => {
+    const lower = caveat.toLowerCase();
+    const psramNoTunnel =
+      lower.includes("without psram") ||
+      lower.includes("without the home-network tunnel");
+    const tunnelFoothold =
+      lower.includes("home-network tunnel lets") ||
+      lower.includes("foothold on your network");
+    if (psramNoTunnel) return homeTunnel === false;
+    if (tunnelFoothold) return homeTunnel === true;
+    return true;
+  });
+
+  if (board.eol) caveats.push("End of life at the vendor");
+  if (board.support === "possible") caveats.push(board.note);
+  return caveats;
+}
+
+function buildParts(
+  device: DeviceEntry,
+  board: PlatformBoard | null,
+  printables: Printable[],
+): BuildPlanPart[] {
+  const parts: BuildPlanPart[] = [{
+    id: "board",
+    name: device.name,
+    qty: 1,
+    required: true,
+    note: "Main board or device for this build.",
+    buy_url: device.buy_url ?? null,
+    search_url: device.buy_url ? null : ebaySearchUrl(device.name),
+    kind: "board",
+  }];
+
+  for (const [index, part] of (board?.parts ?? []).entries()) {
+    parts.push(partToBuildPlanPart(part, index));
+  }
+
+  for (const printable of printables) {
+    parts.push({
+      id: `printed-${printable.part}`,
+      name: printable.part === "desk-stand" ? "Printed desk stand" : "Printed enclosure",
+      qty: 1,
+      required: false,
+      note: "Print it yourself (STL) or order it from a print service; files in step Print the stand.",
+      buy_url: null,
+      search_url: null,
+      kind: "printed",
+    });
+  }
+
+  return parts;
+}
+
+function partToBuildPlanPart(part: PlatformBoardPart, index: number): BuildPlanPart {
+  return {
+    id: `part-${index + 1}-${slugify(part.name)}`,
+    name: part.name,
+    qty: part.qty,
+    required: part.required,
+    note: part.note,
+    buy_url: part.buy_url ?? null,
+    search_url: !part.buy_url && part.search ? amazonSearchUrl(part.search) : null,
+    kind: "part",
+  };
+}
+
+function buildSteps(args: {
+  device: DeviceEntry;
+  platform: Platform | null;
+  board: PlatformBoard | null;
+  parts: BuildPlanPart[];
+  printables: Printable[];
+  trySaying: string[];
+  urls: BuildPlan["urls"];
+}): BuildPlanStep[] {
+  if (!args.platform || !args.board) {
+    return [
+      partsStep(args.parts),
+      researchStep(args.device),
+      tryStep(args.trySaying, false),
+    ];
+  }
+
+  if (args.platform.sdk_path === "linux") {
+    return [
+      partsStep(args.parts),
+      tokenStep(args.platform),
+      linuxInstallStep(args.platform),
+      linuxPairStep(args.platform),
+      tryStep(args.trySaying, true),
+    ];
+  }
+
+  const steps = [
+    partsStep(args.parts),
+    tokenStep(args.platform),
+    esp32FlashStep(args.platform, args.board, args.urls),
+    esp32PairStep(args.platform),
+  ];
+  if (args.printables.length > 0) steps.push(printStep(args.printables));
+  steps.push(tryStep(args.trySaying, true));
+  return steps;
+}
+
+function partsStep(parts: BuildPlanPart[]): BuildPlanStep {
+  return {
+    id: "parts",
+    title: "Get the parts",
+    why: "You need the board and any build-specific accessories before flashing or pairing.",
+    body_md: parts.map(partMarkdownLine).join("\n"),
+    commands: [],
+    links: partLinks(parts),
+  };
+}
+
+function tokenStep(platform: Platform): BuildPlanStep {
+  return {
+    id: "token",
+    title: "Get your Muse SDK token",
+    why: "Muse gadgets pair with your account by using a private SDK token.",
+    body_md:
+      "Create a token at gadgets.muse.ai > Account > SDK tokens (it starts with `mgst_`). ESP32 builds read it from `idf.py menuconfig` > ESP32 Device SDK > Muse Gadgets SDK token (or `CONFIG_GADGET_SDK_TOKEN` in the build's sdkconfig); the Linux installer takes it as `--sdk-token`. Use `mgst_YOUR_TOKEN` as the placeholder in docs, scripts and prompts; never commit the real token or paste it anywhere public.",
+    commands: [],
+    links: [
+      { label: "Muse SDK tokens", url: "https://gadgets.muse.ai/settings/sdk-tokens" },
+      { label: `${platform.name} terms`, url: platform.terms.url },
+    ],
+  };
+}
+
+function esp32FlashStep(
+  platform: Platform,
+  board: PlatformBoard,
+  urls: BuildPlan["urls"],
+): BuildPlanStep {
+  return {
+    id: "flash",
+    title: "Flash the firmware",
+    why: "The board needs the Muse ESP32 firmware configured with your SDK token.",
+    body_md:
+      "### Let your agent do it\n" +
+      `Give your coding agent the build brief at ${urls.build_md}. Tell it to keep the token private, use \`mgst_YOUR_TOKEN\` as the placeholder, and ask you to confirm the serial port before flashing.\n\n` +
+      "### Do it yourself\n" +
+      "Install ESP-IDF v6.0.1, clone the Muse Gadget SDK, run `idf.py menuconfig`, set the SDK token under ESP32 Device SDK, then build and flash. If flashing cannot connect, hold BOOT, tap RESET, then release BOOT.",
+    commands: [
+      "git clone -b v6.0.1 --recursive https://github.com/espressif/esp-idf.git ~/esp/esp-idf-v6",
+      "~/esp/esp-idf-v6/install.sh esp32c5,esp32s3,esp32c6,esp32",
+      ". ~/esp/esp-idf-v6/export.sh",
+      "git clone https://github.com/facebookincubator/muse-gadget-sdk",
+      "cd muse-gadget-sdk/esp32",
+      "idf.py menuconfig",
+      board.build,
+      "idf.py -p PORT flash monitor",
+    ],
+    links: [
+      { label: "Muse Gadget SDK", url: platform.sdk_repo },
+      { label: "ESP32 SDK docs", url: platform.docs_url },
+    ],
+  };
+}
+
+function esp32PairStep(platform: Platform): BuildPlanStep {
+  return {
+    id: "pair",
+    title: "Pair it with the Muse app",
+    why: "Pairing links the freshly flashed board to your Muse account.",
+    body_md:
+      "In the Muse app turn on Settings > Devices > Developer mode, then tap Settings > Devices > Add Device (+) and pick `MuseGadget-XXXXXX`. When the light breathes blue, press the board's button to confirm. Status lights: orange = ready for setup, blue breathing = press the button, green = connected, yellow blinking = reconnecting, red blinking = error. Hold the button for 5 seconds to reset pairing.",
+    commands: [],
+    links: [
+      { label: "Muse Gadgets", url: platform.homepage },
+      { label: "Community help", url: "https://discord.gg/3bhjCkZdd6" },
+    ],
+  };
+}
+
+function printStep(printables: Printable[]): BuildPlanStep {
+  return {
+    id: "print",
+    title: "Print the stand",
+    why: "The printable files keep the gadget visible, stable, and easy to reach.",
+    body_md:
+      "Print the stand from the STL, or send the STEP/STL to a print service. Test fit before leaving the device unattended.",
+    commands: [],
+    links: printables.flatMap((printable) => [
+      { label: `${printable.title} STL`, url: printable.stl_url },
+      { label: `${printable.title} STEP`, url: printable.step_url },
+      { label: `${printable.title} SVG`, url: printable.svg_url },
+      { label: `${printable.title} fab.json`, url: printable.fab_url },
+    ]),
+  };
+}
+
+function linuxInstallStep(platform: Platform): BuildPlanStep {
+  return {
+    id: "install",
+    title: "Install the Linux SDK",
+    why: "The installer creates the Muse gadget service and gives Muse a bounded command surface on the machine.",
+    body_md:
+      "Download `install.sh`, read it, then run it with `mgst_YOUR_TOKEN`. Use `--run-as USER` with a dedicated low-privilege user unless you intentionally want Muse to have the install account's permissions.",
+    commands: [
+      "curl -fsSL https://raw.githubusercontent.com/facebookincubator/muse-gadget-sdk/main/linux/install.sh -o install.sh",
+      "less install.sh",
+      "bash install.sh --sdk-token mgst_YOUR_TOKEN",
+    ],
+    links: [
+      { label: "Linux SDK docs", url: platform.docs_url },
+      { label: "Muse Gadget SDK", url: platform.sdk_repo },
+    ],
+  };
+}
+
+function linuxPairStep(platform: Platform): BuildPlanStep {
+  return {
+    id: "pair",
+    title: "Pair it with the Muse app",
+    why: "The Linux device needs to pair with your Muse account before it can receive commands.",
+    body_md:
+      "Pair from the Muse app within 10 minutes of install. If you miss the window, run `sudo musegadget pair`, then add the device from the app again.",
+    commands: ["sudo musegadget pair"],
+    links: [{ label: "Muse Gadgets", url: platform.homepage }],
+  };
+}
+
+function researchStep(device: DeviceEntry): BuildPlanStep {
+  return {
+    id: "research",
+    title: "Research the firmware path",
+    why: "This device is not mapped to a Muse platform board yet, so the safe next step is reading the existing firmware and community resources.",
+    body_md:
+      "Review the firmware and community links before buying accessories, flashing firmware, or changing bootloaders. Confirm recovery instructions for your exact hardware revision.",
+    commands: [],
+    links: device.firmware_links.map((url, index) => ({
+      label: `Firmware reference ${index + 1}`,
+      url,
+    })),
+  };
+}
+
+function tryStep(trySaying: string[], musePlatform: boolean): BuildPlanStep {
+  const body = trySaying.length > 0
+    ? trySaying.map((prompt) => `- ${prompt}`).join("\n")
+    : musePlatform
+      ? "No board-specific prompts are curated yet. Ask it to report status, then try your project prompt."
+      : "Once it boots with the firmware you chose, verify basic input/output and then try your project prompt manually.";
+
+  return {
+    id: "try",
+    title: "Try it",
+    why: "A first prompt proves the device is paired, reachable, and useful for the project.",
+    body_md: body,
+    commands: [],
+    links: [],
+  };
+}
+
+function buildAgentBrief(args: Omit<BuildPlan, "agent_brief_md"> & {
+  device: DeviceEntry;
+  platform: Platform | null;
+}): string {
+  const lines = [
+    `# Build: ${args.name} as a Muse gadget`,
+    "",
+    "## Goal",
+    args.summary,
+    "",
+    "## Hardware",
+    ...args.parts.map((part) => `- ${hardwareBriefLine(part)}`),
+    "",
+    "## Constraints",
+    "- Ask the human before any purchase.",
+    "- Use `mgst_YOUR_TOKEN` as the placeholder; never commit a real token.",
+    "- ESP-IDF v6.0.1 only for ESP32 builds; do not substitute another ESP-IDF version.",
+    "- Confirm the serial port before flashing; ask the human which `PORT` to use.",
+    args.terms
+      ? `- Terms: ${args.terms.summary} (${args.terms.url})`
+      : "- No Muse platform terms apply yet; verify upstream firmware licenses before distributing.",
+    "",
+    "## Steps",
+    ...args.steps.flatMap((step, index) => [
+      `${index + 1}. ${step.title}`,
+      step.why,
+      ...briefStepBody(step).map((line) => `   ${line}`),
+      ...step.commands.map((command) => `   - \`${command}\``),
+    ]),
+    "",
+    "## Verify",
+    args.platform
+      ? "- Status light is green, or the Linux service is paired and healthy."
+      : "- Device boots and the selected firmware path has a documented recovery route.",
+    ...(args.try_saying.length > 0
+      ? args.try_saying.map((prompt) => `- Try: ${prompt}`)
+      : ["- Try the project prompt manually after the basic bring-up works."]),
+    "",
+    "## References",
+    args.platform ? `- SDK repo: ${args.platform.sdk_repo}` : "- SDK repo: n/a",
+    args.platform
+      ? `- AGENTS.md (read this first): ${args.platform.sdk_repo}/blob/main/${args.platform.sdk_path}/AGENTS.md`
+      : "- AGENTS.md path: n/a",
+    args.platform ? `- Platform docs: ${args.platform.docs_url}` : "- Platform docs: n/a",
+    ...args.device.firmware_links
+      .filter((url) => !args.platform || url !== args.platform.docs_url)
+      .map((url) => `- Board docs or firmware: ${url}`),
+    `- Build page: ${args.urls.build_page}`,
+  ];
+
+  return lines.join("\n");
+}
+
+// The brief is read by a coding agent, so the human-facing "let your agent do
+// it" subsection of the flash step is replaced with the facts the agent needs.
+function briefStepBody(step: BuildPlanStep): string[] {
+  if (step.id === "flash") {
+    return [
+      "Set the SDK token with `idf.py menuconfig` (ESP32 Device SDK > Muse Gadgets SDK token) before building; never print the full token.",
+      "If flashing cannot connect: hold BOOT, tap RESET, release BOOT, retry.",
+    ];
+  }
+  if (step.id === "parts") return [];
+  return step.body_md
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.startsWith("#"));
+}
+
+function hardwareBriefLine(part: BuildPlanPart): string {
+  const link = part.buy_url ?? part.search_url;
+  const prefix = link ? `[${part.name}](${link})` : part.name;
+  const required = part.required ? "required" : "optional";
+  return `${prefix} x${part.qty} (${required}, ${part.kind}): ${part.note}`;
+}
+
+function buildSummary(
+  device: DeviceEntry,
+  platform: Platform | null,
+  tierLabel: string | null,
+): string {
+  if (!platform) {
+    return `A research-first build path for ${device.name}, with firmware references and buying links in one place.`;
+  }
+
+  const tier = tierLabel ? ` (${tierLabel})` : "";
+  return `A working ${platform.name}${tier} build on ${device.name}, paired to your Muse account and ready for first prompts.`;
+}
+
+function partMarkdownLine(part: BuildPlanPart): string {
+  const required = part.required ? "required" : "optional";
+  const link = part.buy_url ?? part.search_url;
+  const suffix = link ? ` [link](${link})` : "";
+  return `- ${part.name} x${part.qty} (${required}): ${part.note}${suffix}`;
+}
+
+function partLinks(parts: BuildPlanPart[]): Array<{ label: string; url: string }> {
+  return parts.flatMap((part) => {
+    const url = part.buy_url ?? part.search_url;
+    return url ? [{ label: part.name, url }] : [];
+  });
+}
+
+function tierLabelFor(platform: Platform, board: PlatformBoard): string {
+  return platform.tiers.find((tier) => tier.id === board.tier)?.label ?? board.tier;
+}
+
+function moneyRange(min: number | undefined, max: number | undefined): string | null {
+  if (min === undefined && max === undefined) return null;
+  if (min !== undefined && max !== undefined && min !== max) return `$${min}-${max}`;
+  return `~$${min ?? max}`;
+}
+
+function hoursRange(min: number | undefined, max: number | undefined): string | null {
+  if (min === undefined && max === undefined) return null;
+  if (min !== undefined && max !== undefined && min !== max) {
+    return `${formatNumber(min)}-${formatNumber(max)} hr setup`;
+  }
+  return `~${formatNumber(min ?? max ?? 0)} hr setup`;
+}
+
+function formatNumber(value: number): string {
+  return Number.isInteger(value) ? String(value) : String(value);
+}
+
+function ebaySearchUrl(name: string): string {
+  return `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(name)}`;
+}
+
+function amazonSearchUrl(search: string): string {
+  return `https://www.amazon.com/s?k=${encodeURIComponent(search)}`;
+}
+
+function normalizeSiteUrl(siteUrl: string): string {
+  return siteUrl.replace(/\/+$/, "");
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "item";
+}

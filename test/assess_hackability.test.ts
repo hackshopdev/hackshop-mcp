@@ -93,6 +93,7 @@ describe("assess_hackability", () => {
 
     expect(out.found).toBe(true);
     expect(out.device?.agent_platforms[0]?.tier).toBe("full-ui");
+    expect(out.device?.build_page_url).toBe("https://www.hackshop.dev/build/m5stack-sticks3");
     expect(out.device?.physical).toBeTruthy();
     expect(out.device?.printables[0]?.part).toBe("desk-stand");
   });
