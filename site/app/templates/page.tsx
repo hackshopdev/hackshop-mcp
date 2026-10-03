@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { StartBuildButton } from "@/components/StartBuildButton";
 import { pageMetadata } from "@/lib/page-metadata";
 import {
@@ -17,12 +19,14 @@ export const metadata = pageMetadata(
 
 const VIABILITY_LABEL: Record<Template["viability"], string> = {
   verified: "Verified",
-  iffy: "Iffy",
+  official: "Official SDK",
+  iffy: "Works with caveats",
   experimental: "Experimental",
 };
 
 const VIABILITY_COLOR: Record<Template["viability"], string> = {
   verified: "var(--ok)",
+  official: "var(--ok)",
   iffy: "var(--warn)",
   experimental: "var(--warn)",
 };
@@ -83,41 +87,47 @@ function ProjectCard({ t }: { t: Template }) {
         {t.viability_note}
       </p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {t.device_id ? (
+          <StartBuildButton
+            deviceId={t.device_id}
+            idea={t.prompt}
+            source="template"
+            label="Start this build"
+            style={{
+              minHeight: 40,
+              padding: "8px 14px",
+              background: "var(--accent)",
+              color: "#111",
+              border: "1px solid var(--accent)",
+              borderRadius: 6,
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          />
+        ) : null}
         <Link
-          href={`/?idea=${encodeURIComponent(t.prompt)}`}
+          href={
+            t.category === "agents"
+              ? `/?idea=${encodeURIComponent(t.prompt)}#start`
+              : `/?scout=${encodeURIComponent(t.prompt)}#scout`
+          }
           style={{
             display: "inline-flex",
             alignItems: "center",
             minHeight: 40,
             padding: "8px 14px",
-            background: "var(--accent)",
-            color: "#fff",
+            background: t.device_id ? "transparent" : "var(--accent)",
+            border: t.device_id ? "1px solid var(--border)" : "1px solid var(--accent)",
+            color: t.device_id ? "var(--fg)" : "#111",
             fontSize: 14,
             fontWeight: 600,
             borderRadius: 6,
             textDecoration: "none",
           }}
         >
-          Try this idea →
+          {t.category === "agents" ? "Compare boards for this →" : "Try this idea →"}
         </Link>
-        {t.device_id ? (
-          <StartBuildButton
-            deviceId={t.device_id}
-            idea={t.prompt}
-            source="template"
-            style={{
-              minHeight: 40,
-              padding: "8px 14px",
-              background: "transparent",
-              color: "var(--fg)",
-              border: "1px solid var(--accent)",
-              borderRadius: 6,
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
-          />
-        ) : null}
       </div>
     </article>
   );
@@ -136,18 +146,30 @@ export default function TemplatesPage() {
   );
 
   return (
+    <>
+    <SiteHeader />
     <main>
       <header>
         <h1>Project templates</h1>
         <p className="tagline">
-          {TEMPLATE_COUNT} project templates, {VERIFIED_TEMPLATE_COUNT}{" "}
-          verified. Each one is a real path —{" "}
-          <span style={{ color: "var(--ok)" }}>verified</span> means the hack is
-          documented and reproducible;{" "}
-          <span style={{ color: "var(--warn)" }}>iffy</span> works with caveats
-          (read the note). Click <em>Try this idea</em> to send it to the live
-          agent and get hardware proposals.
+          {TEMPLATE_COUNT} project templates. Each one is a real path. Start a
+          build to save the parts and steps to My builds, or try the idea in the
+          planner.
         </p>
+        <ul style={{ margin: "0 0 18px", paddingLeft: 18, color: "var(--muted)", fontSize: 14, lineHeight: 1.7 }}>
+          <li>
+            <span style={{ color: "var(--ok)" }}>Verified</span>: the hack is documented and reproducible by the community.
+          </li>
+          <li>
+            <span style={{ color: "var(--ok)" }}>Official SDK</span>: the board is supported by the vendor&apos;s own SDK (for example Meta&apos;s Muse Gadgets).
+          </li>
+          <li>
+            <span style={{ color: "var(--warn)" }}>Works with caveats</span>: it works, but read the note first.
+          </li>
+          <li>
+            <span style={{ color: "var(--warn)" }}>Experimental</span>: worth trying; expect to figure some things out.
+          </li>
+        </ul>
         <div className="badges">
           <Link className="badge" href="/">
             ← Home
@@ -197,5 +219,7 @@ export default function TemplatesPage() {
         </p>
       </footer>
     </main>
+    <SiteFooter />
+    </>
   );
 }

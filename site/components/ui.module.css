@@ -1,0 +1,299 @@
+/* Shared visual system for the marketing-style pages (home, /muse, board
+   pages). Tokens match the /muse page. */
+
+.page {
+  --bg: #0a0a0a;
+  --panel: #151515;
+  --panel2: #1d1d1d;
+  --line: #2a2a2a;
+  --text: #f4f4f2;
+  --muted: #9a9a95;
+  --accent: #ff7a00;
+  --accentSoft: #2a190b;
+  --tile: #f1f1ee;
+  --warn: #f5c451;
+  --ok: #7ad88a;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.section {
+  padding: 88px 0 0;
+}
+
+.sectionHead {
+  max-width: 720px;
+  margin-bottom: 28px;
+}
+
+.sectionHead h2 {
+  margin: 0 0 10px;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.sectionHead p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 14px;
+}
+
+/* Buttons */
+.btn,
+.btnPrimary,
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.btnPrimary {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #111;
+}
+
+.btnPrimary:hover {
+  background: #ff8f2b;
+}
+
+.btnSecondary {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--text);
+}
+
+.btnSecondary:hover {
+  border-color: #444;
+}
+
+.btnPrimary:disabled,
+.btnSecondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btnSmall {
+  min-height: 36px;
+  padding: 7px 12px;
+  font-size: 14px;
+}
+
+.linkArrow {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.linkArrow:hover {
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Pills and chips */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel2);
+  color: #d6d6d2;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.pillAccent {
+  composes: pill;
+  border-color: rgba(255, 122, 0, 0.5);
+  background: var(--accentSoft);
+  color: #ffb066;
+}
+
+.pillOk {
+  composes: pill;
+  border-color: rgba(122, 216, 138, 0.4);
+  color: var(--ok);
+  background: rgba(122, 216, 138, 0.08);
+}
+
+.pillWarn {
+  composes: pill;
+  border-color: rgba(245, 196, 81, 0.45);
+  color: var(--warn);
+  background: rgba(245, 196, 81, 0.08);
+}
+
+.pillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Cards and panels */
+.card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  padding: 20px;
+  min-width: 0;
+}
+
+.panel {
+  border: 1px solid rgba(255, 122, 0, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #171310 0%, var(--panel) 120px);
+  padding: 28px;
+  min-width: 0;
+}
+
+.grid2,
+.grid3,
+.grid4 {
+  display: grid;
+  gap: 18px;
+}
+
+.grid2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+/* Product photo tile: vendor photos are shot on white, so give them a
+   light, intentional surface on the dark page. */
+.tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  background: var(--tile);
+  overflow: hidden;
+}
+
+.tile img {
+  width: 100%;
+  height: 100%;
+  padding: 14px;
+  object-fit: contain;
+}
+
+.tilePlaceholder {
+  color: #77776f;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.codeBox {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #0f0f0f;
+  color: #e9e9e4;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 980px) {
+  .grid4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .grid3,
+  .grid2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .section {
+    padding-top: 64px;
+  }
+
+  .panel {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 520px) {
+  .grid4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

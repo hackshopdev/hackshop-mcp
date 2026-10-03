@@ -72,9 +72,10 @@ function DemoFormInner() {
     };
   }, []);
 
-  // Prefill from ?idea=... when arriving from /templates.
+  // Prefill from ?scout=... when arriving from /templates. (?idea= now
+  // belongs to the Muse gadget planner at the top of the homepage.)
   useEffect(() => {
-    const fromUrl = searchParams.get("idea");
+    const fromUrl = searchParams.get("scout");
     if (fromUrl && !idea) {
       setIdea(fromUrl);
       // Scroll to the form so the user sees what's about to happen.

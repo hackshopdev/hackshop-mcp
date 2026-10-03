@@ -8,8 +8,10 @@ import { buildPlanForDevice } from "@/lib/build-plan-data";
 import { clerkEnabled } from "@/lib/auth-config";
 import type { BuildPlan } from "@/lib/build-plan/types";
 import type { PartStatus, Project, ProjectStatus } from "@/lib/projects/types";
+import { ideaAgentPrompt, projectAgentPrompt } from "@/lib/agent-prompts";
 import {
   appendProjectNotesToBrief,
+  attachPlanToProject,
   shoppingListText,
   stillNeededPartIds,
 } from "@/lib/projects/build";
@@ -17,7 +19,10 @@ import { getProject, saveProject } from "@/lib/projects/store";
 import { track } from "@/lib/analytics";
 import { AgentHandoff } from "./AgentHandoff";
 import { CopyButton } from "./CopyButton";
-import { ProjectNav } from "./ProjectNav";
+import { GadgetPlanner } from "./GadgetPlanner";
+import { SiteFooter } from "./SiteFooter";
+import { SiteHeader } from "./SiteHeader";
+import { TellMyAgent } from "./TellMyAgent";
 import styles from "./build.module.css";
 
 const statuses: ProjectStatus[] = ["draft", "ordering", "building", "done"];
@@ -65,6 +70,25 @@ export function ProjectDetailClient({ id }: { id: string }) {
     return <ProjectShell><p className={styles.muted}>Loading build...</p></ProjectShell>;
   }
 
+  if (project && project.device_ids.length === 0) {
+    return (
+      <IdeaProjectView
+        project={project}
+        saveLabel={saveLabel}
+        onChange={(patch) =>
+          setProject((current) => (current ? { ...current, ...patch } : current))
+        }
+        onUseBoard={(deviceId) => {
+          const chosen = buildPlanForDevice(deviceId);
+          if (!chosen) return;
+          track("idea_board_chosen", { device_id: deviceId });
+          setProject((current) => (current ? attachPlanToProject(current, chosen) : current));
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
+    );
+  }
+
   if (!project || !plan) {
     return (
       <ProjectShell>
@@ -102,6 +126,20 @@ export function ProjectDetailClient({ id }: { id: string }) {
         <p className={styles.muted} style={{ marginTop: 10 }}>
           {plan.name} · {saveLabel}
         </p>
+        <div className={styles.actions} style={{ marginTop: 14 }}>
+          <TellMyAgent
+            prompt={projectAgentPrompt({
+              name: plan.name,
+              deviceId: plan.device_id,
+              idea: project.idea,
+              notes: project.notes,
+            })}
+            surface="project_page"
+          />
+          <Link className={styles.secondaryButton} href={`/build/${plan.device_id}`}>
+            Build page
+          </Link>
+        </div>
       </header>
 
       <SignedOutBanner />
@@ -279,20 +317,99 @@ export function ProjectDetailClient({ id }: { id: string }) {
 function ProjectShell({ children }: { children: React.ReactNode }) {
   return (
     <main className={styles.page}>
-      <div className={styles.shell}>
-        <nav className={styles.nav} aria-label="Primary">
-          <Link className={styles.brand} href="/">
-            Hackshop
-          </Link>
-          <div className={styles.navLinks}>
-            <Link href="/muse">Muse boards</Link>
-            <Link href="/templates">Templates</Link>
-            <ProjectNav />
-          </div>
-        </nav>
-        {children}
-      </div>
+      <SiteHeader />
+      <div className={styles.shell}>{children}</div>
+      <SiteFooter />
     </main>
+  );
+}
+
+function IdeaProjectView({
+  project,
+  saveLabel,
+  onChange,
+  onUseBoard,
+}: {
+  project: Project;
+  saveLabel: string;
+  onChange: (patch: Partial<Project>) => void;
+  onUseBoard: (deviceId: string) => void;
+}) {
+  return (
+    <ProjectShell>
+      <header className={styles.projectsHero}>
+        <p className={styles.eyebrow}>Saved idea · no board yet</p>
+        <input
+          className={styles.input}
+          aria-label="Project title"
+          value={project.title}
+          maxLength={120}
+          onChange={(event) => onChange({ title: event.target.value })}
+          style={{ fontSize: 28, fontWeight: 800 }}
+        />
+        <p className={styles.muted} style={{ marginTop: 10 }}>
+          {saveLabel}
+        </p>
+        <div className={styles.actions} style={{ marginTop: 14 }}>
+          <TellMyAgent prompt={ideaAgentPrompt(project.idea || project.title)} surface="idea_project" />
+        </div>
+      </header>
+
+      <SignedOutBanner />
+
+      <div className={styles.stepStack} style={{ marginTop: 24 }}>
+        <section className={styles.panel}>
+          <h2>Your idea</h2>
+          <div className={styles.formGrid}>
+            <label>
+              <span className={styles.muted}>What should it do?</span>
+              <textarea
+                className={styles.textarea}
+                value={project.idea}
+                maxLength={2000}
+                onChange={(event) => onChange({ idea: event.target.value })}
+              />
+            </label>
+            <label>
+              <span className={styles.muted}>Status</span>
+              <select
+                className={styles.select}
+                value={project.status}
+                onChange={(event) => onChange({ status: event.target.value as ProjectStatus })}
+              >
+                {statuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section className={styles.panel}>
+          <GadgetPlanner
+            source="idea_project"
+            mode="attach"
+            autoRun
+            initialIdea={project.idea}
+            heading="Pick a board"
+            subhead="Find boards that can do it, then choose one. Your parts list, steps and checklist appear here."
+            onUseBoard={onUseBoard}
+          />
+        </section>
+
+        <section className={styles.panel}>
+          <h2>Notes</h2>
+          <textarea
+            className={styles.textarea}
+            value={project.notes}
+            maxLength={5000}
+            onChange={(event) => onChange({ notes: event.target.value })}
+          />
+        </section>
+      </div>
+    </ProjectShell>
   );
 }
 

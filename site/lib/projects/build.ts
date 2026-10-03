@@ -74,3 +74,40 @@ function newProjectId(): string {
     return nibble.toString(16);
   });
 }
+
+// An idea saved before a board is chosen. The project page lets the person
+// pick a board later ("Use this board"), which seeds parts and checklist.
+export function createIdeaProject(input: { idea: string; source?: string | null }): Project {
+  const now = new Date().toISOString();
+  const idea = input.idea.trim().slice(0, 2000);
+  const title = idea.length > 60 ? `${idea.slice(0, 57).trimEnd()}…` : idea || "New idea";
+  return {
+    id: newProjectId(),
+    title: title.slice(0, 120),
+    idea,
+    device_ids: [],
+    platform_id: null,
+    status: "draft",
+    checklist: {},
+    parts: {},
+    notes: "",
+    source: (input.source ?? "idea").slice(0, 40),
+    created_at: now,
+    updated_at: now,
+    synced: false,
+  };
+}
+
+// Attach a board to an idea-only project, keeping the idea, notes and title
+// the person already wrote.
+export function attachPlanToProject(project: Project, plan: BuildPlan): Project {
+  return {
+    ...project,
+    title: project.title || `Build: ${plan.name}`.slice(0, 120),
+    device_ids: [plan.device_id],
+    platform_id: plan.platform_id,
+    checklist: Object.fromEntries(plan.steps.map((step) => [step.id, false])),
+    parts: Object.fromEntries(plan.parts.map((part) => [part.id, "need"])),
+    updated_at: new Date().toISOString(),
+  };
+}

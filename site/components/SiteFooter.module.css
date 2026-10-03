@@ -1,0 +1,81 @@
+.footer {
+  margin-top: 96px;
+  border-top: 1px solid #242424;
+  background: #080808;
+  color: #9a9a95;
+  font-size: 15px;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
+  gap: 40px;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 44px 0 56px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #f4f4f2;
+  font-size: 18px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.mark {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: #ff7a00;
+}
+
+.about p {
+  max-width: 340px;
+  margin: 12px 0 0;
+  line-height: 1.6;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.cols h2 {
+  margin: 0 0 10px;
+  color: #f4f4f2;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cols div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cols a {
+  color: #b9b9b4;
+  text-decoration: none;
+}
+
+.cols a:hover {
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+  .inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

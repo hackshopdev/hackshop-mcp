@@ -7,24 +7,18 @@ import { track } from "@/lib/analytics";
 import { shoppingListText } from "@/lib/projects/build";
 import { AgentHandoff } from "./AgentHandoff";
 import { CopyButton } from "./CopyButton";
-import { ProjectNav } from "./ProjectNav";
+import { boardAgentPrompt } from "@/lib/agent-prompts";
+import { SiteFooter } from "./SiteFooter";
+import { SiteHeader } from "./SiteHeader";
+import { TellMyAgent } from "./TellMyAgent";
 import { StartBuildButton } from "./StartBuildButton";
 import styles from "./build.module.css";
 
 export function BuildExperience({ plan }: { plan: BuildPlan }) {
   return (
     <main className={styles.page}>
+      <SiteHeader />
       <div className={styles.shell}>
-        <nav className={styles.nav} aria-label="Primary">
-          <Link className={styles.brand} href="/">
-            Hackshop
-          </Link>
-          <div className={styles.navLinks}>
-            <Link href="/muse">Muse boards</Link>
-            <Link href="/templates">Templates</Link>
-            <ProjectNav />
-          </div>
-        </nav>
 
         <header className={styles.hero}>
           <div>
@@ -44,9 +38,10 @@ export function BuildExperience({ plan }: { plan: BuildPlan }) {
                 deviceId={plan.device_id}
                 source="build_page"
               />
-              <a className={styles.secondaryButton} href="#agent-handoff">
-                Hand it to your agent
-              </a>
+              <TellMyAgent
+                prompt={boardAgentPrompt({ name: plan.name, deviceId: plan.device_id })}
+                surface="build_page"
+              />
               <a className={styles.secondaryButton} href={plan.urls.build_md}>
                 Download build.md
               </a>
@@ -66,6 +61,7 @@ export function BuildExperience({ plan }: { plan: BuildPlan }) {
           </div>
         </div>
       </div>
+      <SiteFooter />
     </main>
   );
 }
@@ -88,12 +84,17 @@ function PartsPreview({ plan }: { plan: BuildPlan }) {
           </div>
         ))}
       </div>
-      <CopyButton
-        className={styles.copyButton}
-        text={shoppingListText(plan)}
-        label="Copy shopping list"
-        onCopied={() => track("parts_list_copied", { device_id: plan.device_id })}
-      />
+      <div className={styles.actions}>
+        <CopyButton
+          className={styles.copyButton}
+          text={shoppingListText(plan)}
+          label="Copy shopping list"
+          onCopied={() => track("parts_list_copied", { device_id: plan.device_id })}
+        />
+        {estimatedTotal(plan) !== null ? (
+          <span className={styles.muted}>Estimated total ~${estimatedTotal(plan)}</span>
+        ) : null}
+      </div>
       <p className={styles.muted} style={{ margin: "12px 0 0" }}>
         Hackshop never buys for you. Links open the store.
       </p>
@@ -329,4 +330,13 @@ function hostLabel(url: string): string {
   } catch {
     return "store";
   }
+}
+
+// The shopping list (with an estimated total) is added to build plans by the
+// planner core; older plans don't have it.
+function estimatedTotal(plan: BuildPlan): number | null {
+  const list = (plan as BuildPlan & { shopping_list?: { est_total_usd?: number | null } })
+    .shopping_list;
+  const total = list?.est_total_usd;
+  return typeof total === "number" && Number.isFinite(total) ? Math.round(total) : null;
 }

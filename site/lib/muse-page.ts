@@ -324,8 +324,8 @@ function fabricationNote(device: DeviceEntry, printables: MusePrintablePart[]): 
     physical.size_mm.t === null ||
     ["approximate", "conflicting"].includes(physical.size_confidence);
   if (needsMeasure) {
-    const note = physical.size_note ?? "dimensions are incomplete or uncertain";
-    return `No printable part yet: ${note}. Measure the device, then run python -m hackshop_sim.cad.generate --device ${device.id} --part desk-stand --t <mm> from sim-worker/.`;
+    const note = (physical.size_note ?? "the published dimensions are incomplete").replace(/[.\s]+$/, "");
+    return `No printable stand yet. ${capitalizeFirst(note)}.`;
   }
 
   const mount = physical.mounting ?? "it ships in a finished case";
@@ -348,9 +348,6 @@ function buildFaq(
   const psramCaveat =
     platform.caveats.find((caveat) => caveat.toLowerCase().includes("without psram")) ??
     "Boards without PSRAM run without the home-network tunnel.";
-  const localHttpCaveat =
-    platform.caveats.find((caveat) => caveat.toLowerCase().includes("local http api")) ??
-    "The home-network tunnel lets Muse reach local HTTP devices.";
 
   return [
     {
@@ -372,7 +369,7 @@ function buildFaq(
     },
     {
       question: "What is the home-network tunnel?",
-      answer: `${psramCaveat} ${localHttpCaveat}`,
+      answer: `It lets Muse reach devices on your home Wi-Fi that have a local web API, like a printer, a smart plug or a Home Assistant server, so it can check on them or control them for you. Treat it like giving the agent a foothold on your network. ${psramCaveat}`,
     },
   ];
 }
@@ -381,6 +378,10 @@ function requireRow(boards: MuseBoardRow[], id: string): MuseBoardRow {
   const row = boards.find((candidate) => candidate.device.id === id);
   if (!row) throw new Error(`Missing Muse board ${id}`);
   return row;
+}
+
+function capitalizeFirst(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 function joinNames(names: string[]): string {
