@@ -15,6 +15,7 @@ import type { DeviceEntry } from "../src/catalog/schema.js";
 function makeMockServer(opts: {
   reply?: string;
   throwOn?: number; // 1 = throw on first call, 2 = throw on both
+  sampling?: boolean;
 }): { server: any; calls: number } {
   let calls = 0;
   const server = {
@@ -29,6 +30,9 @@ function makeMockServer(opts: {
         stopReason: "endTurn",
       };
     }),
+    getClientCapabilities: vi.fn(() => (
+      opts.sampling === false ? {} : { sampling: {} }
+    )),
   };
   return { server, get calls() { return calls; } };
 }
@@ -254,6 +258,30 @@ describe("propose_hardware safety rule integration", () => {
 });
 
 describe("propose_hardware degraded paths", () => {
+  it("returns immediately when the host has no sampling and no Anthropic key", async () => {
+    const prevKey = process.env.ANTHROPIC_API_KEY;
+    delete process.env.ANTHROPIC_API_KEY;
+    try {
+      const sampler = makeMockServer({ sampling: false, throwOn: 2 });
+      const started = Date.now();
+
+      const out = await proposeHardware(
+        { idea: "a Muse agent body for my desk" },
+        fixture,
+        sampler.server as any,
+      );
+
+      expect(Date.now() - started).toBeLessThan(1000);
+      expect(sampler.server.createMessage).not.toHaveBeenCalled();
+      expect(out.degraded).toBe(true);
+      expect(out.reasoning_unavailable).toBe(true);
+      expect(out.note).toContain("doesn't support sampling");
+      expect(out.try_instead).toBe("plan_gadget");
+    } finally {
+      if (prevKey !== undefined) process.env.ANTHROPIC_API_KEY = prevKey;
+    }
+  });
+
   it("degrades gracefully when sampling fails twice and no Anthropic key", async () => {
     // Ensure ANTHROPIC_API_KEY is NOT set for this test
     const prevKey = process.env.ANTHROPIC_API_KEY;

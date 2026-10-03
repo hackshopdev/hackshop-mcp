@@ -1,0 +1,172 @@
+{
+ "inferred_needs": [
+  "voice",
+  "air-sensors"
+ ],
+ "inferred_preferences": [],
+ "picks": [
+  {
+   "device_id": "m5stack-sticks3",
+   "name": "M5Stack StickS3",
+   "platform_id": "muse-esp32",
+   "platform_name": "Muse Gadgets: ESP32 Device SDK",
+   "support": "official",
+   "tier": "full-ui",
+   "tier_label": "Full UI",
+   "score": 1,
+   "why": "Push-to-talk with spoken replies. Pocket stick with speaker, mic, IMU and battery; the best push-to-talk remote.",
+   "gaps": [
+    "air sensors: no air-quality sensors"
+   ],
+   "price_label": "~$22",
+   "build_page_url": "https://www.hackshop.dev/build/m5stack-sticks3",
+   "agent_brief_url": "https://www.hackshop.dev/build/m5stack-sticks3/build.md",
+   "links": [
+    "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+    "https://docs.m5stack.com/en/core/StickS3",
+    "https://github.com/m5stack/M5Unified"
+   ],
+   "build_command": "tools/muse/board.sh build sticks3",
+   "setup_steps": [
+    "Get an SDK token at https://gadgets.muse.ai/settings/sdk-tokens (never commit it or paste it into a public repo).",
+    "Install ESP-IDF v6.0.1: git clone -b v6.0.1 --recursive https://github.com/espressif/esp-idf.git ~/esp/esp-idf-v6 && ~/esp/esp-idf-v6/install.sh esp32c5,esp32s3,esp32c6,esp32 && . ~/esp/esp-idf-v6/export.sh",
+    "git clone https://github.com/facebookincubator/muse-gadget-sdk && cd muse-gadget-sdk/esp32",
+    "Set the token: idf.py menuconfig > ESP32 Device SDK > Muse Gadgets SDK token (or CONFIG_GADGET_SDK_TOKEN in the build's sdkconfig).",
+    "Build and flash with the board's command below, then idf.py -p PORT flash monitor. If flashing can't connect: hold BOOT, tap RESET, release BOOT.",
+    "In the Muse app: Settings > Devices > Add Device, pick MuseGadget-XXXXXX, press the board's button when the light breathes blue. Green = connected."
+   ],
+   "caveats": [
+    "The home-network tunnel lets Muse reach devices on your LAN that expose a local HTTP API. Treat it like giving the agent a foothold on your network.",
+    "Pairing has no manufacturer verification and can't prevent an active man-in-the-middle attack.",
+    "Builds are signed with the included development key and never enable Secure Boot. Enable NVS encryption (CONFIG_HOMEHUB_NVS_ENCRYPTION).",
+    "Custom ESP32 commands are not a documented API yet: the command set (display.draw_url, sensors.read, camera.capture, ...) is hardcoded in main/app.c."
+   ],
+   "fabrication": {
+    "printables": [
+     {
+      "part": "desk-stand",
+      "title": "Printable desk stand",
+      "stl_url": "https://www.hackshop.dev/cad/m5stack-sticks3/desk-stand.stl",
+      "step_url": "https://www.hackshop.dev/cad/m5stack-sticks3/desk-stand.step",
+      "svg_url": "https://www.hackshop.dev/cad/m5stack-sticks3/desk-stand.svg",
+      "fab_url": "https://www.hackshop.dev/cad/m5stack-sticks3/desk-stand.fab.json"
+     }
+    ],
+    "note": "Print the stand: STL/STEP links above. Dimensions are from a drawing source; print once and check the fit."
+   },
+   "needs_met": [
+    "voice"
+   ],
+   "within_budget": null
+  },
+  {
+   "device_id": "seeed-sensecap-indicator",
+   "name": "Seeed SenseCAP Indicator (D1 series)",
+   "platform_id": "muse-esp32",
+   "platform_name": "Muse Gadgets: ESP32 Device SDK",
+   "support": "official",
+   "tier": "status",
+   "tier_label": "Status",
+   "score": 4,
+   "why": "Air-sensor readings. Air sensors only on D1S/D1Pro (temp/humidity via the bundled Grove AHT20).",
+   "gaps": [],
+   "price_label": "$49-89",
+   "build_page_url": "https://www.hackshop.dev/build/seeed-sensecap-indicator",
+   "agent_brief_url": "https://www.hackshop.dev/build/seeed-sensecap-indicator/build.md",
+   "links": [
+    "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+    "https://wiki.seeedstudio.com/Sensor/SenseCAP/SenseCAP_Indicator/Get_started_with_SenseCAP_Indicator/",
+    "https://github.com/Seeed-Solution/SenseCAP_Indicator_ESP32"
+   ],
+   "build_command": "tools/board.sh sensecap-indicator build",
+   "setup_steps": [
+    "Get an SDK token at https://gadgets.muse.ai/settings/sdk-tokens (never commit it or paste it into a public repo).",
+    "Install ESP-IDF v6.0.1: git clone -b v6.0.1 --recursive https://github.com/espressif/esp-idf.git ~/esp/esp-idf-v6 && ~/esp/esp-idf-v6/install.sh esp32c5,esp32s3,esp32c6,esp32 && . ~/esp/esp-idf-v6/export.sh",
+    "git clone https://github.com/facebookincubator/muse-gadget-sdk && cd muse-gadget-sdk/esp32",
+    "Set the token: idf.py menuconfig > ESP32 Device SDK > Muse Gadgets SDK token (or CONFIG_GADGET_SDK_TOKEN in the build's sdkconfig).",
+    "Build and flash with the board's command below, then idf.py -p PORT flash monitor. If flashing can't connect: hold BOOT, tap RESET, release BOOT.",
+    "In the Muse app: Settings > Devices > Add Device, pick MuseGadget-XXXXXX, press the board's button when the light breathes blue. Green = connected."
+   ],
+   "caveats": [
+    "The home-network tunnel lets Muse reach devices on your LAN that expose a local HTTP API. Treat it like giving the agent a foothold on your network.",
+    "Pairing has no manufacturer verification and can't prevent an active man-in-the-middle attack.",
+    "Builds are signed with the included development key and never enable Secure Boot. Enable NVS encryption (CONFIG_HOMEHUB_NVS_ENCRYPTION).",
+    "Custom ESP32 commands are not a documented API yet: the command set (display.draw_url, sensors.read, camera.capture, ...) is hardcoded in main/app.c."
+   ],
+   "fabrication": {
+    "printables": [],
+    "note": "No printed part needed: it ships with its own stand or mount (Fold-out kickstand and keyhole wall slot (no dimensions published).)."
+   },
+   "needs_met": [
+    "air-sensors"
+   ],
+   "within_budget": null
+  },
+  {
+   "device_id": "aipi-lite",
+   "name": "AIPI Lite",
+   "platform_id": "muse-esp32",
+   "platform_name": "Muse Gadgets: ESP32 Device SDK",
+   "support": "official",
+   "tier": "full-ui",
+   "tier_label": "Full UI",
+   "score": 1,
+   "why": "Push-to-talk with spoken replies. Palm-size voice buddy with a snap-on battery and a two-button menu.",
+   "gaps": [
+    "air sensors: no air-quality sensors"
+   ],
+   "price_label": "~$36",
+   "build_page_url": "https://www.hackshop.dev/build/aipi-lite",
+   "agent_brief_url": "https://www.hackshop.dev/build/aipi-lite/build.md",
+   "links": [
+    "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+    "https://aipi.com/pages/manual",
+    "https://github.com/sticks918/AIPI-Lite-ESPHome"
+   ],
+   "build_command": "tools/muse/board.sh build aipi",
+   "setup_steps": [
+    "Get an SDK token at https://gadgets.muse.ai/settings/sdk-tokens (never commit it or paste it into a public repo).",
+    "Install ESP-IDF v6.0.1: git clone -b v6.0.1 --recursive https://github.com/espressif/esp-idf.git ~/esp/esp-idf-v6 && ~/esp/esp-idf-v6/install.sh esp32c5,esp32s3,esp32c6,esp32 && . ~/esp/esp-idf-v6/export.sh",
+    "git clone https://github.com/facebookincubator/muse-gadget-sdk && cd muse-gadget-sdk/esp32",
+    "Set the token: idf.py menuconfig > ESP32 Device SDK > Muse Gadgets SDK token (or CONFIG_GADGET_SDK_TOKEN in the build's sdkconfig).",
+    "Build and flash with the board's command below, then idf.py -p PORT flash monitor. If flashing can't connect: hold BOOT, tap RESET, release BOOT.",
+    "In the Muse app: Settings > Devices > Add Device, pick MuseGadget-XXXXXX, press the board's button when the light breathes blue. Green = connected."
+   ],
+   "caveats": [
+    "The home-network tunnel lets Muse reach devices on your LAN that expose a local HTTP API. Treat it like giving the agent a foothold on your network.",
+    "Pairing has no manufacturer verification and can't prevent an active man-in-the-middle attack.",
+    "Builds are signed with the included development key and never enable Secure Boot. Enable NVS encryption (CONFIG_HOMEHUB_NVS_ENCRYPTION).",
+    "Custom ESP32 commands are not a documented API yet: the command set (display.draw_url, sensors.read, camera.capture, ...) is hardcoded in main/app.c."
+   ],
+   "fabrication": {
+    "printables": [],
+    "note": "No printable part yet: Manual lists 55.5 x 47.5 x 7.8 mm, likely without the snap-on battery module; which side is width is not stated.. Measure the device, then run `python -m hackshop_sim.cad.generate --device aipi-lite --part desk-stand --t <mm>` from sim-worker/."
+   },
+   "needs_met": [
+    "voice"
+   ],
+   "within_budget": null
+  }
+ ],
+ "terms": [
+  {
+   "platform_id": "muse-esp32",
+   "summary": "Personal, non-commercial use with your own Muse account. A token can be linked to at most 50 devices. You may not put it in any device you sell, advertise, or list publicly or in a marketplace or app store; other distribution needs Meta's written permission. Provided as-is; Meta can change, withdraw or revoke access at any time.",
+   "url": "https://gadgets.muse.ai/sdk-terms",
+   "max_devices_per_token": 50,
+   "selling_allowed": false
+  }
+ ],
+ "next_steps": [
+  "Get a Muse SDK token from gadgets.muse.ai (keep it private).",
+  "Build: `tools/muse/board.sh build sticks3`, then flash with idf.py -p PORT flash monitor.",
+  "Pair it in the Muse app (Settings > Devices > Developer mode > Add Device).",
+  "Print the desk stand (STL/STEP linked above) and check the fit.",
+  "Keep it personal and non-commercial: at most 50 devices per token, no selling."
+ ],
+ "fit": "partial",
+ "notes": [
+  "No single board has both air sensors and a speaker for spoken replies. SenseCAP Indicator covers air quality; M5Stack StickS3 covers voice."
+ ],
+ "warnings": []
+}

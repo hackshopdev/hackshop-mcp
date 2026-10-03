@@ -36,6 +36,9 @@ export interface ProposeOutput {
   reasoning: string;
   degraded: boolean;
   message?: string;
+  note?: string;
+  reasoning_unavailable?: boolean;
+  try_instead?: "plan_gadget";
 }
 
 interface SamplerPick {
@@ -145,6 +148,16 @@ export async function proposeHardware(
     };
   }
 
+  const hostAdvertisesSampling = Boolean(server.getClientCapabilities?.()?.sampling);
+  const hasApiKey = Boolean(process.env.ANTHROPIC_API_KEY);
+  if (!hostAdvertisesSampling && !hasApiKey) {
+    return degradedCatalogMatches(
+      input,
+      catalog,
+      "Your MCP host doesn't support sampling and no ANTHROPIC_API_KEY is set, so these are catalog matches without AI reasoning. For Muse gadgets, call plan_gadget (instant, no key needed).",
+    );
+  }
+
   // Pass the FULL catalog to sampling when small; lets the LLM weigh all
   // options. Shortlist only as the degraded-mode fallback.
   const fullCatalog = catalog.length <= 100 ? catalog : shortlistCandidates(catalog, input.idea);
@@ -167,30 +180,20 @@ export async function proposeHardware(
     userPrompt,
     maxTokens: 1500,
     diagnostics,
+    hostSamplingTimeoutMs: 45_000,
   });
 
   // Degraded path: every reasoning attempt failed (host sampling + retry +
   // optional Anthropic API fallback). Use the alias-aware shortlist as the
   // best available approximation. Honest about the degradation.
   if (!sampled || !Array.isArray(sampled.picks)) {
-    const shortlisted = shortlistCandidates(catalog, input.idea);
-    const fallback = shortlisted.slice(0, 5).map((d) =>
-      buildProposal(d, "Reasoning unavailable; matched against catalog tags only."),
-    );
     // If a key WAS present but the API fallback threw (e.g. retired model id),
     // surface that specific reason instead of the misleading "no fallback was
     // configured" message — otherwise the failure is invisible (stderr only).
     const reasoning = diagnostics.apiFallbackError
       ? `Reasoning unavailable. ${diagnostics.apiFallbackError} Returning catalog matches by tag overlap.`
       : "Reasoning unavailable. The host LLM failed and no Anthropic API fallback was configured. Returning catalog matches by tag overlap. Set ANTHROPIC_API_KEY in the MCP server's env config to enable reasoning even on hosts without sampling/createMessage support.";
-    return {
-      proposals: fallback,
-      reasoning,
-      degraded: true,
-      ...(diagnostics.apiFallbackError
-        ? { message: diagnostics.apiFallbackError }
-        : {}),
-    };
+    return degradedCatalogMatches(input, catalog, reasoning, diagnostics.apiFallbackError);
   }
 
   const proposals: Proposal[] = [];
@@ -215,6 +218,31 @@ export async function proposeHardware(
     reasoning: sampled.rationale ?? "",
     degraded: false,
   };
+}
+
+function degradedCatalogMatches(
+  input: ProposeInput,
+  catalog: DeviceEntry[],
+  note: string,
+  message?: string,
+): ProposeOutput {
+  const shortlisted = shortlistCandidates(catalog, input.idea);
+  const fallback = shortlisted.slice(0, 5).map((d) =>
+    buildProposal(d, "Reasoning unavailable; matched against catalog tags only."),
+  );
+  return {
+    proposals: fallback,
+    reasoning: note,
+    degraded: true,
+    reasoning_unavailable: true,
+    note,
+    ...(message ? { message } : {}),
+    ...(mentionsMuseAgent(input.idea) ? { try_instead: "plan_gadget" as const } : {}),
+  };
+}
+
+function mentionsMuseAgent(idea: string): boolean {
+  return /\b(muse|agent gadget|agent body|physical body|body for you|ai body)\b/i.test(idea);
 }
 
 function buildProposal(device: DeviceEntry, whyThisFits: string): Proposal {

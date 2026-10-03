@@ -13,6 +13,7 @@ interface CadManifest {
     device_id: string;
     part: "desk-stand" | "enclosure";
     title?: string;
+    checks?: Record<string, boolean | null>;
     files: {
       stl: string;
       step: string;
@@ -76,6 +77,7 @@ function printablesForDevice(deviceId: string): Printable[] {
       step_url: part.files.step,
       svg_url: part.files.svg,
       fab_url: part.files.fab,
+      fab: { checks: part.checks },
     }));
 }
 

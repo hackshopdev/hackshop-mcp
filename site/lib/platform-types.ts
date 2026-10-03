@@ -11,6 +11,7 @@ export const PlatformBoardPart = z.object({
   note: z.string().min(1),
   buy_url: z.string().url().optional(),
   search: z.string().min(1).optional(),
+  est_price_usd: z.number().nonnegative().optional(),
 });
 
 export const PlatformBoard = z.object({

@@ -25,16 +25,20 @@ describe("get_build_plan MCP tool", () => {
       "flash",
       "pair",
       "print",
+      "assemble",
       "try",
     ]);
+    expect(plan.shopping_list.purchase_policy).toContain("explicit approval");
     expect(plan.urls.build_page).toBe("https://www.hackshop.dev/build/m5stack-sticks3");
   });
 
-  it("returns a 404-style error for an unknown device id", async () => {
+  it("returns a tool error for an unknown device id", async () => {
     const runTool = createToolRunner({ devices, platforms });
 
-    await expect(runTool("get_build_plan", { device_id: "nope" })).rejects.toThrow(
-      /404: device "nope" is not in the catalog/,
-    );
+    const result = await runTool("get_build_plan", { device_id: "nope" });
+
+    expect(result.isError).toBe(true);
+    expect(result.text).toMatch(/Unknown device_id "nope"/);
+    expect(result.text).toMatch(/Try one of: espressif-esp32-c5-devkitc-1/);
   });
 });

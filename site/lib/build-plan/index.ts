@@ -1,4 +1,5 @@
 import type {
+  AssemblyStep,
   BuildPlan,
   BuildPlanPart,
   BuildPlanStep,
@@ -7,6 +8,7 @@ import type {
   PlatformBoard,
   PlatformBoardPart,
   Printable,
+  ShoppingList,
 } from "./types.js";
 
 export function buildPlan(input: {
@@ -21,6 +23,7 @@ export function buildPlan(input: {
     ? tierLabelFor(input.platform, input.board)
     : null;
   const parts = buildParts(input.device, input.board, input.printables);
+  const shopping_list = buildShoppingList(parts);
   const trySaying = input.board?.try_saying ?? [];
   const caveats = input.platform && input.board
     ? platformCaveatsFor(input.platform, input.board)
@@ -38,6 +41,13 @@ export function buildPlan(input: {
     trySaying,
     urls,
   });
+  const assembly = buildAssembly({
+    device: input.device,
+    platform: input.platform,
+    board: input.board,
+    parts,
+    printables: input.printables,
+  });
   const planBase = {
     device_id: input.device.id,
     name: input.device.name,
@@ -47,7 +57,9 @@ export function buildPlan(input: {
     est_cost_label: moneyRange(input.device.est_used_price_usd_min, input.device.est_used_price_usd_max),
     est_time_label: hoursRange(input.device.est_setup_hours_min, input.device.est_setup_hours_max),
     parts,
+    shopping_list,
     steps,
+    assembly,
     try_saying: trySaying,
     caveats,
     terms,
@@ -111,6 +123,7 @@ function buildParts(
     buy_url: device.buy_url ?? null,
     search_url: device.buy_url ? null : ebaySearchUrl(device.name),
     kind: "board",
+    est_price_usd: device.est_used_price_usd_min ?? null,
   }];
 
   for (const [index, part] of (board?.parts ?? []).entries()) {
@@ -127,6 +140,7 @@ function buildParts(
       buy_url: null,
       search_url: null,
       kind: "printed",
+      est_price_usd: null,
     });
   }
 
@@ -143,6 +157,36 @@ function partToBuildPlanPart(part: PlatformBoardPart, index: number): BuildPlanP
     buy_url: part.buy_url ?? null,
     search_url: !part.buy_url && part.search ? amazonSearchUrl(part.search) : null,
     kind: "part",
+    est_price_usd: part.est_price_usd ?? null,
+  };
+}
+
+function buildShoppingList(parts: BuildPlanPart[]): ShoppingList {
+  const items = parts.map((part) => {
+    const url = part.buy_url ?? part.search_url;
+    return {
+      part_id: part.id,
+      name: part.name,
+      qty: part.qty,
+      url,
+      url_kind: part.buy_url ? "buy" as const : "search" as const,
+      est_price_usd: part.est_price_usd,
+      required: part.required,
+    };
+  });
+  const requiredPrices = items
+    .filter((item) => item.required)
+    .map((item) => item.est_price_usd === null ? null : item.est_price_usd * item.qty);
+  const est_total_usd = requiredPrices.some((price) => price === null)
+    ? null
+    : (requiredPrices as number[]).reduce((sum, price) => sum + price, 0);
+
+  return {
+    items,
+    est_total_usd,
+    currency: "USD",
+    purchase_policy:
+      "Show the human this list and get explicit approval for the exact items and total before buying anything. If you can use a browser, you may add items to a cart, but stop before checkout.",
   };
 }
 
@@ -159,6 +203,7 @@ function buildSteps(args: {
     return [
       partsStep(args.parts),
       researchStep(args.device),
+      assembleStep(args.platform, args.board, args.printables),
       tryStep(args.trySaying, false),
     ];
   }
@@ -166,6 +211,7 @@ function buildSteps(args: {
   if (args.platform.sdk_path === "linux") {
     return [
       partsStep(args.parts),
+      assembleStep(args.platform, args.board, args.printables),
       tokenStep(args.platform),
       linuxInstallStep(args.platform),
       linuxPairStep(args.platform),
@@ -180,6 +226,7 @@ function buildSteps(args: {
     esp32PairStep(args.platform),
   ];
   if (args.printables.length > 0) steps.push(printStep(args.printables));
+  steps.push(assembleStep(args.platform, args.board, args.printables));
   steps.push(tryStep(args.trySaying, true));
   return steps;
 }
@@ -247,7 +294,7 @@ function esp32PairStep(platform: Platform): BuildPlanStep {
     title: "Pair it with the Muse app",
     why: "Pairing links the freshly flashed board to your Muse account.",
     body_md:
-      "In the Muse app turn on Settings > Devices > Developer mode, then tap Settings > Devices > Add Device (+) and pick `MuseGadget-XXXXXX`. When the light breathes blue, press the board's button to confirm. Status lights: orange = ready for setup, blue breathing = press the button, green = connected, yellow blinking = reconnecting, red blinking = error. Hold the button for 5 seconds to reset pairing.",
+      "In the Muse app, turn on Settings > Devices > Developer mode, then Settings > Devices > Add Device (+). Pick `MuseGadget-XXXXXX` and press the board's button (BOOT on dev kits) when the light breathes blue. Green = connected. Status lights: orange = ready for setup, blue breathing = press the button, green = connected, yellow blinking = reconnecting, red blinking = error. Hold the button for 5 seconds to reset pairing.",
     commands: [],
     links: [
       { label: "Muse Gadgets", url: platform.homepage },
@@ -270,6 +317,49 @@ function printStep(printables: Printable[]): BuildPlanStep {
       { label: `${printable.title} SVG`, url: printable.svg_url },
       { label: `${printable.title} fab.json`, url: printable.fab_url },
     ]),
+  };
+}
+
+function assembleStep(
+  platform: Platform | null,
+  board: PlatformBoard | null,
+  printables: Printable[],
+): BuildPlanStep {
+  if (platform?.sdk_path === "linux") {
+    return {
+      id: "assemble",
+      title: "Put it together",
+      why: "The Linux gadget needs storage, power and Bluetooth ready before pairing.",
+      body_md:
+        "Put the board in its case, insert the flashed SD card if it uses one, connect the power supply and attach a USB Bluetooth LE adapter if the machine does not have Bluetooth built in.",
+      commands: [],
+      links: [],
+    };
+  }
+
+  const printable = printables[0];
+  const fabCue = printable?.fab?.print?.orientation
+    ? `The printable was designed to print ${printable.fab.print.orientation}. `
+    : "";
+  const placement = printable
+    ? `Put the board in the printed ${printable.part.replace("-", " ")}. `
+    : "Put the board in its stand, case or a stable spot on the desk. ";
+  const cable = board
+    ? "Route the USB-C cable through the slot or open edge, power it, and check that the buttons and display are reachable."
+    : "Route the cable neatly, power it, and check the fit.";
+
+  return {
+    id: "assemble",
+    title: "Put it together",
+    why: "A physical agent body needs to sit safely, keep the cable clear and leave controls reachable.",
+    body_md: `${fabCue}${placement}${cable}`,
+    commands: [],
+    links: printable
+      ? [
+        { label: `${printable.title} fab.json`, url: printable.fab_url },
+        { label: `${printable.title} STL`, url: printable.stl_url },
+      ]
+      : [],
   };
 }
 
@@ -298,7 +388,7 @@ function linuxPairStep(platform: Platform): BuildPlanStep {
     title: "Pair it with the Muse app",
     why: "The Linux device needs to pair with your Muse account before it can receive commands.",
     body_md:
-      "Pair from the Muse app within 10 minutes of install. If you miss the window, run `sudo musegadget pair`, then add the device from the app again.",
+      "In the Muse app, turn on Settings > Devices > Developer mode, then Settings > Devices > Add Device (+). Pick `MuseGadget-XXXXXX` within 10 minutes of install. Green = connected. If you miss the window, run `sudo musegadget pair`, then add the device from the app again.",
     commands: ["sudo musegadget pair"],
     links: [{ label: "Muse Gadgets", url: platform.homepage }],
   };
@@ -336,6 +426,94 @@ function tryStep(trySaying: string[], musePlatform: boolean): BuildPlanStep {
   };
 }
 
+function buildAssembly(args: {
+  device: DeviceEntry;
+  platform: Platform | null;
+  board: PlatformBoard | null;
+  parts: BuildPlanPart[];
+  printables: Printable[];
+}): AssemblyStep[] {
+  if (!args.platform || !args.board) {
+    return [
+      assemblyStep(1, "verify", ["board"], [], "Verify the device powers on before changing firmware.", "Device boots and has a documented recovery path.", false, "Requires human judgment about firmware safety."),
+    ];
+  }
+
+  if (args.platform.sdk_path === "linux") {
+    const hasBluetoothAdapter = args.parts.some((part) => /bluetooth|ble/i.test(part.name));
+    const steps: AssemblyStep[] = [
+      assemblyStep(1, "insert", partIdsMatching(args.parts, /microsd|sd card/i), [], "Insert the prepared SD card or boot storage into the board.", "Storage is fully seated.", true, "Simple insertion if the slot is exposed and the card is oriented."),
+      assemblyStep(2, "place", ["board"], ["case screwdriver if needed"], "Put the Linux board in its case or stable enclosure.", "Board is supported, vents are clear and ports are accessible.", true, "Simple placement; fastening depends on the case."),
+    ];
+    if (hasBluetoothAdapter) {
+      steps.push(assemblyStep(3, "connect", partIdsMatching(args.parts, /bluetooth|ble/i), [], "Plug in the USB Bluetooth LE adapter if the device does not have Bluetooth built in.", "Adapter is fully seated in a USB port.", true, "USB insertion is feasible with a known port pose."));
+    }
+    steps.push(
+      assemblyStep(steps.length + 1, "power", partIdsMatching(args.parts, /power|supply/i), [], "Connect power to the board.", "Power LED is on and the board starts booting.", true, "Simple cable insertion if the connector is visible."),
+      assemblyStep(steps.length + 2, "pair", ["board"], ["Muse app"], "Pair from the Muse app within 10 minutes, or run sudo musegadget pair and add the device again.", "Muse app shows the gadget as connected.", false, "Pairing requires app access and account confirmation."),
+      assemblyStep(steps.length + 3, "verify", ["board"], [], "Ask Muse to check the device health or run a simple command.", "The service responds and reports healthy status.", false, "Requires software verification through Muse."),
+    );
+    return renumber(steps);
+  }
+
+  const steps: AssemblyStep[] = [];
+  if (args.printables.length > 0) {
+    const printable = args.printables[0]!;
+    const printInstruction = printable.fab?.print?.orientation
+      ? `Print ${printable.title} ${printable.fab.print.orientation}.`
+      : `Print ${printable.title} from the STL.`;
+    steps.push(assemblyStep(1, "print", [`printed-${printable.part}`], ["3D printer or print service"], printInstruction, "Part is clean, stable and matches the board before final assembly.", false, "Printing is a fabrication job, not a dexterous assembly move."));
+    steps.push(assemblyStep(2, "place", ["board", `printed-${printable.part}`], [], "Put the board into the printed stand or case and keep buttons, screen and ports exposed.", "Board sits flush without forcing and does not wobble.", true, `Clearance should allow placement; check fab.json before automating.`));
+    steps.push(assemblyStep(3, "route_cable", ["board", `printed-${printable.part}`], [], "Route the USB-C cable through the cable slot or open edge.", "Cable exits without lifting the board or blocking buttons.", true, "Cable routing is feasible when the cable path is unobstructed."));
+  } else {
+    steps.push(assemblyStep(1, "place", ["board"], [], "Place the board in its stand, case or a stable spot on the desk.", "Board is stable and ports are reachable.", true, "Simple placement."));
+  }
+
+  steps.push(
+    assemblyStep(steps.length + 1, "power", ["board"], ["USB-C data cable"], "Connect USB-C power/data.", "Board powers on or appears on the serial port.", true, "USB-C insertion is feasible with a known connector pose."),
+    assemblyStep(steps.length + 2, "flash", ["board"], ["computer", "USB-C data cable"], "Build and flash the Muse firmware with the selected board command.", "Flash completes and serial monitor shows startup logs.", false, "Requires a computer, serial-port selection and software commands."),
+    assemblyStep(steps.length + 3, "pair", ["board"], ["Muse app"], "In the Muse app, turn on Developer mode, add MuseGadget-XXXXXX and press the board button when the light breathes blue.", "Status turns green and the app shows connected.", false, "Pairing requires the human's Muse app and account."),
+    assemblyStep(steps.length + 4, "verify", ["board"], [], "Try the first board-specific prompt.", "The gadget responds in Muse or displays the expected status.", false, "Requires semantic verification."),
+  );
+  return renumber(steps);
+}
+
+function assemblyStep(
+  order: number,
+  action: AssemblyStep["action"],
+  part_ids: string[],
+  tools: string[],
+  instruction: string,
+  check: string,
+  feasible: boolean,
+  notes: string,
+): AssemblyStep {
+  return {
+    id: `${order}-${action}`,
+    order,
+    action,
+    part_ids: part_ids.filter(Boolean),
+    tools,
+    instruction,
+    check,
+    robot: { feasible, notes },
+  };
+}
+
+function renumber(steps: AssemblyStep[]): AssemblyStep[] {
+  return steps.map((step, index) => ({
+    ...step,
+    id: `${index + 1}-${step.action}`,
+    order: index + 1,
+  }));
+}
+
+function partIdsMatching(parts: BuildPlanPart[], pattern: RegExp): string[] {
+  return parts
+    .filter((part) => pattern.test(part.name))
+    .map((part) => part.id);
+}
+
 function buildAgentBrief(args: Omit<BuildPlan, "agent_brief_md"> & {
   device: DeviceEntry;
   platform: Platform | null;
@@ -348,6 +526,11 @@ function buildAgentBrief(args: Omit<BuildPlan, "agent_brief_md"> & {
     "",
     "## Hardware",
     ...args.parts.map((part) => `- ${hardwareBriefLine(part)}`),
+    "",
+    "## Shopping list (ask before buying)",
+    ...args.shopping_list.items.map((item) => `- ${shoppingBriefLine(item)}`),
+    `- Estimated total: ${args.shopping_list.est_total_usd === null ? "unknown" : `$${args.shopping_list.est_total_usd}`}`,
+    `- Purchase policy: ${args.shopping_list.purchase_policy}`,
     "",
     "## Constraints",
     "- Ask the human before any purchase.",
@@ -365,6 +548,11 @@ function buildAgentBrief(args: Omit<BuildPlan, "agent_brief_md"> & {
       ...briefStepBody(step).map((line) => `   ${line}`),
       ...step.commands.map((command) => `   - \`${command}\``),
     ]),
+    "",
+    "## Assemble",
+    ...args.assembly.map((step) =>
+      `${step.order}. ${step.instruction} Check: ${step.check} Robot feasible: ${step.robot.feasible ? "yes" : "no"} (${step.robot.notes})`
+    ),
     "",
     "## Verify",
     args.platform
@@ -384,6 +572,7 @@ function buildAgentBrief(args: Omit<BuildPlan, "agent_brief_md"> & {
       .filter((url) => !args.platform || url !== args.platform.docs_url)
       .map((url) => `- Board docs or firmware: ${url}`),
     `- Build page: ${args.urls.build_page}`,
+    "- Save it: tell the human to click Start a build on the build page so their progress is saved.",
   ];
 
   return lines.join("\n");
@@ -410,6 +599,13 @@ function hardwareBriefLine(part: BuildPlanPart): string {
   const prefix = link ? `[${part.name}](${link})` : part.name;
   const required = part.required ? "required" : "optional";
   return `${prefix} x${part.qty} (${required}, ${part.kind}): ${part.note}`;
+}
+
+function shoppingBriefLine(item: ShoppingList["items"][number]): string {
+  const required = item.required ? "required" : "optional";
+  const price = item.est_price_usd === null ? "price unknown" : `est. $${item.est_price_usd}`;
+  const url = item.url ? `${item.url_kind}: ${item.url}` : "no URL";
+  return `${item.name} x${item.qty} (${required}, ${price}; ${url})`;
 }
 
 function buildSummary(

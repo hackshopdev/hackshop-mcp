@@ -1,54 +1,48 @@
 # hackshop (hackshop-mcp)
 
-> hackshop is an open-source MCP server and website that maps a project idea to hackable, repurposable, or protocol-native hardware — returning 3-5 candidates with brick-risk ratings, firmware links, live eBay searches, step-by-step how-tos, and AI-generated architecture diagrams.
+Hackshop helps an agent plan and build a physical body for itself. Muse gadgets are the first supported agent platform.
 
-## Product
+## Use First
 
-- [Home](https://www.hackshop.dev/): Live demo — describe a project idea and get hardware proposals with hack difficulty, brick risk, community size, used-market price ranges, and setup-time estimates.
-- [Templates](https://www.hackshop.dev/templates): Pre-filled project templates (old phone as a clock, e-paper calendar, Roomba as a robot, etc.).
-- [Muse boards](https://www.hackshop.dev/muse): Which boards work with Meta's Muse Gadgets SDK, compared, with printable stands.
-- [Build pages](https://www.hackshop.dev/build/m5stack-sticks3): Parts, flashing steps, printable downloads, and agent handoff for a specific device.
-- Agent-ready build briefs: `/build/<device_id>/build.md`.
-- [Inventory](https://www.hackshop.dev/inventory): Mark hardware you already own (stored in browser localStorage) so proposals can reuse it.
-- [Field guides](https://www.hackshop.dev/resources): Editorial guides on hacking and repurposing consumer hardware.
+- Hosted MCP: `https://www.hackshop.dev/mcp`
+- Planner API: `POST https://www.hackshop.dev/api/plan`
+- Build JSON: `https://www.hackshop.dev/build/<device_id>/plan.json`
+- Build brief: `https://www.hackshop.dev/build/<device_id>/build.md`
+- Muse boards: `https://www.hackshop.dev/muse`
 
-## MCP server
+## MCP Install
 
-hackshop is also an MCP (Model Context Protocol) server usable from Claude Desktop, Claude Code, Cursor, or any MCP-aware host:
+Hosted connector:
+
+```json
+{
+  "url": "https://www.hackshop.dev/mcp",
+  "transport": "streamable-http"
+}
+```
+
+Local npm server:
 
 ```json
 {
   "mcpServers": {
     "hackshop": {
       "command": "npx",
-      "args": ["-y", "hackshop-mcp"],
-      "env": {
-        "ANTHROPIC_API_KEY": "sk-ant-..."
-      }
+      "args": ["-y", "hackshop-mcp"]
     }
   }
 }
 ```
 
-- Use `plan_gadget` for Muse Gadgets board recommendations, SDK token caveats, and printable stand links.
-- Use `get_build_plan` or `/build/<device_id>/build.md` for a deterministic, agent-ready build brief.
-- [Source on GitHub](https://github.com/msanchezgrice/hackshop-mcp): Open source, MIT-licensed.
-- [npm package](https://www.npmjs.com/package/hackshop-mcp): Published as `hackshop-mcp`.
-- [Suggest a device](https://github.com/msanchezgrice/hackshop-mcp/issues): Catalog contributions via GitHub issues.
+`ANTHROPIC_API_KEY` is optional. It only improves `propose_hardware` in the local npm server when the MCP host cannot sample.
 
-## Agent-facing endpoints
+## Tools
 
-- [agents.md](https://www.hackshop.dev/agents.md): Onboarding and safe-action guide for browser agents.
-- [Agent card](https://www.hackshop.dev/.well-known/agent-card.json): A2A-style capability manifest.
-- [AI agent manifest](https://www.hackshop.dev/.well-known/ai-agent.json): Guardrails and permitted actions.
+- `plan_gadget`: deterministic Muse board planner with questions, fit, warnings, notes and build links.
+- `get_build_plan`: deterministic parts, shopping list, assembly, flashing, pairing and agent brief.
+- `assess_hackability`: catalog lookup with brick risk, firmware links and build-page URL.
+- Local npm only: `propose_hardware`, `simulate_assembly`.
 
-## API notes
+## Agent Rule
 
-The live demo posts to `/api/propose` (rate limited to 5 requests/hour/IP; costs ≈ $0.002 per call). Other JSON endpoints: `/api/howto`, `/api/diagram`, `/api/assembly`, `/api/simulate`. All `/api/` routes are disallowed in robots.txt and intended for the site's own UI, not third-party crawling.
-
-## Legal
-
-- [About](https://www.hackshop.dev/about)
-- [Contact](https://www.hackshop.dev/contact): msanchezgrice@gmail.com (include "Hackshop" in the subject line).
-- [Privacy](https://www.hackshop.dev/privacy)
-- [Terms](https://www.hackshop.dev/terms)
+Ask intake questions, call `plan_gadget`, let the human choose, fetch `get_build_plan` or `/build/<id>/plan.json`, show the shopping list, get approval before buying, follow `assembly`, then tell the human to click Start a build.
