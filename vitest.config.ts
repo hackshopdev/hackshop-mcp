@@ -10,7 +10,7 @@ export default defineConfig({
       "@supabase/supabase-js": fileURLToPath(
         new URL("./test/fixtures/supabase-js.ts", import.meta.url),
       ),
-      "next/server": fileURLToPath(new URL("./site/node_modules/next/server.js", import.meta.url)),
+      "next/server": fileURLToPath(new URL("./test/fixtures/next-server.ts", import.meta.url)),
       "server-only": fileURLToPath(new URL("./test/fixtures/server-only.ts", import.meta.url)),
     },
   },
