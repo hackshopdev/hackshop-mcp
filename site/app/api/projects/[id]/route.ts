@@ -15,7 +15,7 @@ import {
 export const runtime = "nodejs";
 
 type AuthState = { userId: string; getToken: () => Promise<string | null> };
-type RouteContext = { params: Promise<{ id: string }> | { id: string } };
+type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, context: RouteContext) {
   const authState = await requireAuth();

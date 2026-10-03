@@ -14,27 +14,33 @@ Hackshop now knows about Meta's Muse Gadgets SDK: ESP32 boards and Linux machine
 
 ## Status
 
-v0.0.5 — published on npm. Install with `npx hackshop-mcp` or add it to your MCP client config. Five tools (`propose_hardware`, `assess_hackability`, `plan_gadget`, `get_build_plan`, `simulate_assembly`), 80 devices. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
+v0.0.5 - published on npm and hosted at `https://www.hackshop.dev/mcp`. The hosted MCP exposes the deterministic tools (`plan_gadget`, `get_build_plan`, `assess_hackability`); the npm server also includes `propose_hardware` and `simulate_assembly`. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
 
 ## Install in 30 seconds
 
-Add to your MCP client config (Claude Desktop / Claude Code / Cursor):
+Hosted connector, when your client supports streamable HTTP:
+
+```json
+{
+  "url": "https://www.hackshop.dev/mcp",
+  "transport": "streamable-http"
+}
+```
+
+Or add the local npm server to your MCP client config (Claude Desktop / Claude Code / Cursor):
 
 ```json
 {
   "mcpServers": {
     "hackshop": {
       "command": "npx",
-      "args": ["-y", "hackshop-mcp"],
-      "env": {
-        "ANTHROPIC_API_KEY": "sk-ant-..."
-      }
+      "args": ["-y", "hackshop-mcp"]
     }
   }
 }
 ```
 
-The `ANTHROPIC_API_KEY` env var is **optional but recommended**. The server first tries `sampling/createMessage` (host-delegated reasoning, no key needed). If your host doesn't support that — many don't yet — the server falls back to a direct Anthropic API call when this key is set. Without it, you'll get raw catalog matches in degraded mode.
+`ANTHROPIC_API_KEY` is optional. It only improves `propose_hardware` in the local npm server when the MCP host cannot sample; `plan_gadget`, `get_build_plan`, and `assess_hackability` never need a key. Anonymous usage telemetry (tool names and timings only) is on by default in the npm server; set `HACKSHOP_TELEMETRY=0` to turn it off.
 
 ## Tools
 
@@ -55,21 +61,30 @@ Returns 3-5 hardware proposals, each with:
 
 Lookup by id, exact name, or substring. Returns the same shape as a single proposal. Use when you have a device in mind and want to verify hackability before searching for one to buy.
 
-### `plan_gadget(idea, platform?, budget_usd?, owned_device_ids?, needs?, limit?)`
+### `plan_gadget(idea, platform?, budget_usd?, owned_device_ids?, needs?, size?, limit?)`
 
 Deterministically plans a physical gadget for an AI agent, with Meta Muse Gadgets as the first supported platform. It infers needs such as voice, screen, camera, air sensors, e-paper, round display, home-network tunnel, or Linux control; ranks supported boards; and returns:
 
-- `inferred_needs` and ranked `picks`
-- each pick's Muse platform, support level, tier, score, concrete `why`, gaps, price label, firmware/build links, setup steps, and caveats
+- `inferred_needs`, `fit` (`all | partial | none`), `notes`, `warnings`, `questions`, and ranked `picks`
+- each pick's Muse platform, support level, tier, score, concrete `why`, gaps, `needs_met`, `within_budget`, price label, firmware/build links, setup steps, and caveats
 - `fabrication.printables` with STL/STEP/SVG/fab.json URLs when a stand or enclosure exists
 - Muse SDK `terms` for every platform represented in the picks
-- concrete `next_steps`
+- concrete `next_steps`, starting with the build page where the human can save progress
 
 This tool does not call an LLM and does not use the network. It never suggests selling Muse devices; the Muse SDK token terms are personal and non-commercial.
 
 ### `get_build_plan(device_id)`
 
-Returns the full, deterministic build plan for one device: parts (with store or search links), numbered steps with exact commands, `try_saying` prompts, caveats, the Muse SDK terms, and `agent_brief_md`, a self-contained Markdown brief a coding agent can follow. It also returns the human page (`https://www.hackshop.dev/build/<device_id>`) and the raw brief (`/build/<device_id>/build.md`). It never buys anything; ordering parts is left to the human.
+Returns the full, deterministic build plan for one device: parts (with store or search links), `shopping_list` with explicit purchase policy, numbered steps with exact commands, machine-readable `assembly`, `try_saying` prompts, caveats, the Muse SDK terms, and `agent_brief_md`, a self-contained Markdown brief a coding agent can follow. It also returns the human page (`https://www.hackshop.dev/build/<device_id>`), raw JSON (`/build/<device_id>/plan.json`) and raw brief (`/build/<device_id>/build.md`). It never buys anything; ordering parts is left to the human.
+
+## Resources and Prompts
+
+Both hosted MCP and npm expose:
+
+- `hackshop://muse/boards` - JSON for every Muse board: ids, names, platform, tier, price, features, build command and build page URL.
+- `hackshop://muse/sdk-terms` - text summary of Muse SDK token terms.
+- `hackshop://catalog/tags` - catalog tag list.
+- Prompt `plan-muse-gadget` - tells an agent to do intake, call `plan_gadget`, call `get_build_plan`, show the shopping list, ask before buying, assemble, flash and pair.
 
 ### `simulate_assembly(assembly)`
 
@@ -104,7 +119,7 @@ The `simulate_assembly` MCP tool above is the bounded, single-call entry point i
 ## Architecture
 
 - TypeScript + `@modelcontextprotocol/sdk`
-- LLM reasoning delegated to the host via `sampling/createMessage` first; falls back to a direct Anthropic API call (`@anthropic-ai/sdk`) when `ANTHROPIC_API_KEY` is set and the host lacks sampling
+- LLM reasoning for `propose_hardware` delegates to the host via `sampling/createMessage` first, then falls back to a direct Anthropic API call (`@anthropic-ai/sdk`) only when optional `ANTHROPIC_API_KEY` is set
 - `simulate_assembly` calls out to a separate Python MuJoCo **sim-worker** over HTTP (`SIM_WORKER_URL`); the worker isn't bundled in the npm package
 - Catalog stored as `catalog.json` in the repo (JSON, version-controllable, 80 devices and growing)
 - Tag vocabulary in `tags.md`, validated at boot — server refuses to start on tag drift
@@ -121,28 +136,9 @@ npm test           # safety + schema + lookup tests
 npm run build      # tsc -> dist/
 ```
 
-## Troubleshooting: verify sampling support
+## Troubleshooting: quick deterministic check
 
-`propose_hardware` reasons via `sampling/createMessage`. Some MCP hosts don't support it (and without an `ANTHROPIC_API_KEY` fallback you'll get degraded, raw-catalog responses). If proposals come back without reasoning, verify your host supports sampling with this quick smoke check.
-
-```bash
-npm install
-```
-
-Add this to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "hackshop-smoke": {
-      "command": "tsx",
-      "args": ["/Users/YOU/hackshop-mcp/scripts/smoke.ts"]
-    }
-  }
-}
-```
-
-Restart Claude Desktop. Ask Claude to call the `smoke_check` tool. If it returns "Smoke OK," sampling works in your host. If it fails, set an `ANTHROPIC_API_KEY` (see install above) or expect degraded responses from `propose_hardware`.
+Ask your agent to call `plan_gadget` with `a desk gadget I can talk to`. This should return Muse board picks instantly and without any API key. If `propose_hardware` returns catalog matches without reasoning, your host probably does not support sampling and no optional `ANTHROPIC_API_KEY` is set.
 
 ## Install (local build → host)
 
@@ -167,7 +163,7 @@ The founder had an Electric Objects EO1 picture frame. The company shut down; th
 
 ## Safety Rule (P0)
 
-Bricking unrecoverable hardware is the single failure mode that ends this product. The catalog tracks brick-risk provenance: `founder-verified | community-reported | llm-inferred`. For categories where bricks are unrecoverable (`handheld`, `sbc`), the server **refuses to surface LLM-inferred brick-risk scores**. It returns "brick-risk unknown — research before flashing" instead. This is a tested release gate. See `src/safety.ts` and `test/safety.test.ts`.
+Bricking unrecoverable hardware is the single failure mode that ends this product. The catalog tracks brick-risk provenance: `founder-verified | community-reported | vendor-docs | llm-inferred`. For categories where bricks are unrecoverable (`handheld`, `sbc`), the server **refuses to surface LLM-inferred brick-risk scores**. It returns "brick-risk unknown - research before flashing" instead. This is a tested release gate. See `src/safety.ts` and `test/safety.test.ts`.
 
 ## Telemetry
 

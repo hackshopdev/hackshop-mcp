@@ -5,12 +5,16 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
+  GetPromptRequestSchema,
+  ListPromptsRequestSchema,
+  ListResourcesRequestSchema,
   ListToolsRequestSchema,
+  ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { loadCatalog } from "./catalog/load.js";
 import type { DeviceEntry } from "./catalog/schema.js";
 import { loadPlatforms } from "./platforms/load.js";
-import { setLoadedPlatforms } from "./platforms/index.js";
+import { printablesFor, setLoadedPlatforms } from "./platforms/index.js";
 import type { Platform } from "./platforms/schema.js";
 import { probeSamplingSupport } from "./sampling.js";
 import {
@@ -18,33 +22,40 @@ import {
   proposeHardwareInput,
 } from "./tools/propose_hardware.js";
 import {
-  assessHackability,
-  assessHackabilityInput,
-} from "./tools/assess_hackability.js";
-import {
   simulateAssembly,
   simulateAssemblyInput,
 } from "./tools/simulate_assembly.js";
-import {
-  NEED_VALUES,
-  planGadget,
-  planGadgetInput,
-} from "./tools/plan_gadget.js";
-import {
-  getBuildPlan,
-  getBuildPlanInput,
-} from "./tools/get_build_plan.js";
 import { siteUrlFromEnv } from "./site-url.js";
 import { createTelemetry, errorKind } from "./telemetry.js";
+import {
+  coreToolDefinitions,
+  executeCoreTool,
+  type CoreToolResult,
+} from "./core/tools.js";
+import {
+  getCorePrompt,
+  listCorePrompts,
+  listCoreResources,
+  readCoreResource,
+} from "./core/resources.js";
+import type { CoreContext } from "./core/types.js";
 
 const NAME = "hackshop-mcp";
 const VERSION = "0.0.5";
+const STDIO_INSTRUCTIONS =
+  "Hackshop maps a natural-language project idea to hackable, repurposable, or protocol-native hardware. Use plan_gadget for Muse agent-body gadgets because it is deterministic, instant and key-free. Use propose_hardware for broader repurposing ideas and existing hardware, especially when the host can sample or ANTHROPIC_API_KEY is set. Hackshop never buys anything; show shopping lists and ask the human before any purchase. Anonymous usage telemetry (tool names and timings only) is on by default; set HACKSHOP_TELEMETRY=0 to turn it off.";
 
 export function createToolRunner(context: {
   devices: DeviceEntry[];
   platforms: Platform[];
   server?: Server;
-}): (name: string, args: unknown) => Promise<{ out: unknown; degraded?: boolean }> {
+  tags?: string[];
+}): (name: string, args: unknown) => Promise<{
+  out: unknown;
+  degraded?: boolean;
+  isError?: boolean;
+  text?: string;
+}> {
   return async (name: string, args: unknown) => {
     if (name === "propose_hardware") {
       if (!context.server) {
@@ -55,21 +66,17 @@ export function createToolRunner(context: {
       return { out, degraded: out.degraded };
     }
 
-    if (name === "assess_hackability") {
-      const input = assessHackabilityInput.parse(args);
-      return { out: assessHackability(input, context.devices) };
-    }
-
-    if (name === "plan_gadget") {
-      const input = planGadgetInput.parse(args);
-      return { out: planGadget(input, context.devices) };
-    }
-
-    if (name === "get_build_plan") {
-      const input = getBuildPlanInput.parse(args);
-      return {
-        out: getBuildPlan(input, context.devices, context.platforms, siteUrlFromEnv()),
-      };
+    if (
+      name === "assess_hackability" ||
+      name === "plan_gadget" ||
+      name === "get_build_plan"
+    ) {
+      const result = executeCoreTool(
+        name,
+        args,
+        coreContext(context.devices, context.platforms, context.tags),
+      );
+      return runnerResult(result);
     }
 
     if (name === "simulate_assembly") {
@@ -81,9 +88,36 @@ export function createToolRunner(context: {
   };
 }
 
+function coreContext(
+  catalog: DeviceEntry[],
+  platforms: Platform[],
+  tags?: string[],
+): CoreContext {
+  const siteUrl = siteUrlFromEnv();
+  return {
+    catalog,
+    platforms,
+    printablesFor: (device, baseUrl) => printablesFor(device as DeviceEntry, baseUrl),
+    siteUrl,
+    tags,
+  };
+}
+
+function runnerResult(result: CoreToolResult): {
+  out: unknown;
+  isError?: boolean;
+  text?: string;
+} {
+  if (result.isError) {
+    return { out: { error: result.text }, isError: true, text: result.text };
+  }
+  return { out: result.output };
+}
+
 async function main(): Promise<void> {
   // Boot validation. Refuses to start on bad catalog/tags.
   const { devices, tags } = loadCatalog();
+  const sortedTags = [...tags].sort();
   const platforms = loadPlatforms(devices);
   setLoadedPlatforms(platforms);
   process.stderr.write(
@@ -95,7 +129,10 @@ async function main(): Promise<void> {
   // supports it or doesn't. probeSamplingSupport() handles the check.
   const server = new Server(
     { name: NAME, version: VERSION },
-    { capabilities: { tools: {} } },
+    {
+      capabilities: { tools: {}, resources: {}, prompts: {} },
+      instructions: STDIO_INSTRUCTIONS,
+    },
   );
 
   const telemetry = createTelemetry(VERSION);
@@ -138,77 +175,7 @@ async function main(): Promise<void> {
           required: ["idea"],
         },
       },
-      {
-        name: "assess_hackability",
-        description:
-          "Given a device name, return: hackable y/n, hack difficulty, brick risk (with safety rule applied), firmware links, community size, last verified date, and notes. Looks up by id, exact name, or substring.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            device_name: {
-              type: "string",
-              description: "Device name or id.",
-            },
-          },
-          required: ["device_name"],
-        },
-      },
-      {
-        name: "plan_gadget",
-        description:
-          "Plan a physical gadget for an AI agent (Meta Muse Gadgets today). Given an idea, returns the best supported boards with tier, what works on each (voice, images, touch, camera, sensors, home-network tunnel), build commands, setup steps, Muse SDK terms, and printable stand/enclosure files when available. Deterministic: no LLM or network calls.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            idea: {
-              type: "string",
-              description: "Gadget idea or use case.",
-            },
-            platform: {
-              type: "string",
-              enum: ["muse-esp32", "muse-linux", "any"],
-              description: "Optional platform filter. Defaults to any.",
-            },
-            budget_usd: {
-              type: "number",
-              description: "Optional hardware budget in USD.",
-            },
-            owned_device_ids: {
-              type: "array",
-              items: { type: "string" },
-              description: "Catalog device ids the user already owns.",
-            },
-            needs: {
-              type: "array",
-              items: {
-                type: "string",
-                enum: NEED_VALUES,
-              },
-              description: "Optional explicit needs; otherwise inferred from idea.",
-            },
-            limit: {
-              type: "number",
-              description: "Number of picks to return, 1-5. Defaults to 3.",
-            },
-          },
-          required: ["idea"],
-        },
-      },
-      {
-        name: "get_build_plan",
-        description:
-          "Get a step-by-step build plan for a device: parts list with buy links, numbered steps with exact commands, what to say to it once it works, and an agent-ready Markdown brief you can follow directly. Deterministic, no network.",
-        inputSchema: {
-          type: "object",
-          properties: {
-            device_id: {
-              type: "string",
-              description: "Catalog device id.",
-            },
-          },
-          required: ["device_id"],
-        },
-      },
+      ...coreToolDefinitions(),
       {
         name: "simulate_assembly",
         description:
@@ -232,23 +199,52 @@ async function main(): Promise<void> {
     ],
   }));
 
-  const runTool = createToolRunner({ devices, platforms, server });
+  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+    resources: listCoreResources(),
+  }));
+
+  server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+    const resource = readCoreResource(
+      request.params.uri,
+      coreContext(devices, platforms, sortedTags),
+    );
+    if (!resource) {
+      throw new Error(`Unknown resource: ${request.params.uri}`);
+    }
+    return { contents: [resource] };
+  });
+
+  server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+    prompts: listCorePrompts(),
+  }));
+
+  server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+    const prompt = getCorePrompt(request.params.name, request.params.arguments);
+    if (!prompt) {
+      throw new Error(`Unknown prompt: ${request.params.name}`);
+    }
+    return prompt;
+  });
+
+  const runTool = createToolRunner({ devices, platforms, server, tags: sortedTags });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
     const startedAt = Date.now();
     try {
-      const { out, degraded } = await runTool(name, args);
+      const { out, degraded, isError, text } = await runTool(name, args);
       telemetry.send({
         event: "mcp_tool_called",
         tool: name,
-        success: true,
+        success: !isError,
         degraded,
+        ...(isError ? { error_kind: "tool_error" } : {}),
         duration_ms: Date.now() - startedAt,
         ...clientInfo(),
       });
       return {
-        content: [{ type: "text", text: JSON.stringify(out, null, 2) }],
+        ...(isError ? { isError: true } : {}),
+        content: [{ type: "text", text: text ?? JSON.stringify(out, null, 2) }],
       };
     } catch (err) {
       telemetry.send({

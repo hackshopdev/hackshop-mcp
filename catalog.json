@@ -37,7 +37,7 @@
     ],
     "hack_difficulty": 1,
     "brick_risk": 1,
-    "brick_provenance": "founder-verified",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-05-04",
     "firmware_links": [
       "https://www.raspberrypi.com/documentation/"
@@ -65,7 +65,7 @@
     ],
     "hack_difficulty": 1,
     "brick_risk": 1,
-    "brick_provenance": "founder-verified",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-05-04",
     "firmware_links": [
       "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/"
@@ -281,7 +281,7 @@
       "https://github.com/OLIMEX/ESP32-POE"
     ],
     "community_size_bucket": "small",
-    "notes": "ESP32 with PoE Ethernet. Single cable for power and network \u2014 good for wall-mounted displays/sensors with no wall-warts.",
+    "notes": "ESP32 with PoE Ethernet. Single cable for power and network — good for wall-mounted displays/sensors with no wall-warts.",
     "est_used_price_usd_min": 20,
     "est_used_price_usd_max": 35,
     "est_setup_hours_min": 2,
@@ -452,7 +452,7 @@
       "https://github.com/LumaTeam/Luma3DS"
     ],
     "community_size_bucket": "thriving",
-    "notes": "Massive modding scene. CFW (Luma3DS) enables homebrew, emulators, region-free play. Brick risk REAL on bad installs \u2014 the 3ds.hacks.guide walkthrough is the canonical source.",
+    "notes": "Massive modding scene. CFW (Luma3DS) enables homebrew, emulators, region-free play. Brick risk REAL on bad installs — the 3ds.hacks.guide walkthrough is the canonical source.",
     "est_used_price_usd_min": 50,
     "est_used_price_usd_max": 150,
     "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Nintendo-3DS-AquaOpen.png?width=640",
@@ -585,7 +585,7 @@
       "https://github.com/pimoroni/inky"
     ],
     "community_size_bucket": "active",
-    "notes": "800x480 SEVEN-COLOR e-paper HAT. 7-color e-ink is rare \u2014 great for ambient art rotation, family photos, weather displays. Slow refresh (~30s) so static-frame use only. Pi Zero W compatible.",
+    "notes": "800x480 SEVEN-COLOR e-paper HAT. 7-color e-ink is rare — great for ambient art rotation, family photos, weather displays. Slow refresh (~30s) so static-frame use only. Pi Zero W compatible.",
     "est_used_price_usd_min": 90,
     "est_used_price_usd_max": 130,
     "est_setup_hours_min": 3,
@@ -690,7 +690,7 @@
       "https://www.mobileread.com/forums/forumdisplay.php?f=275"
     ],
     "community_size_bucket": "small",
-    "notes": "6\" e-ink with stock Android 10 + Google Play. Sideload any Android app \u2014 Google Calendar, custom dashboards, kiosk launchers. Less hacking required than a Kindle/Kobo because it's already open.",
+    "notes": "6\" e-ink with stock Android 10 + Google Play. Sideload any Android app — Google Calendar, custom dashboards, kiosk launchers. Less hacking required than a Kindle/Kobo because it's already open.",
     "est_used_price_usd_min": 90,
     "est_used_price_usd_max": 160,
     "est_setup_hours_min": 1,
@@ -1658,7 +1658,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -1709,7 +1709,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -1759,7 +1759,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -1814,7 +1814,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -1867,7 +1867,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -1921,7 +1921,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -1939,8 +1939,8 @@
       "orientation": "upright",
       "shape": "round",
       "size_mm": {
-        "w": 55.0,
-        "h": 55.0,
+        "w": 55,
+        "h": 55,
         "t": 15.05
       },
       "size_confidence": "drawing",
@@ -1976,7 +1976,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -2027,7 +2027,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -2047,7 +2047,7 @@
       "size_mm": {
         "w": 37.6,
         "h": 45.2,
-        "t": 15.0
+        "t": 15
       },
       "size_confidence": "drawing",
       "size_note": "Portrait. Display window 28.70 x 34.94 mm.",
@@ -2082,7 +2082,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -2137,7 +2137,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -2155,15 +2155,15 @@
       "orientation": "upright",
       "shape": "box",
       "size_mm": {
-        "w": 24.0,
-        "h": 48.0,
-        "t": 15.0
+        "w": 24,
+        "h": 48,
+        "t": 15
       },
       "size_confidence": "drawing",
       "size_note": "Corner radius R3. Hole positions were measured off the drawing; confirm against a unit.",
       "corner_radius_mm": 3,
       "comes_in_case": true,
-      "mass_g": 20.0,
+      "mass_g": 20,
       "usb": {
         "type": "usb-c",
         "count": 1,
@@ -2193,7 +2193,7 @@
     ],
     "hack_difficulty": 2,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
@@ -2211,8 +2211,8 @@
       "orientation": "upright",
       "shape": "box",
       "size_mm": {
-        "w": 24.0,
-        "h": 48.0,
+        "w": 24,
+        "h": 48,
         "t": 13.5
       },
       "size_confidence": "published",
@@ -2248,7 +2248,7 @@
     ],
     "hack_difficulty": 1,
     "brick_risk": 1,
-    "brick_provenance": "llm-inferred",
+    "brick_provenance": "vendor-docs",
     "last_verified": "2026-10-02",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/linux",

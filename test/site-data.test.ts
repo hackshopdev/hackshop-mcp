@@ -25,6 +25,19 @@ describe("site data mirrors", () => {
     }
   });
 
+  it("keeps the site core implementation byte-identical to the root copy", () => {
+    const sourceDir = join(process.cwd(), "src", "core");
+    const siteDir = join(process.cwd(), "site", "lib", "core");
+    const files = readdirSync(sourceDir).filter((file) => file.endsWith(".ts")).sort();
+
+    expect(files.length).toBeGreaterThan(0);
+    for (const file of files) {
+      expect(readFileSync(join(siteDir, file), "utf8")).toBe(
+        readFileSync(join(sourceDir, file), "utf8"),
+      );
+    }
+  });
+
   it("parses site/platforms.json with the site platform schema", () => {
     const parsed = Platforms.parse(
       JSON.parse(readFileSync(join(process.cwd(), "site", "platforms.json"), "utf8")),

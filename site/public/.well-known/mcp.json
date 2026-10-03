@@ -1,0 +1,28 @@
+{
+  "name": "hackshop",
+  "description": "Hosted MCP for planning Muse gadget bodies, build plans, shopping lists and machine-readable assembly instructions.",
+  "url": "https://www.hackshop.dev/mcp",
+  "transport": "streamable-http",
+  "tools": [
+    {
+      "name": "plan_gadget",
+      "description": "Plan a Muse gadget body with questions, fit, notes, warnings and build links."
+    },
+    {
+      "name": "get_build_plan",
+      "description": "Return parts, shopping list, assembly steps, commands and agent brief for a device."
+    },
+    {
+      "name": "assess_hackability",
+      "description": "Look up catalog hackability, brick risk, firmware links and build support."
+    }
+  ],
+  "resources": [
+    "hackshop://muse/boards",
+    "hackshop://muse/sdk-terms",
+    "hackshop://catalog/tags"
+  ],
+  "prompts": ["plan-muse-gadget"],
+  "npm": "hackshop-mcp",
+  "docs": "https://github.com/msanchezgrice/hackshop-mcp"
+}

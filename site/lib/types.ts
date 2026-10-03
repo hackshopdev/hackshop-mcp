@@ -18,6 +18,7 @@ export const Provenance = z.enum([
   "founder-verified",
   "community-reported",
   "llm-inferred",
+  "vendor-docs",
 ]);
 
 export const CommunitySize = z.enum(["tiny", "small", "active", "thriving"]);

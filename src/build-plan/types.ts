@@ -18,6 +18,7 @@ export interface PlatformBoardPart {
   note: string;
   buy_url?: string;
   search?: string;
+  est_price_usd?: number;
 }
 
 export interface PlatformBoard {
@@ -63,6 +64,23 @@ export interface Printable {
   step_url: string;
   svg_url: string;
   fab_url: string;
+  fab?: {
+    print?: {
+      orientation?: string;
+      supports?: boolean;
+      material?: string;
+      layer_mm?: number;
+      infill_pct?: number;
+    };
+    params?: {
+      clearance?: number;
+      cable_d?: number;
+      plug_overmold?: number[];
+      tilt_deg?: number;
+    };
+    checks?: Record<string, boolean | null>;
+    caveats?: string[];
+  };
 }
 
 export interface BuildPlanPart {
@@ -74,6 +92,7 @@ export interface BuildPlanPart {
   buy_url: string | null;
   search_url: string | null;
   kind: "board" | "part" | "printed";
+  est_price_usd: number | null;
 }
 
 export interface BuildPlanStep {
@@ -85,6 +104,45 @@ export interface BuildPlanStep {
   links: Array<{ label: string; url: string }>;
 }
 
+export interface AssemblyStep {
+  id: string;
+  order: number;
+  action:
+    | "print"
+    | "place"
+    | "insert"
+    | "connect"
+    | "route_cable"
+    | "fasten"
+    | "power"
+    | "flash"
+    | "pair"
+    | "verify";
+  part_ids: string[];
+  tools: string[];
+  instruction: string;
+  check: string;
+  robot: {
+    feasible: boolean;
+    notes: string;
+  };
+}
+
+export interface ShoppingList {
+  items: Array<{
+    part_id: string;
+    name: string;
+    qty: number;
+    url: string | null;
+    url_kind: "buy" | "search";
+    est_price_usd: number | null;
+    required: boolean;
+  }>;
+  est_total_usd: number | null;
+  currency: "USD";
+  purchase_policy: string;
+}
+
 export interface BuildPlan {
   device_id: string;
   name: string;
@@ -94,7 +152,9 @@ export interface BuildPlan {
   est_cost_label: string | null;
   est_time_label: string | null;
   parts: BuildPlanPart[];
+  shopping_list: ShoppingList;
   steps: BuildPlanStep[];
+  assembly: AssemblyStep[];
   try_saying: string[];
   caveats: string[];
   terms: { summary: string; url: string } | null;

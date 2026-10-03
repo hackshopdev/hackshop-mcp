@@ -6,6 +6,7 @@ import type { DeviceEntry } from "../src/catalog/schema.js";
 import { printablesFor, setLoadedPlatforms } from "../src/platforms/index.js";
 import { Platforms, type PlatformBoard } from "../src/platforms/schema.js";
 import { planGadget, planGadgetInput } from "../src/tools/plan_gadget.js";
+import { createToolRunner } from "../src/server.js";
 
 const { devices } = loadCatalog();
 const platforms = Platforms.parse(
@@ -50,6 +51,72 @@ describe("plan_gadget", () => {
   it("prefers SenseCAP Indicator for air quality", () => {
     const out = run({ idea: "air quality monitor muse can read" });
     expect(out.picks[0]?.device_id).toBe("seeed-sensecap-indicator");
+  });
+
+  it("covers air sensors even when the user also wants voice", () => {
+    const out = run({ idea: "an air quality monitor I can talk to" });
+
+    expect(out.picks.map((pick) => pick.device_id)).toContain("seeed-sensecap-indicator");
+    expect(out.notes.join("\n")).toMatch(/No single board/i);
+    expect(out.picks.find((pick) => pick.device_id === "seeed-sensecap-indicator")?.needs_met)
+      .toContain("air-sensors");
+  });
+
+  it("keeps within-budget voice picks above over-budget picks", () => {
+    const out = run({ idea: "a desk gadget I can talk to", budget_usd: 40 });
+    const firstOverBudget = out.picks.findIndex((pick) => pick.within_budget === false);
+
+    expect(out.picks.every((pick) => typeof pick.within_budget === "boolean")).toBe(true);
+    if (firstOverBudget !== -1) {
+      const laterWithinBudget = out.picks.findIndex((pick, index) =>
+        index > firstOverBudget && pick.within_budget === true
+      );
+      expect(laterWithinBudget).toBe(-1);
+    }
+  });
+
+  it("is honest when no board fits the budget", () => {
+    const out = run({ idea: "a desk gadget I can talk to", budget_usd: 5 });
+
+    expect(out.fit).toBe("none");
+    expect(out.notes.join("\n")).toMatch(/Nothing on the Muse list fits a \$5 budget/);
+    // The suggested board must actually do what was asked (voice).
+    expect(out.notes.join("\n")).not.toMatch(/ideaspark/i);
+  });
+
+  it("warns for non-Muse assistants", () => {
+    const out = run({ idea: "a smart speaker for Alexa" });
+    expect(out.warnings.join("\n")).toMatch(/Alexa/);
+  });
+
+  it("warns for unknown owned device ids", () => {
+    const out = run({ idea: "a desk gadget I can talk to", owned_device_ids: ["nope"] });
+    expect(out.warnings).toContain('Unknown device id "nope" (not in the catalog); ignored.');
+  });
+
+  it("returns intake questions for vague ideas but not specific ones", () => {
+    const vague = run({ idea: "a body for you" });
+    const specific = run({ idea: "a desk gadget I can talk to" });
+
+    expect(vague.questions.length).toBeGreaterThan(0);
+    expect(vague.questions.length).toBeLessThanOrEqual(4);
+    expect(specific.questions).toEqual([]);
+  });
+
+  it("formats bad input as a tool error without raw Zod JSON", async () => {
+    const runTool = createToolRunner({ devices, platforms });
+    const result = await runTool("plan_gadget", {
+      idea: "x",
+      limit: 9,
+      needs: ["laser"],
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.text).toMatch(/`idea`/);
+    expect(result.text).toMatch(/`limit`/);
+    expect(result.text).toMatch(/`needs\[0\]`/);
+    expect(result.text).toMatch(/voice, screen/);
+    expect(result.text).not.toContain("[{");
   });
 
   it("prefers reTerminal E1001 for e-paper status", () => {
