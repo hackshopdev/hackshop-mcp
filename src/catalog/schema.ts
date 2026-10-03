@@ -80,6 +80,7 @@ export const DeviceEntry = z.object({
   notes: z.string().max(500, "notes capped at 500 chars to discourage dumping"),
   est_used_price_usd_min: z.number().int().nonnegative().optional(),
   est_used_price_usd_max: z.number().int().nonnegative().optional(),
+  buy_url: z.string().url().optional(),
   image_url: z.string().url().optional(),
   est_setup_hours_min: z.number().nonnegative().optional(),
   est_setup_hours_max: z.number().nonnegative().optional(),

@@ -80,6 +80,7 @@ export const DeviceEntry = z.object({
   notes: z.string().max(500),
   est_used_price_usd_min: z.number().int().nonnegative().optional(),
   est_used_price_usd_max: z.number().int().nonnegative().optional(),
+  buy_url: z.string().url().optional(),
   // Best-effort hotlink to a manufacturer / Wikipedia / GitHub product image.
   // UI shows a neutral placeholder when missing. Optional because many older
   // entries don't have a stable canonical URL.

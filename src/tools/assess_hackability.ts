@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { buildUrls } from "../build-plan/index.js";
 import type { DeviceEntry } from "../catalog/schema.js";
 import { applyBrickRiskSafety } from "../safety.js";
 import { buildLinks, type DeviceLinks } from "../links.js";
+import { siteUrlFromEnv } from "../site-url.js";
 import {
   agentPlatformsFor,
   printablesFor,
@@ -31,6 +33,7 @@ export interface AssessOutput {
     last_verified: string;
     notes: string;
     links: DeviceLinks;
+    build_page_url: string;
     agent_platforms: AgentPlatform[];
     physical: DeviceEntry["physical"] | null;
     printables: Printable[];
@@ -85,6 +88,7 @@ export function assessHackability(
 
   const safety = applyBrickRiskSafety(match);
   const links = buildLinks(match);
+  const siteUrl = siteUrlFromEnv();
   const agentPlatforms = safeAgentPlatformsFor(match.id);
 
   // Derive hackability from a real signal rather than hardcoding true: a device
@@ -108,9 +112,10 @@ export function assessHackability(
       last_verified: match.last_verified,
       notes: match.notes,
       links,
+      build_page_url: buildUrls(match.id, siteUrl, false).build_page,
       agent_platforms: agentPlatforms,
       physical: match.physical ?? null,
-      printables: printablesFor(match),
+      printables: printablesFor(match, siteUrl),
     },
   };
 }

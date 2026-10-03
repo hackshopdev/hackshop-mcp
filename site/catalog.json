@@ -48,7 +48,8 @@
     "est_used_price_usd_max": 65,
     "image_url": "https://en.wikipedia.org/wiki/Special:FilePath/Raspberry_Pi_4_Model_B_-_Side.jpg?width=640",
     "est_setup_hours_min": 1,
-    "est_setup_hours_max": 2
+    "est_setup_hours_max": 2,
+    "buy_url": "https://www.raspberrypi.com/products/raspberry-pi-4-model-b/"
   },
   {
     "id": "raspberry-pi-zero-2w",
@@ -74,7 +75,8 @@
     "est_used_price_usd_min": 15,
     "est_used_price_usd_max": 25,
     "est_setup_hours_min": 1,
-    "est_setup_hours_max": 2
+    "est_setup_hours_max": 2,
+    "buy_url": "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/"
   },
   {
     "id": "tidbyt-gen1",
@@ -1692,7 +1694,8 @@
       "mounting": "No mounting holes on the dimension drawing.",
       "printables": [],
       "source_url": "https://dl.espressif.com/dl/schematics/Dimension_esp32-c5-devkitc-1_v1.2_20250509.pdf"
-    }
+    },
+    "buy_url": "https://www.digikey.com/en/products/detail/espressif-systems/ESP32-C5-DEVKITC-1-N8R8/28718162"
   },
   {
     "id": "ideaspark-esp32-1-9-lcd",
@@ -1739,7 +1742,8 @@
       "mounting": null,
       "printables": [],
       "source_url": "https://manuals.plus/ae/1005007181435830"
-    }
+    },
+    "buy_url": "https://www.amazon.com/dp/B0D6QXC813"
   },
   {
     "id": "seeed-sensecap-indicator",
@@ -1793,7 +1797,8 @@
       "mounting": "Fold-out kickstand and keyhole wall slot (no dimensions published).",
       "printables": [],
       "source_url": "https://www.thethingsnetwork.org/device-repository/devices/seeed/sensecap-indicator/"
-    }
+    },
+    "buy_url": "https://www.seeedstudio.com/SenseCAP-Indicator-D1-p-5643.html"
   },
   {
     "id": "seeed-reterminal-e1001",
@@ -1846,7 +1851,8 @@
       "mounting": "Wall hole on the back; embedded nuts for the included stand.",
       "printables": [],
       "source_url": "https://wiki.seeedstudio.com/getting_started_with_reterminal_e1001/"
-    }
+    },
+    "buy_url": "https://www.seeedstudio.com/reTerminal-E1001-p-6534.html"
   },
   {
     "id": "home-assistant-voice-pe",
@@ -1898,7 +1904,8 @@
       "mounting": null,
       "printables": [],
       "source_url": "https://www.home-assistant.io/voice-pe/"
-    }
+    },
+    "buy_url": "https://www.home-assistant.io/voice-pe/"
   },
   {
     "id": "waveshare-esp32-s3-touch-amoled-1-75c",
@@ -1953,7 +1960,8 @@
         "desk-stand"
       ],
       "source_url": "https://www.waveshare.com/img/devkit/ESP32-S3-Touch-AMOLED-1.75C/ESP32-S3-Touch-AMOLED-1.75C-details-size.jpg"
-    }
+    },
+    "buy_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.75c.htm"
   },
   {
     "id": "aipi-lite",
@@ -2003,7 +2011,8 @@
       "mounting": "Magnets in the case.",
       "printables": [],
       "source_url": "https://static.aipi.com/AIPI_InstructionBook/AIPI_InstructionBook.html"
-    }
+    },
+    "buy_url": "https://aipi.com/products/aipi-lite"
   },
   {
     "id": "waveshare-esp32-c6-touch-amoled-1-8",
@@ -2057,7 +2066,8 @@
         "desk-stand"
       ],
       "source_url": "https://docs.waveshare.com/assets/images/ESP32-C6-Touch-AMOLED-1.8-size-567e74ffd49f34e5d3d0e9ef419fcb30.webp"
-    }
+    },
+    "buy_url": "https://www.waveshare.com/esp32-c6-touch-amoled-1.8.htm"
   },
   {
     "id": "seeed-sensecap-watcher",
@@ -2110,7 +2120,8 @@
       "mounting": "Ships with a bracket, base plate and 1/4\" adapter set.",
       "printables": [],
       "source_url": "https://www.seeed.cc/product/sensecap-watcher-the-physical-ai-agent-for-smarter-spaces"
-    }
+    },
+    "buy_url": "https://www.seeedstudio.com/SenseCAP-Watcher-W1-A-p-5979.html"
   },
   {
     "id": "m5stack-sticks3",
@@ -2166,7 +2177,8 @@
         "desk-stand"
       ],
       "source_url": "https://docs.m5stack.com/en/core/StickS3"
-    }
+    },
+    "buy_url": "https://shop.m5stack.com/products/m5sticks3-esp32s3-mini-iot-dev-kit"
   },
   {
     "id": "m5stack-stickc-plus2",
@@ -2221,7 +2233,8 @@
         "desk-stand"
       ],
       "source_url": "https://docs.m5stack.com/en/core/M5StickC%20PLUS2"
-    }
+    },
+    "buy_url": "https://shop.m5stack.com/products/m5stickc-plus2-esp32-mini-iot-development-kit"
   },
   {
     "id": "raspberry-pi-5",
@@ -2246,6 +2259,7 @@
     "est_used_price_usd_min": 50,
     "est_used_price_usd_max": 120,
     "est_setup_hours_min": 0.5,
-    "est_setup_hours_max": 2
+    "est_setup_hours_max": 2,
+    "buy_url": "https://www.raspberrypi.com/products/raspberry-pi-5/"
   }
 ]

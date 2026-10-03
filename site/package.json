@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "sync-data": "cp ../catalog.json ./catalog.json && cp ../tags.md ./tags.md && cp ../platforms.json ./platforms.json"
+    "sync-data": "cp ../catalog.json ./catalog.json && cp ../tags.md ./tags.md && cp ../platforms.json ./platforms.json && mkdir -p ./lib/build-plan && cp ../src/build-plan/*.ts ./lib/build-plan/"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",
