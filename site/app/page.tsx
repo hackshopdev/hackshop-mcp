@@ -197,7 +197,10 @@ export default function Home() {
               <BoardCard row={row} key={row.device.id} />
             ))}
           </div>
-          <p style={{ marginTop: 20 }}>
+          <p className={ui.actions} style={{ marginTop: 20, gap: "10px 24px" }}>
+            <Link className={ui.linkArrow} href="/store">
+              Shop every board and part →
+            </Link>
             <Link className={ui.linkArrow} href="/muse#compare">
               Compare every board →
             </Link>

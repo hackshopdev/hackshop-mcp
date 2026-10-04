@@ -186,7 +186,7 @@ function buildShoppingList(parts: BuildPlanPart[]): ShoppingList {
     est_total_usd,
     currency: "USD",
     purchase_policy:
-      "Show the human this list and get explicit approval for the exact items and total before buying anything. If you can use a browser, you may add items to a cart, but stop before checkout.",
+      "Show the human this list and get explicit approval for the exact items, sellers and total before buying anything. Once they approve, you may add exactly those items to a cart and, if they ask you to, check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.",
   };
 }
 

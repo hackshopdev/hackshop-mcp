@@ -32,12 +32,16 @@ export function TellMyAgent({
   surface,
   variant = "button",
   title = "Or point your agent at hackshop.dev",
+  blurb = "Paste this into Claude, ChatGPT or your coding agent. It will ask you a few questions, pick the board, make the shopping list and walk you through the build.",
+  label = "Tell my agent",
   className,
 }: {
   prompt: string;
   surface: string;
   variant?: "hero" | "button";
   title?: string;
+  blurb?: string;
+  label?: string;
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -82,11 +86,7 @@ export function TellMyAgent({
         <div className={styles.heroTop}>
           <span className={styles.badge}>Tell my agent</span>
           <h2>{title}</h2>
-          <p>
-            Paste this into Claude, ChatGPT or your coding agent. It will ask
-            you a few questions, pick the board, make the shopping list and walk
-            you through the build.
-          </p>
+          <p>{blurb}</p>
         </div>
         <pre className={styles.prompt}>
           <code>{prompt}</code>
@@ -125,7 +125,7 @@ export function TellMyAgent({
     <div className={`${styles.split} ${className ?? ""}`} ref={menuRef}>
       <button type="button" className={styles.splitMain} onClick={onCopy}>
         <AgentIcon />
-        {copied ? "Copied. Paste it into your agent." : "Tell my agent"}
+        {copied ? "Copied. Paste it into your agent." : label}
       </button>
       <button
         type="button"

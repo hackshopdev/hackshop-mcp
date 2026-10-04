@@ -9,6 +9,7 @@ Hackshop helps an agent plan and build a physical body for itself. Muse gadgets 
 - Build JSON: `https://www.hackshop.dev/build/<device_id>/plan.json`
 - Build brief: `https://www.hackshop.dev/build/<device_id>/build.md`
 - Muse boards: `https://www.hackshop.dev/muse`
+- Store JSON (every board and part, seller links, newest eBay listings): `https://www.hackshop.dev/store.json`
 
 ## MCP Install
 
@@ -45,4 +46,4 @@ Local npm server:
 
 ## Agent Rule
 
-Ask intake questions, call `plan_gadget`, let the human choose, fetch `get_build_plan` or `/build/<id>/plan.json`, show the shopping list, get approval before buying, follow `assembly`, then tell the human to click Start a build.
+Ask intake questions, call `plan_gadget`, let the human choose, fetch `get_build_plan` or `/build/<id>/plan.json`, show the shopping list (best prices from `/store.json`), get approval for the exact items and total before buying, follow `assembly`, then tell the human to click Start a build.

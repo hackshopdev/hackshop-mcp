@@ -9,6 +9,7 @@ const site = "https://www.hackshop.dev";
 // group actually changes.
 const HOME_UPDATED = new Date("2026-10-03T00:00:00Z");
 const MUSE_UPDATED = new Date("2026-10-03T00:00:00Z");
+const STORE_UPDATED = new Date("2026-10-04T00:00:00Z");
 const TEMPLATES_UPDATED = new Date("2026-10-03T00:00:00Z");
 const RESOURCES_INDEX_UPDATED = new Date("2026-10-03T00:00:00Z");
 const INVENTORY_UPDATED = new Date("2026-07-13T00:00:00Z");
@@ -30,6 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.72,
     })),
+    { url: `${site}/store`, lastModified: STORE_UPDATED, changeFrequency: "daily", priority: 0.85 },
     { url: `${site}/templates`, lastModified: TEMPLATES_UPDATED, changeFrequency: "monthly", priority: 0.7 },
     { url: `${site}/resources`, lastModified: RESOURCES_INDEX_UPDATED, changeFrequency: "weekly", priority: 0.8 },
     ...editorialPosts.map((post) => ({

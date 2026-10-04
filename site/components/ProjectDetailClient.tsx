@@ -18,6 +18,7 @@ import {
 import { getProject, saveProject } from "@/lib/projects/store";
 import { track } from "@/lib/analytics";
 import { AgentHandoff } from "./AgentHandoff";
+import { BuyEverythingPanel } from "./BuyEverythingPanel";
 import { CopyButton } from "./CopyButton";
 import { GadgetPlanner } from "./GadgetPlanner";
 import { SiteFooter } from "./SiteFooter";
@@ -106,6 +107,7 @@ export function ProjectDetailClient({ id }: { id: string }) {
   const update = (patch: Partial<Project>) => {
     setProject((current) => (current ? { ...current, ...patch } : current));
   };
+  const stillNeeded = stillNeededPartIds(project);
   const brief = appendProjectNotesToBrief(plan, {
     idea: project.idea,
     notes: project.notes,
@@ -136,6 +138,9 @@ export function ProjectDetailClient({ id }: { id: string }) {
             })}
             surface="project_page"
           />
+          <a className={styles.secondaryButton} href="#buy">
+            Buy everything
+          </a>
           <Link className={styles.secondaryButton} href={`/build/${plan.device_id}`}>
             Build page
           </Link>
@@ -177,6 +182,16 @@ export function ProjectDetailClient({ id }: { id: string }) {
               </label>
             </div>
           </section>
+
+          <BuyEverythingPanel
+            plan={plan}
+            projectId={project.id}
+            projectTitle={project.title}
+            idea={project.idea}
+            stillNeeded={stillNeeded}
+            allHave={Object.keys(project.parts).length > 0 && stillNeeded.size === 0}
+            listText={shoppingListText(plan, stillNeeded.size > 0 ? stillNeeded : undefined)}
+          />
 
           <section id="parts" className={styles.panel}>
             <h2>Parts</h2>
@@ -225,12 +240,6 @@ export function ProjectDetailClient({ id }: { id: string }) {
                 </article>
               ))}
             </div>
-            <CopyButton
-              className={styles.copyButton}
-              label="Copy what I still need"
-              text={shoppingListText(plan, stillNeededPartIds(project))}
-              onCopied={() => track("parts_list_copied", { device_id: plan.device_id })}
-            />
           </section>
 
           {plan.steps.map((step, index) => (
@@ -416,6 +425,7 @@ function IdeaProjectView({
 function ProjectRail({ plan, project }: { plan: BuildPlan; project: Project }) {
   return (
     <aside className={styles.rail} aria-label="Project progress">
+      <a href="#buy">Buy everything</a>
       <a href="#parts">
         Parts <span>{partsDone(project)}</span>
       </a>

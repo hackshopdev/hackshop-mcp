@@ -20,6 +20,7 @@ export function SiteFooter() {
             <h2>Product</h2>
             <Link href="/#start">Start a build</Link>
             <Link href="/muse">Muse gadgets</Link>
+            <Link href="/store">Store</Link>
             <Link href="/templates">Templates</Link>
             <Link href="/projects">My builds</Link>
           </div>
