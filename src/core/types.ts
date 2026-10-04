@@ -15,7 +15,8 @@ export const NEED_VALUES = [
 ] as const;
 
 export type Need = (typeof NEED_VALUES)[number];
-export type Size = "pocket" | "desk" | "wall" | "any";
+export type Size = "pocket" | "desk" | "wall" | "hidden" | "any";
+export type FitSize = Exclude<Size, "any">;
 export type FeatureValue = boolean | string | number | null;
 
 export interface Physical {
@@ -69,6 +70,7 @@ export interface PlatformBoardPart {
   required: boolean;
   note: string;
   buy_url?: string;
+  info_url?: string;
   search?: string;
   est_price_usd?: number;
 }
@@ -79,6 +81,8 @@ export interface PlatformBoard {
   tier: string;
   kind: string;
   build: string;
+  chip?: "esp32" | "esp32c5" | "esp32c6" | "esp32s3";
+  fits?: FitSize[];
   eol?: boolean;
   note: string;
   features: Record<string, FeatureValue>;

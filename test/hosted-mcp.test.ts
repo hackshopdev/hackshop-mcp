@@ -32,6 +32,9 @@ describe("hosted MCP route", () => {
       "get_build_plan",
       "assess_hackability",
     ]);
+    expect(tools.result.tools.every((tool: { outputSchema?: { type?: string } }) =>
+      tool.outputSchema?.type === "object"
+    )).toBe(true);
 
     const plan = await rpc("tools/call", {
       name: "plan_gadget",
@@ -39,6 +42,7 @@ describe("hosted MCP route", () => {
     });
     const planText = plan.result.content[0].text;
     const planJson = JSON.parse(planText);
+    expect(plan.result.structuredContent).toEqual(planJson);
     expect(planJson.picks.length).toBeGreaterThan(0);
     expect(planJson.picks.map((pick: { device_id: string }) => pick.device_id))
       .toContain("seeed-sensecap-indicator");
@@ -56,5 +60,20 @@ describe("hosted MCP route", () => {
     const boardsJson = JSON.parse(boards.result.contents[0].text);
     expect(boardsJson.some((board: { device_id: string }) => board.device_id === "m5stack-sticks3"))
       .toBe(true);
+
+    const templates = await rpc("resources/templates/list");
+    expect(templates.result.resourceTemplates).toContainEqual(
+      expect.objectContaining({
+        uriTemplate: "hackshop://build/{device_id}",
+        mimeType: "application/json",
+      }),
+    );
+
+    const build = await rpc("resources/read", {
+      uri: "hackshop://build/m5stack-sticks3",
+    });
+    const buildJson = JSON.parse(build.result.contents[0].text);
+    expect(buildJson.device_id).toBe("m5stack-sticks3");
+    expect(buildJson.shopping_list.items[0].buy_options.length).toBeGreaterThan(0);
   });
 });

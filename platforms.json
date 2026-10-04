@@ -61,6 +61,8 @@
         "tier": "status",
         "kind": "light",
         "build": "idf.py build",
+        "chip": "esp32c5",
+        "fits": ["hidden"],
         "features": {
           "home_tunnel": true,
           "images": "none",
@@ -96,6 +98,8 @@
         "tier": "status",
         "kind": "status-screen",
         "build": "tools/board.sh ideaspark build",
+        "chip": "esp32",
+        "fits": ["desk"],
         "features": {
           "home_tunnel": false,
           "images": "color",
@@ -131,6 +135,8 @@
         "tier": "status",
         "kind": "status-screen",
         "build": "tools/board.sh sensecap-indicator build",
+        "chip": "esp32s3",
+        "fits": ["desk", "wall"],
         "features": {
           "home_tunnel": true,
           "images": "color",
@@ -173,6 +179,8 @@
         "tier": "status",
         "kind": "e-paper",
         "build": "tools/board.sh reterminal-e1001 build",
+        "chip": "esp32s3",
+        "fits": ["wall", "desk"],
         "features": {
           "home_tunnel": true,
           "images": "black-and-white",
@@ -203,11 +211,50 @@
         ]
       },
       {
+        "device_id": "seeed-reterminal-e1002",
+        "support": "official",
+        "tier": "status",
+        "kind": "e-paper",
+        "build": "tools/board.sh reterminal-e1002 build",
+        "chip": "esp32s3",
+        "fits": ["wall", "desk"],
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "none",
+          "audio": "none",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": "yes",
+          "round_display": false,
+          "display_in": 7.3
+        },
+        "note": "Status text and six-colour images on 7.3\" e-paper.",
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "search": "USB-C data cable",
+            "est_price_usd": 8
+          }
+        ],
+        "try_saying": [
+          "Show a color status card for my day.",
+          "Display the family calendar."
+        ]
+      },
+      {
         "device_id": "home-assistant-voice-pe",
         "support": "official",
         "tier": "status",
         "kind": "light",
         "build": "tools/board.sh home-assistant-voice build",
+        "chip": "esp32s3",
+        "fits": ["desk", "hidden"],
         "features": {
           "home_tunnel": true,
           "images": "none",
@@ -251,6 +298,8 @@
         "tier": "full-ui",
         "kind": "ui",
         "build": "tools/muse/board.sh build s3",
+        "chip": "esp32s3",
+        "fits": ["desk"],
         "features": {
           "home_tunnel": true,
           "images": "color",
@@ -279,7 +328,8 @@
             "qty": 1,
             "required": false,
             "note": "Optional, for cordless use. Buy the battery SKU or check the Waveshare wiki for the cell size before ordering one separately.",
-            "buy_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.75c.htm",
+            "info_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.75c.htm",
+            "search": "3.7V Li-ion cell MX1.25 connector",
             "est_price_usd": 8
           }
         ],
@@ -294,6 +344,8 @@
         "tier": "full-ui",
         "kind": "ui",
         "build": "tools/muse/board.sh build aipi",
+        "chip": "esp32s3",
+        "fits": ["desk", "pocket"],
         "features": {
           "home_tunnel": true,
           "images": "color",
@@ -329,6 +381,8 @@
         "tier": "full-ui",
         "kind": "ui",
         "build": "tools/muse/board.sh build c6",
+        "chip": "esp32c6",
+        "fits": ["desk"],
         "features": {
           "home_tunnel": false,
           "images": "none",
@@ -357,7 +411,8 @@
             "qty": 1,
             "required": false,
             "note": "Optional. Waveshare recommends a thin cell around 3.85 x 24 x 28 mm; check the wiki before buying.",
-            "buy_url": "https://docs.waveshare.com/ESP32-C6-Touch-AMOLED-1.8",
+            "info_url": "https://docs.waveshare.com/ESP32-C6-Touch-AMOLED-1.8",
+            "search": "3.7V Li-ion cell MX1.25 connector thin",
             "est_price_usd": 8
           }
         ],
@@ -372,6 +427,8 @@
         "tier": "full-ui",
         "kind": "ui",
         "build": "tools/muse/board.sh build watcher",
+        "chip": "esp32s3",
+        "fits": ["desk"],
         "features": {
           "home_tunnel": true,
           "images": "color",
@@ -407,6 +464,8 @@
         "tier": "full-ui",
         "kind": "ui",
         "build": "tools/muse/board.sh build sticks3",
+        "chip": "esp32s3",
+        "fits": ["pocket"],
         "features": {
           "home_tunnel": true,
           "images": "color",
@@ -442,6 +501,8 @@
         "tier": "full-ui",
         "kind": "ui",
         "build": "tools/muse/board.sh build plus2",
+        "chip": "esp32",
+        "fits": ["pocket"],
         "features": {
           "home_tunnel": true,
           "images": "color",
@@ -544,6 +605,7 @@
         "tier": "linux",
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
+        "fits": ["hidden"],
         "features": {
           "ble_builtin": true,
           "compute": "standard"
@@ -586,6 +648,7 @@
         "tier": "linux",
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
+        "fits": ["hidden"],
         "features": {
           "ble_builtin": true,
           "compute": "standard"
@@ -620,6 +683,7 @@
         "tier": "linux",
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
+        "fits": ["hidden"],
         "features": {
           "ble_builtin": true,
           "compute": "light"
@@ -654,6 +718,7 @@
         "tier": "linux",
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
+        "fits": ["hidden"],
         "features": {
           "ble_builtin": false,
           "compute": "desktop"
@@ -688,6 +753,7 @@
         "tier": "linux",
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
+        "fits": ["hidden"],
         "features": {
           "ble_builtin": false,
           "compute": "desktop"
@@ -722,6 +788,7 @@
         "tier": "linux",
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
+        "fits": ["hidden"],
         "features": {
           "ble_builtin": null,
           "compute": "desktop"
@@ -748,6 +815,7 @@
         "tier": "linux",
         "kind": "linux",
         "build": "bash install.sh --sdk-token mgst_...",
+        "fits": ["hidden"],
         "features": {
           "ble_builtin": null,
           "compute": "desktop"

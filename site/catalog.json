@@ -1822,7 +1822,7 @@
       "https://github.com/Seeed-Projects/OSHW-reTerminal-Series-E-D"
     ],
     "community_size_bucket": "small",
-    "notes": "7.5\" 800x480 black-and-white e-paper, ESP32-S3, 2000mAh battery, temp/humidity sensor, ships with a stand. Muse shows status text and black-and-white images. The color E1002 appears on gadgets.muse.ai but only the E1001 is in the SDK's board list.",
+    "notes": "7.5\" 800x480 black-and-white e-paper, ESP32-S3, 2000mAh battery, temp/humidity sensor, ships with a stand. Muse shows status text and black-and-white images; the E1002 is the color sibling.",
     "est_used_price_usd_min": 69,
     "est_used_price_usd_max": 79,
     "image_url": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-104991002-reterminal-e1001-epaper-display.jpg",
@@ -1853,6 +1853,36 @@
       "source_url": "https://wiki.seeedstudio.com/getting_started_with_reterminal_e1001/"
     },
     "buy_url": "https://www.seeedstudio.com/reTerminal-E1001-p-6534.html"
+  },
+  {
+    "id": "seeed-reterminal-e1002",
+    "name": "Seeed reTerminal E1002 (7.3\" color e-paper)",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "e-ink",
+      "framed-art",
+      "ambient",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-04",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://www.seeedstudio.com/reTerminal-E1002-p-6533.html",
+      "https://github.com/Seeed-Projects/OSHW-reTerminal-Series-E-D"
+    ],
+    "community_size_bucket": "small",
+    "notes": "7.3\" E Ink Spectra 6 full-color ePaper with ESP32-S3 and up to 3-month battery life. Muse shows status text and six-color images. Official SDK build command is reterminal-e1002.",
+    "est_used_price_usd_min": 99,
+    "est_used_price_usd_max": 99,
+    "image_url": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-104991003-reterminal-e1002-epaper-display.jpg",
+    "est_setup_hours_min": 1,
+    "est_setup_hours_max": 3,
+    "buy_url": "https://www.seeedstudio.com/reTerminal-E1002-p-6533.html"
   },
   {
     "id": "home-assistant-voice-pe",
@@ -1999,14 +2029,14 @@
         "t": null
       },
       "size_confidence": "approximate",
-      "size_note": "Manual lists 55.5 x 47.5 x 7.8 mm, likely without the snap-on battery module; which side is width is not stated.",
+      "size_note": "Manual lists 55.5 x 47.5 x 7.8 mm, likely without the snap-on battery module; width/depth orientation is unclear.",
       "comes_in_case": true,
       "mass_g": null,
       "usb": {
         "type": "usb-c",
         "count": 1,
         "faces": [],
-        "note": "Edge not stated; the battery module plugs into it."
+        "note": "Edge is unclear; the battery module plugs into it."
       },
       "mounting": "Magnets in the case.",
       "printables": [],

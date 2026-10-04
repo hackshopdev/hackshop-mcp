@@ -4,6 +4,7 @@ import {
   NEED_VALUES,
   type CoreContext,
   type DeviceEntry,
+  type FitSize,
   type Need,
   type Platform,
   type PlatformBoard,
@@ -14,7 +15,7 @@ import {
 export { NEED_VALUES, type Need, type Size };
 
 const NeedSchema = z.enum(NEED_VALUES);
-const SizeSchema = z.enum(["pocket", "desk", "wall", "any"]);
+const SizeSchema = z.enum(["pocket", "desk", "wall", "hidden", "any"]);
 
 export const planGadgetInput = z.object({
   idea: z.string().min(3).max(2000),
@@ -44,6 +45,7 @@ export interface PlanGadgetQuestion {
 export interface PlanGadgetOutput {
   inferred_needs: Need[];
   inferred_preferences: InferredPreference[];
+  inferred_size: Size;
   fit: "all" | "partial" | "none";
   notes: string[];
   warnings: string[];
@@ -60,6 +62,7 @@ export interface PlanGadgetOutput {
     why: string;
     gaps: string[];
     needs_met: Need[];
+    est_total_usd: number | null;
     within_budget: boolean | null;
     price_label: string | null;
     build_page_url: string;
@@ -83,7 +86,7 @@ export interface PlanGadgetOutput {
   next_steps: string[];
 }
 
-type InferredPreference = "cheap";
+type InferredPreference = "cheap" | FitSize;
 
 const NEED_ORDER: Need[] = [...NEED_VALUES];
 const HARD_NEEDS = new Set<Need>(["voice", "camera", "air-sensors", "e-ink", "linux"]);
@@ -131,7 +134,13 @@ const NEED_KEYWORDS: Record<Need, string[]> = {
 };
 
 const CHEAP_KEYWORDS = ["cheap", "cheapest", "inexpensive", "budget", "low-cost", "affordable"];
-const SIZE_WORDS = ["pocket", "desk", "desktop", "table", "wall", "fridge", "hidden", "portable", "wearable", "keychain"];
+const SIZE_KEYWORDS: Record<FitSize, string[]> = {
+  pocket: ["pocket", "portable", "keychain", "wearable"],
+  desk: ["desk", "desktop", "table", "nightstand", "bedside", "shelf"],
+  wall: ["wall", "fridge", "kitchen", "frame", "poster"],
+  hidden: ["hidden", "closet", "no screen", "headless"],
+};
+const SIZE_WORDS = Object.values(SIZE_KEYWORDS).flat();
 
 const NON_MUSE_ASSISTANTS: Array<[RegExp, string]> = [
   [/\b(alexa|echo)\b/i, "Alexa"],
@@ -149,7 +158,9 @@ interface ScoredBoard {
   score: number;
   satisfied: Need[];
   gaps: string[];
+  estTotalUsd: number | null;
   withinBudget: boolean | null;
+  sizeFit: boolean | null;
 }
 
 export function planGadget(
@@ -158,7 +169,8 @@ export function planGadget(
 ): PlanGadgetOutput {
   const catalogById = new Map(ctx.catalog.map((device) => [device.id, device]));
   const needs = input.needs ? orderNeeds(input.needs) : inferNeeds(input.idea);
-  const inferredPreferences = inferPreferences(input.idea);
+  const inferredSize = input.size === "any" ? inferSize(input.idea) : input.size;
+  const inferredPreferences = inferPreferences(input.idea, inferredSize);
   const warnings = [
     ...unknownOwnedDeviceWarnings(input.owned_device_ids ?? [], catalogById),
     ...nonMuseAssistantWarnings(input.idea),
@@ -183,7 +195,7 @@ export function planGadget(
         budgetUsd: input.budget_usd,
         owned: owned.has(device.id),
         cheapPreference: inferredPreferences.includes("cheap"),
-        size: input.size,
+        size: inferredSize,
       }));
     }
   }
@@ -195,8 +207,8 @@ export function planGadget(
   const ranked = budgeted && !anyWithinBudget
     ? [...candidates].sort((a, b) => {
       if (b.satisfied.length !== a.satisfied.length) return b.satisfied.length - a.satisfied.length;
-      const priceA = priceFor(a.device);
-      const priceB = priceFor(b.device);
+      const priceA = priceFor(a);
+      const priceB = priceFor(b);
       if (priceA !== priceB) return priceA - priceB;
       return a.device.id.localeCompare(b.device.id);
     })
@@ -225,6 +237,7 @@ export function planGadget(
       why: buildWhy(candidate),
       gaps: candidate.gaps,
       needs_met: candidate.satisfied,
+      est_total_usd: candidate.estTotalUsd,
       within_budget: candidate.withinBudget,
       price_label: priceLabel(candidate.device),
       build_page_url: plan.urls.build_page,
@@ -257,10 +270,11 @@ export function planGadget(
   return {
     inferred_needs: needs,
     inferred_preferences: inferredPreferences,
+    inferred_size: inferredSize,
     fit,
     notes,
     warnings,
-    questions: intakeQuestions(input, needs),
+    questions: intakeQuestions(input, needs, inferredSize, inferredPreferences),
     picks,
     terms: [...pickedPlatforms.values()].map((platform) => ({
       platform_id: platform.id,
@@ -283,8 +297,20 @@ export function inferNeeds(idea: string): Need[] {
   return [...found];
 }
 
-function inferPreferences(idea: string): InferredPreference[] {
-  return CHEAP_KEYWORDS.some((keyword) => wordBoundaryMatch(idea, keyword)) ? ["cheap"] : [];
+function inferSize(idea: string): Size {
+  for (const size of ["pocket", "desk", "wall", "hidden"] as const) {
+    if (SIZE_KEYWORDS[size].some((keyword) => wordBoundaryMatch(idea, keyword))) return size;
+  }
+  return "any";
+}
+
+function inferPreferences(idea: string, size: Size): InferredPreference[] {
+  const preferences: InferredPreference[] = [];
+  if (CHEAP_KEYWORDS.some((keyword) => wordBoundaryMatch(idea, keyword))) {
+    preferences.push("cheap");
+  }
+  if (size !== "any") preferences.push(size);
+  return preferences;
 }
 
 function orderNeeds(needs: Need[]): Need[] {
@@ -339,29 +365,23 @@ function scoreBoard(args: {
     score -= minPrice === undefined ? 3 : Math.floor(minPrice / 20);
   }
 
+  const estTotalUsd = totalFor(args.device, args.board);
   const withinBudget = args.budgetUsd === undefined
     ? null
-    : args.device.est_used_price_usd_min !== undefined &&
-      args.device.est_used_price_usd_min <= args.budgetUsd;
+    : estTotalUsd === null
+      ? null
+      : estTotalUsd <= args.budgetUsd;
   if (withinBudget === false) {
     score -= 3;
-    gaps.push("over budget");
+    const gap = args.budgetUsd === undefined || estTotalUsd === null
+      ? null
+      : Math.ceil(estTotalUsd - args.budgetUsd);
+    gaps.push(gap === null ? "over budget" : `over budget by about $${gap}`);
   }
 
-  if (args.size === "pocket") {
-    const longest = longestSide(args.device);
-    if (
-      (args.board.features.battery === "yes" || args.board.features.battery === "optional") &&
-      longest !== null &&
-      longest <= 70
-    ) {
-      score += 3;
-    } else {
-      score -= 1;
-    }
-  } else if (args.size === "wall") {
-    if (featureNumber(args.board, "display_in") >= 3.5) score += 3;
-    else score -= 1;
+  const sizeFit = args.size === "any" ? null : fitsSize(args.board, args.device, args.size);
+  if (sizeFit !== null) {
+    score += sizeFit ? 3 : -1;
   }
 
   const needsLinux = args.needs.includes("linux");
@@ -379,7 +399,9 @@ function scoreBoard(args: {
     score,
     satisfied,
     gaps,
+    estTotalUsd,
     withinBudget,
+    sizeFit,
   };
 }
 
@@ -462,14 +484,18 @@ function featureString(board: PlatformBoard, key: string): string | null {
 
 function candidateSort(budgetUsd?: number) {
   return (a: ScoredBoard, b: ScoredBoard): number => {
+    if (b.satisfied.length !== a.satisfied.length) return b.satisfied.length - a.satisfied.length;
     if (budgetUsd !== undefined && a.withinBudget !== b.withinBudget) {
       if (a.withinBudget === true) return -1;
       if (b.withinBudget === true) return 1;
     }
-    if (b.satisfied.length !== a.satisfied.length) return b.satisfied.length - a.satisfied.length;
     if (b.score !== a.score) return b.score - a.score;
-    const priceA = priceFor(a.device);
-    const priceB = priceFor(b.device);
+    if (a.sizeFit !== b.sizeFit) {
+      if (a.sizeFit === true) return -1;
+      if (b.sizeFit === true) return 1;
+    }
+    const priceA = priceFor(a);
+    const priceB = priceFor(b);
     if (priceA !== priceB) return priceA - priceB;
     return a.device.id.localeCompare(b.device.id);
   };
@@ -540,11 +566,11 @@ function buildNotes(args: {
     const bestCoverage = Math.max(0, ...args.candidates.map((candidate) => candidate.satisfied.length));
     const cheapest = [...args.candidates]
       .filter((candidate) => candidate.satisfied.length === bestCoverage)
-      .sort((a, b) => priceFor(a.device) - priceFor(b.device))[0];
+      .sort((a, b) => priceFor(a) - priceFor(b))[0];
     if (cheapest) {
       const what = args.needs.length > 0 ? "does what you asked" : "runs Muse";
       notes.push(
-        `Nothing on the Muse list fits a $${args.budgetUsd} budget. The cheapest board that ${what} is ${cheapest.device.name} at ${priceLabel(cheapest.device) ?? "an unknown price"}.`,
+        `Nothing on the Muse list fits a $${args.budgetUsd} budget. The cheapest board that ${what} is ${cheapest.device.name} at ${totalLabel(cheapest) ?? "an unknown price"} all-in.`,
       );
     }
   }
@@ -640,8 +666,31 @@ function priceLabel(device: DeviceEntry): string | null {
   return `~$${min ?? max}`;
 }
 
-function priceFor(device: DeviceEntry): number {
-  return device.est_used_price_usd_min ?? Number.POSITIVE_INFINITY;
+function totalLabel(candidate: ScoredBoard): string | null {
+  return candidate.estTotalUsd === null ? priceLabel(candidate.device) : `~$${candidate.estTotalUsd}`;
+}
+
+function priceFor(candidate: ScoredBoard): number {
+  return candidate.estTotalUsd ?? candidate.device.est_used_price_usd_min ?? Number.POSITIVE_INFINITY;
+}
+
+function totalFor(device: DeviceEntry, board: PlatformBoard): number | null {
+  const boardPrice = device.est_used_price_usd_min;
+  if (boardPrice === undefined) return null;
+  return board.parts
+    .filter((part) => part.required)
+    .reduce((sum, part) => sum + (part.est_price_usd ?? 0) * part.qty, boardPrice);
+}
+
+function fitsSize(board: PlatformBoard, device: DeviceEntry, size: FitSize): boolean {
+  if (board.fits) return board.fits.includes(size);
+  if (size !== "pocket") return false;
+  const longest = longestSide(device);
+  return (
+    (board.features.battery === "yes" || board.features.battery === "optional") &&
+    longest !== null &&
+    longest <= 70
+  );
 }
 
 function fabricationNote(device: DeviceEntry, printables: Printable[]): string {
@@ -655,8 +704,8 @@ function fabricationNote(device: DeviceEntry, printables: Printable[]): string {
     physical.size_mm.t === null ||
     ["approximate", "conflicting"].includes(physical.size_confidence);
   if (needsMeasure) {
-    const note = physical.size_note ?? "dimensions are incomplete or uncertain";
-    return `No printable part yet: ${note}. Measure the device, then run \`python -m hackshop_sim.cad.generate --device ${device.id} --part desk-stand --t <mm>\` from sim-worker/.`;
+    const note = physical.size_note ?? "the board's dimensions aren't verified";
+    return `No printable stand yet; ${note}. Measure the device before making a stand.`;
   }
 
   const mount = physical.mounting ?? "it ships in a finished case";
@@ -711,13 +760,19 @@ function nonMuseAssistantWarnings(idea: string): string[] {
   return warnings;
 }
 
-function intakeQuestions(input: PlanGadgetInput, needs: Need[]): PlanGadgetQuestion[] {
+function intakeQuestions(
+  input: PlanGadgetInput,
+  needs: Need[],
+  inferredSize: Size,
+  inferredPreferences: InferredPreference[],
+): PlanGadgetQuestion[] {
   const words = input.idea.trim().split(/\s+/).filter(Boolean);
-  const hasSizeWord = SIZE_WORDS.some((word) => wordBoundaryMatch(input.idea, word));
+  const hasSizeWord = inferredSize !== "any" ||
+    SIZE_WORDS.some((word) => wordBoundaryMatch(input.idea, word));
   const vague = needs.length === 0 || words.length < 5 || !hasSizeWord;
   if (!vague) return [];
 
-  return [
+  const questions: PlanGadgetQuestion[] = [
     {
       id: "size",
       question: "Where should this body live?",
@@ -726,7 +781,7 @@ function intakeQuestions(input: PlanGadgetInput, needs: Need[]): PlanGadgetQuest
         { label: "Pocket", value: "pocket", needs: ["battery"], size: "pocket" },
         { label: "Desk", value: "desk", size: "desk" },
         { label: "Wall or fridge", value: "wall", needs: ["big-screen"], size: "wall" },
-        { label: "Hidden, no screen", value: "hidden", needs: ["home-tunnel"], size: "any" },
+        { label: "Hidden, no screen", value: "hidden", needs: ["home-tunnel"], size: "hidden" },
       ],
     },
     {
@@ -761,6 +816,20 @@ function intakeQuestions(input: PlanGadgetInput, needs: Need[]): PlanGadgetQuest
       ],
     },
   ];
+
+  return questions.filter((question) => {
+    if (question.id === "size") return inferredSize === "any";
+    if (question.id === "interaction") {
+      return !needs.some((need) => ["voice", "touch", "screen", "home-tunnel"].includes(need));
+    }
+    if (question.id === "sensing") {
+      return input.needs === undefined && !needs.some((need) => ["camera", "air-sensors"].includes(need));
+    }
+    if (question.id === "budget") {
+      return input.budget_usd === undefined && !inferredPreferences.includes("cheap");
+    }
+    return true;
+  });
 }
 
 function longestSide(device: DeviceEntry): number | null {

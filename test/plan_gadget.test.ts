@@ -75,6 +75,47 @@ describe("plan_gadget", () => {
     }
   });
 
+  it("uses inferred size to rank desk and pocket voice boards", () => {
+    const desk = run({ idea: "a desk gadget I can talk to", budget_usd: 60 });
+    const deskBoard = boardFor(desk.picks[0]!.device_id);
+
+    expect(desk.inferred_size).toBe("desk");
+    expect(desk.inferred_preferences).toEqual(["desk"]);
+    expect(desk.picks[0]?.device_id).not.toBe("m5stack-sticks3");
+    expect(deskBoard.fits).toContain("desk");
+    expect(desk.picks[0]?.needs_met).toContain("voice");
+
+    const pocket = run({ idea: "a pocket remote I can talk to", budget_usd: 60 });
+
+    expect(pocket.inferred_size).toBe("pocket");
+    expect(pocket.inferred_preferences).toEqual(["pocket"]);
+    expect(pocket.picks[0]?.device_id).toBe("m5stack-sticks3");
+  });
+
+  it("does not re-ask questions answered by explicit size, budget and needs", () => {
+    const out = run({
+      idea: "a gadget I can talk to",
+      size: "desk",
+      budget_usd: 60,
+      needs: ["voice"],
+    });
+
+    expect(out.inferred_size).toBe("desk");
+    expect(out.questions).toEqual([]);
+  });
+
+  it("uses all-in totals for budget checks", () => {
+    const out = run({
+      idea: "a camera I can talk to",
+      budget_usd: 60,
+      limit: 5,
+    });
+    const watcher = out.picks.find((pick) => pick.device_id === "seeed-sensecap-watcher");
+
+    expect(watcher?.est_total_usd).toBeGreaterThan(60);
+    expect(watcher?.within_budget).toBe(false);
+  });
+
   it("is honest when no board fits the budget", () => {
     const out = run({ idea: "a desk gadget I can talk to", budget_usd: 5 });
 
@@ -100,6 +141,8 @@ describe("plan_gadget", () => {
 
     expect(vague.questions.length).toBeGreaterThan(0);
     expect(vague.questions.length).toBeLessThanOrEqual(4);
+    expect(vague.questions.find((question) => question.id === "size")?.options)
+      .toContainEqual(expect.objectContaining({ value: "hidden", size: "hidden" }));
     expect(specific.questions).toEqual([]);
   });
 

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { buildPlan } from "../src/build-plan/index.js";
+import { PURCHASE_POLICY, buildPlan } from "../src/build-plan/index.js";
 import type { BuildPlan } from "../src/build-plan/types.js";
 import { loadCatalog } from "../src/catalog/load.js";
 import type { DeviceEntry } from "../src/catalog/schema.js";
@@ -88,17 +88,48 @@ describe("buildPlan", () => {
     expect(plan.agent_brief_md).toContain("mgst_YOUR_TOKEN");
     expect(plan.agent_brief_md).toContain("Shopping list (ask before buying)");
     expect(plan.agent_brief_md).toContain("## Assemble");
+    expect(plan.agent_brief_md).toContain("CONFIG_GADGET_SDK_TOKEN=\"mgst_YOUR_TOKEN\"");
+    expect(plan.agent_brief_md).not.toContain("--sdk-token");
+    expect(plan.agent_brief_md).not.toContain("Linux service is paired");
     expect(plan.agent_brief_md).not.toMatch(/mgst_[A-Za-z0-9]{8,}/);
     expect(plan.shopping_list.est_total_usd).toBe(30);
-    expect(plan.shopping_list.purchase_policy).toMatch(/explicit approval/);
+    expect(plan.shopping_list.purchase_policy).toBe(PURCHASE_POLICY);
+    expect(plan.shopping_list.notes).toContain(
+      "Prices are estimates before shipping and tax. M5Stack, Waveshare and Seeed often ship from China (1 to 3 weeks); Amazon or a US reseller is usually faster.",
+    );
+    expect(plan.shopping_list.store_url).toBe("https://www.hackshop.dev/store#sticks3");
+    expect(plan.shopping_list.store_json_url).toBe("https://www.hackshop.dev/store.json");
+    expect(plan.shopping_list.items[0]).toMatchObject({
+      buy_options: expect.arrayContaining([
+        expect.objectContaining({ kind: "seller", condition: "new" }),
+        expect.objectContaining({ label: "Amazon", kind: "search", condition: "new" }),
+        expect.objectContaining({ label: "eBay", kind: "search", condition: "used" }),
+      ]),
+    });
+    expect(plan.shopping_list.items.find((item) => item.url_kind === "print")).toMatchObject({
+      url: "https://example.test/cad/m5stack-sticks3/desk-stand.stl",
+      est_price_usd: null,
+      buy_options: [
+        expect.objectContaining({
+          kind: "print",
+          url: "https://example.test/cad/m5stack-sticks3/desk-stand.stl",
+          condition: null,
+        }),
+      ],
+    });
     expect(plan.assembly.map((step) => step.action)).toEqual([
-      "print",
-      "place",
-      "route_cable",
       "power",
       "flash",
       "pair",
       "verify",
+      "print",
+      "place",
+      "route_cable",
+    ]);
+    expect(plan.assembly.filter((step) => step.optional).map((step) => step.action)).toEqual([
+      "print",
+      "place",
+      "route_cable",
     ]);
     expect(plan.urls).toEqual({
       build_page: `${SITE_URL}/build/m5stack-sticks3`,
@@ -127,6 +158,19 @@ describe("buildPlan", () => {
         }),
       ]),
     );
+  });
+
+  it("uses absolute printable URLs in site build plans", async () => {
+    const { buildPlanForDevice } = await import("../site/lib/build-plan-data");
+    const plan = buildPlanForDevice("m5stack-sticks3")!;
+
+    expect(plan.parts.find((part) => part.kind === "printed")?.buy_url).toBe(
+      "https://www.hackshop.dev/cad/m5stack-sticks3/desk-stand.stl",
+    );
+    expect(plan.steps.find((step) => step.id === "print")?.links.every((link) =>
+      link.url.startsWith("https://www.hackshop.dev/cad/")
+    )).toBe(true);
+    expect(plan.agent_brief_md).toContain("https://www.hackshop.dev/cad/m5stack-sticks3/desk-stand.stl");
   });
 
   it("keeps possible Linux boards honest about adapter parts and caveats", () => {

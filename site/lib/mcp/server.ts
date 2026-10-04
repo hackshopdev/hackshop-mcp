@@ -2,6 +2,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
   CallToolRequestSchema,
   GetPromptRequestSchema,
+  ListResourceTemplatesRequestSchema,
   ListPromptsRequestSchema,
   ListResourcesRequestSchema,
   ListToolsRequestSchema,
@@ -14,6 +15,7 @@ import {
 } from "../core/tools";
 import {
   getCorePrompt,
+  listCoreResourceTemplates,
   listCorePrompts,
   listCoreResources,
   readCoreResource,
@@ -67,11 +69,16 @@ export function createHostedMcpServer(ctx: CoreContext, request: Request): Serve
 
     return {
       content: [{ type: "text" as const, text: JSON.stringify(result.output, null, 2) }],
+      structuredContent: result.output as Record<string, unknown>,
     };
   });
 
   server.setRequestHandler(ListResourcesRequestSchema, async () => ({
     resources: listCoreResources(),
+  }));
+
+  server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => ({
+    resourceTemplates: listCoreResourceTemplates(),
   }));
 
   server.setRequestHandler(ReadResourceRequestSchema, async (resourceRequest) => {

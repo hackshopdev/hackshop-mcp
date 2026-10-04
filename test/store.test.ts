@@ -29,8 +29,11 @@ describe("store data", () => {
     const pi = storeBoard("raspberry-pi-5");
     expect(pi?.buy[0]).toMatchObject({ kind: "seller", label: "Raspberry Pi" });
     expect(pi?.buy.some((link) => link.label === "Walmart")).toBe(true);
-    const e1001 = storeBoard("seeed-reterminal-e1001");
-    expect(e1001?.buy.some((link) => link.url.includes("reTerminal-E1002"))).toBe(true);
+    expect(storeBoard("seeed-reterminal-e1001")?.buy.some((link) => link.url.includes("reTerminal-E1002")))
+      .toBe(false);
+    const e1002 = storeBoard("seeed-reterminal-e1002");
+    expect(e1002?.buy[0]).toMatchObject({ kind: "seller", label: "Seeed Studio" });
+    expect(e1002?.muse_featured).toBe(true);
     const ideaspark = storeBoard("ideaspark-esp32-1-9-lcd");
     // Already an Amazon link, so no extra Amazon search.
     expect(ideaspark?.buy.filter((link) => link.label === "Amazon")).toHaveLength(1);
@@ -55,6 +58,13 @@ describe("store data", () => {
     expect(buyLinksFor({ deviceId: "x", name: "Thing", buyUrl: null })).toEqual([
       { label: "Amazon", url: "https://www.amazon.com/s?k=Thing", kind: "search" },
     ]);
+    expect(ebayNewestUrl("Raspberry Pi 5", { ebayCampaignId: "camp" })).toContain("campid=camp");
+    expect(buyLinksFor({
+      deviceId: "x",
+      name: "Thing",
+      buyUrl: null,
+      affiliate: { amazonTag: "hack-20" },
+    })[0]?.url).toContain("tag=hack-20");
   });
 });
 
@@ -70,9 +80,9 @@ describe("buy-everything prompts", () => {
     expect(prompt).toContain("1 × USB-C data cable");
     expect(prompt).toMatch(/wait for my OK/);
     expect(prompt).toMatch(/only add to cart or check out after I approve/i);
-    expect(prompt).toMatch(/Amazon and eBay don't allow automated checkout/);
+    expect(prompt).toMatch(/Amazon and eBay don't allow automated carts or checkout/);
     expect(STORE_AGENT_PROMPT).toMatch(/wait for my OK before you add anything to a cart or check out/);
-    expect(STORE_AGENT_PROMPT).toMatch(/Amazon and eBay don't allow automated checkout/);
+    expect(STORE_AGENT_PROMPT).toMatch(/Amazon and eBay don't allow automated carts or checkout/);
   });
 });
 

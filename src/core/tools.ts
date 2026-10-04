@@ -23,11 +23,17 @@ export type GetBuildPlanInput = z.infer<typeof getBuildPlanInput>;
 
 type JsonSchema = Record<string, unknown>;
 
+const OBJECT_OUTPUT_SCHEMA = {
+  type: "object" as const,
+  properties: {},
+};
+
 export interface CoreTool<Input, Output> {
   name: "plan_gadget" | "get_build_plan" | "assess_hackability";
   title: string;
   description: string;
   inputSchema: JsonSchema;
+  outputSchema: { type: "object"; properties?: Record<string, object>; required?: string[] };
   zodSchema: z.ZodTypeAny;
   run(input: Input, ctx: CoreContext): Output | CoreToolError;
 }
@@ -51,7 +57,7 @@ export const CORE_TOOLS = [
     description:
       "Deterministically plan a physical body for an AI agent using Meta Muse boards. Inputs: `idea` 3-2000 chars; `platform` one of muse-esp32, muse-linux, any (default any); `budget_usd` positive number up to 100000; `owned_device_ids` up to 50 catalog ids; `needs` values: " +
       `${NEED_VALUES.join(", ")}; ` +
-      "`size` one of pocket, desk, wall, any (default any); `limit` 1-5 (default 3). Returns fit, notes, warnings, intake questions, picks, terms and next steps.",
+      "`size` one of pocket, desk, wall, hidden, any (default any); `limit` 1-5 (default 3). Returns fit, notes, warnings, intake questions, picks, terms and next steps.",
     inputSchema: {
       type: "object",
       properties: {
@@ -69,9 +75,9 @@ export const CORE_TOOLS = [
         },
         budget_usd: {
           type: "number",
-          minimum: 0,
+          exclusiveMinimum: 0,
           maximum: 100000,
-          description: "Optional hardware budget in USD. Positive, max 100000.",
+          description: "Optional hardware budget in USD. Must be greater than 0, max 100000.",
         },
         owned_device_ids: {
           type: "array",
@@ -86,9 +92,9 @@ export const CORE_TOOLS = [
         },
         size: {
           type: "string",
-          enum: ["pocket", "desk", "wall", "any"],
+          enum: ["pocket", "desk", "wall", "hidden", "any"],
           default: "any",
-          description: "Preferred size or placement: pocket, desk, wall, any. Default any.",
+          description: "Preferred size or placement: pocket, desk, wall, hidden, any. Default any.",
         },
         limit: {
           type: "number",
@@ -100,6 +106,7 @@ export const CORE_TOOLS = [
       },
       required: ["idea"],
     },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
     zodSchema: planGadgetInput,
     run: planGadget,
   } satisfies CoreTool<z.infer<typeof planGadgetInput>, PlanGadgetOutput>,
@@ -107,7 +114,7 @@ export const CORE_TOOLS = [
     name: "get_build_plan",
     title: "Get a build plan",
     description:
-      "Return the complete deterministic build plan for a catalog device id: parts, shopping list, steps, machine-readable assembly, commands, links, caveats and an agent-ready brief. Input: `device_id` 1-200 chars.",
+      "Return the complete deterministic build plan for a catalog device id: parts, shopping list with buy_options and store URLs, steps, machine-readable assembly, commands, links, caveats and an agent-ready brief. Input: `device_id` 1-200 chars.",
     inputSchema: {
       type: "object",
       properties: {
@@ -120,6 +127,7 @@ export const CORE_TOOLS = [
       },
       required: ["device_id"],
     },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
     zodSchema: getBuildPlanInput,
     run: getBuildPlan,
   } satisfies CoreTool<GetBuildPlanInput, BuildPlan>,
@@ -140,6 +148,7 @@ export const CORE_TOOLS = [
       },
       required: ["device_name"],
     },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
     zodSchema: assessHackabilityInput,
     run: assessHackability,
   } satisfies CoreTool<z.infer<typeof assessHackabilityInput>, AssessOutput>,
@@ -153,6 +162,7 @@ export function coreToolDefinitions() {
     title: tool.title,
     description: tool.description,
     inputSchema: tool.inputSchema,
+    outputSchema: tool.outputSchema,
   }));
 }
 

@@ -32,7 +32,7 @@ describe("Muse page data assembly", () => {
     const data = getMusePageData();
     const rows = data.esp32.boards;
 
-    expect(rows).toHaveLength(11);
+    expect(rows).toHaveLength(12);
 
     const firstStatus = rows.findIndex((row) => row.tier === "status");
     expect(firstStatus).toBeGreaterThan(0);
@@ -41,6 +41,10 @@ describe("Muse page data assembly", () => {
 
     const fullUiRows = rows.filter((row) => row.tier === "full-ui");
     expect(fullUiRows.at(-1)?.device.id).toBe("m5stack-stickc-plus2");
+
+    const e1002 = rows.find((row) => row.device.id === "seeed-reterminal-e1002");
+    expect(e1002?.tier).toBe("status");
+    expect(e1002?.imageLabel).toBe("Color");
   });
 
   it("attaches printable parts only for devices with manifest files", () => {

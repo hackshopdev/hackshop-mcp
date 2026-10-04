@@ -10,6 +10,24 @@ import type {
   Printable,
   ShoppingList,
 } from "./types.js";
+import {
+  amazonSearchUrl,
+  boardSlug,
+  buyLinksFor,
+  ebayNewestUrl,
+  ebayQueryFor,
+  retailerLabel,
+  type AffiliateTags,
+  type BuyOption,
+} from "./buy-links.js";
+
+export const PURCHASE_POLICY =
+  "Show the human one list with links and the total, and get explicit approval for the exact items, sellers and total before buying anything. Amazon and eBay don't allow automated carts or checkout, so for those items give the human the links and let them check out. On other stores, once they approve and ask you to, you may add exactly those items to a cart and check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.";
+
+const SHIPPING_NOTE =
+  "Prices are estimates before shipping and tax. M5Stack, Waveshare and Seeed often ship from China (1 to 3 weeks); Amazon or a US reseller is usually faster.";
+
+const STORE_SITE_URL = "https://www.hackshop.dev";
 
 export function buildPlan(input: {
   device: DeviceEntry;
@@ -17,13 +35,19 @@ export function buildPlan(input: {
   board: PlatformBoard | null;
   printables: Printable[];
   siteUrl: string;
+  affiliate?: AffiliateTags;
 }): BuildPlan {
   const urls = buildUrls(input.device.id, input.siteUrl, input.platform !== null);
   const tierLabel = input.platform && input.board
     ? tierLabelFor(input.platform, input.board)
     : null;
   const parts = buildParts(input.device, input.board, input.printables);
-  const shopping_list = buildShoppingList(parts);
+  const shopping_list = buildShoppingList({
+    device: input.device,
+    parts,
+    siteUrl: input.siteUrl,
+    affiliate: input.affiliate,
+  });
   const trySaying = input.board?.try_saying ?? [];
   const caveats = input.platform && input.board
     ? platformCaveatsFor(input.platform, input.board)
@@ -121,7 +145,9 @@ function buildParts(
     required: true,
     note: "Main board or device for this build.",
     buy_url: device.buy_url ?? null,
+    info_url: null,
     search_url: device.buy_url ? null : ebaySearchUrl(device.name),
+    search: device.name,
     kind: "board",
     est_price_usd: device.est_used_price_usd_min ?? null,
   }];
@@ -136,9 +162,11 @@ function buildParts(
       name: printable.part === "desk-stand" ? "Printed desk stand" : "Printed enclosure",
       qty: 1,
       required: false,
-      note: "Print it yourself (STL) or order it from a print service; files in step Print the stand.",
-      buy_url: null,
+      note: "Print it yourself, or upload the STL to a print service such as Craftcloud or JLC3DP; small parts usually cost a few dollars plus shipping.",
+      buy_url: printable.stl_url,
+      info_url: null,
       search_url: null,
+      search: null,
       kind: "printed",
       est_price_usd: null,
     });
@@ -148,30 +176,46 @@ function buildParts(
 }
 
 function partToBuildPlanPart(part: PlatformBoardPart, index: number): BuildPlanPart {
+  const infoNote = part.info_url ? `${part.note} Battery size: ${part.info_url}` : part.note;
   return {
     id: `part-${index + 1}-${slugify(part.name)}`,
     name: part.name,
     qty: part.qty,
     required: part.required,
-    note: part.note,
+    note: infoNote,
     buy_url: part.buy_url ?? null,
+    info_url: part.info_url ?? null,
     search_url: !part.buy_url && part.search ? amazonSearchUrl(part.search) : null,
+    search: part.search ?? null,
     kind: "part",
     est_price_usd: part.est_price_usd ?? null,
   };
 }
 
-function buildShoppingList(parts: BuildPlanPart[]): ShoppingList {
-  const items = parts.map((part) => {
+function buildShoppingList(args: {
+  device: DeviceEntry;
+  parts: BuildPlanPart[];
+  siteUrl: string;
+  affiliate?: AffiliateTags;
+}): ShoppingList {
+  const items = args.parts.map((part) => {
     const url = part.buy_url ?? part.search_url;
+    const urlKind = part.kind === "printed"
+      ? "print" as const
+      : part.buy_url
+        ? "buy" as const
+        : part.search_url
+          ? "search" as const
+          : null;
     return {
       part_id: part.id,
       name: part.name,
       qty: part.qty,
       url,
-      url_kind: part.buy_url ? "buy" as const : "search" as const,
+      url_kind: urlKind,
       est_price_usd: part.est_price_usd,
       required: part.required,
+      buy_options: buyOptionsForPart(part, args.device, args.affiliate),
     };
   });
   const requiredPrices = items
@@ -185,9 +229,76 @@ function buildShoppingList(parts: BuildPlanPart[]): ShoppingList {
     items,
     est_total_usd,
     currency: "USD",
-    purchase_policy:
-      "Show the human this list and get explicit approval for the exact items, sellers and total before buying anything. Amazon and eBay don't allow automated carts or checkout, so for those items give the human the links and let them check out. On other stores, once they approve and ask you to, you may add exactly those items to a cart and check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.",
+    purchase_policy: PURCHASE_POLICY,
+    notes: [SHIPPING_NOTE],
+    store_url: `${STORE_SITE_URL}/store#${boardSlug(args.device.id) ?? args.device.id}`,
+    store_json_url: `${STORE_SITE_URL}/store.json`,
   };
+}
+
+function buyOptionsForPart(
+  part: BuildPlanPart,
+  device: DeviceEntry,
+  affiliate?: AffiliateTags,
+): BuyOption[] {
+  if (part.kind === "printed") {
+    return part.buy_url
+      ? [{ label: "STL file", url: part.buy_url, kind: "print", condition: null }]
+      : [];
+  }
+
+  if (part.kind === "board") {
+    const query = ebayQueryFor(device.id, device.name);
+    return [
+      ...buyLinksFor({
+        deviceId: device.id,
+        name: device.name,
+        buyUrl: device.buy_url,
+        affiliate,
+      }).map((link) => ({
+        label: link.label,
+        url: link.url,
+        kind: link.kind,
+        condition: "new" as const,
+      })),
+      { label: "eBay", url: ebayNewestUrl(query, affiliate), kind: "search", condition: "used" },
+    ];
+  }
+
+  const options: BuyOption[] = [];
+  if (part.buy_url) {
+    options.push({
+      label: retailerLabel(part.buy_url),
+      url: part.buy_url,
+      kind: "seller",
+      condition: "new",
+    });
+  }
+  const query = part.search ?? part.name;
+  if (part.search) {
+    options.push({
+      label: "Amazon",
+      url: amazonSearchUrl(query, affiliate),
+      kind: "search",
+      condition: "new",
+    });
+    options.push({
+      label: "eBay",
+      url: ebayNewestUrl(query, affiliate),
+      kind: "search",
+      condition: "used",
+    });
+  }
+  return dedupeOptions(options);
+}
+
+function dedupeOptions(options: BuyOption[]): BuyOption[] {
+  const seen = new Set<string>();
+  return options.filter((option) => {
+    if (seen.has(option.url)) return false;
+    seen.add(option.url);
+    return true;
+  });
 }
 
 function buildSteps(args: {
@@ -212,7 +323,7 @@ function buildSteps(args: {
     return [
       partsStep(args.parts),
       assembleStep(args.platform, args.board, args.printables),
-      tokenStep(args.platform),
+      tokenStep(args.platform, "linux"),
       linuxInstallStep(args.platform),
       linuxPairStep(args.platform),
       tryStep(args.trySaying, true),
@@ -221,9 +332,9 @@ function buildSteps(args: {
 
   const steps = [
     partsStep(args.parts),
-    tokenStep(args.platform),
+    tokenStep(args.platform, "esp32", args.board),
     esp32FlashStep(args.platform, args.board, args.urls),
-    esp32PairStep(args.platform),
+    esp32PairStep(args.platform, args.board),
   ];
   if (args.printables.length > 0) steps.push(printStep(args.printables));
   steps.push(assembleStep(args.platform, args.board, args.printables));
@@ -242,13 +353,21 @@ function partsStep(parts: BuildPlanPart[]): BuildPlanStep {
   };
 }
 
-function tokenStep(platform: Platform): BuildPlanStep {
+function tokenStep(
+  platform: Platform,
+  mode: "esp32" | "linux",
+  board?: PlatformBoard,
+): BuildPlanStep {
+  const configPath = board ? sdkconfigPathFor(board) : "build/sdkconfig";
+  const body = mode === "linux"
+    ? "Create a token at gadgets.muse.ai > Account > SDK tokens (https://gadgets.muse.ai/settings/sdk-tokens). It starts with `mgst_`. The Linux installer takes it as `--sdk-token mgst_YOUR_TOKEN`. Never commit the real token or paste it anywhere public."
+    : `Create a token at gadgets.muse.ai > Account > SDK tokens (https://gadgets.muse.ai/settings/sdk-tokens). It starts with \`mgst_\`. For this ESP32 build, set \`CONFIG_GADGET_SDK_TOKEN="mgst_YOUR_TOKEN"\` in \`${configPath}\` after the board build command has created that file, then run the build command again. \`idf.py menuconfig\` > ESP32 Device SDK > Muse Gadgets SDK token is the interactive alternative. Never commit the real token or paste it anywhere public.`;
+
   return {
     id: "token",
     title: "Get your Muse SDK token",
     why: "Muse gadgets pair with your account by using a private SDK token.",
-    body_md:
-      "Create a token at gadgets.muse.ai > Account > SDK tokens (it starts with `mgst_`). ESP32 builds read it from `idf.py menuconfig` > ESP32 Device SDK > Muse Gadgets SDK token (or `CONFIG_GADGET_SDK_TOKEN` in the build's sdkconfig); the Linux installer takes it as `--sdk-token`. Use `mgst_YOUR_TOKEN` as the placeholder in docs, scripts and prompts; never commit the real token or paste it anywhere public.",
+    body_md: body,
     commands: [],
     links: [
       { label: "Muse SDK tokens", url: "https://gadgets.muse.ai/settings/sdk-tokens" },
@@ -262,24 +381,29 @@ function esp32FlashStep(
   board: PlatformBoard,
   urls: BuildPlan["urls"],
 ): BuildPlanStep {
+  const chip = board.chip ?? "esp32s3";
+  const configPath = sdkconfigPathFor(board);
+  const flashCommand = flashCommandFor(board);
   return {
     id: "flash",
     title: "Flash the firmware",
     why: "The board needs the Muse ESP32 firmware configured with your SDK token.",
     body_md:
       "### Let your agent do it\n" +
-      `Give your coding agent the build brief at ${urls.build_md}. Tell it to keep the token private, use \`mgst_YOUR_TOKEN\` as the placeholder, and ask you to confirm the serial port before flashing.\n\n` +
+      `Give your coding agent the build brief at ${urls.build_md}. Tell it to keep the token private, use \`mgst_YOUR_TOKEN\` as the placeholder, and find the serial port before flashing. On macOS it should run \`ls /dev/cu.usbmodem* /dev/cu.usbserial*\`; on Linux, \`ls /dev/ttyACM* /dev/ttyUSB*\`; on Windows, use Device Manager to find the COM port, then run commands in the ESP-IDF shell.\n\n` +
       "### Do it yourself\n" +
-      "Install ESP-IDF v6.0.1, clone the Muse Gadget SDK, run `idf.py menuconfig`, set the SDK token under ESP32 Device SDK, then build and flash. If flashing cannot connect, hold BOOT, tap RESET, then release BOOT.",
+      `Install ESP-IDF v6.0.1 and only the \`${chip}\` target for this board. Muse's ESP32 README verifies macOS and Linux. Windows is not documented by the Muse SDK; if you use it, install ESP-IDF v6.0.1 with Espressif's Windows installer and run commands in the ESP-IDF shell. Clone the Muse Gadget SDK, run \`${board.build}\` once to create \`${configPath}\`, set \`CONFIG_GADGET_SDK_TOKEN="mgst_YOUR_TOKEN"\` in that file, run \`${board.build}\` again, then flash. If flashing cannot connect, hold BOOT, tap RESET, then release BOOT.`,
     commands: [
       "git clone -b v6.0.1 --recursive https://github.com/espressif/esp-idf.git ~/esp/esp-idf-v6",
-      "~/esp/esp-idf-v6/install.sh esp32c5,esp32s3,esp32c6,esp32",
+      `~/esp/esp-idf-v6/install.sh ${chip}`,
       ". ~/esp/esp-idf-v6/export.sh",
       "git clone https://github.com/facebookincubator/muse-gadget-sdk",
       "cd muse-gadget-sdk/esp32",
-      "idf.py menuconfig",
       board.build,
-      "idf.py -p PORT flash monitor",
+      `printf '\\nCONFIG_GADGET_SDK_TOKEN="mgst_YOUR_TOKEN"\\n' >> ${configPath}`,
+      board.build,
+      "ls /dev/cu.usbmodem* /dev/cu.usbserial* 2>/dev/null || ls /dev/ttyACM* /dev/ttyUSB* 2>/dev/null",
+      flashCommand,
     ],
     links: [
       { label: "Muse Gadget SDK", url: platform.sdk_repo },
@@ -288,13 +412,15 @@ function esp32FlashStep(
   };
 }
 
-function esp32PairStep(platform: Platform): BuildPlanStep {
+function esp32PairStep(platform: Platform, board?: PlatformBoard): BuildPlanStep {
+  const button = board ? boardButtonName(board) : "the board button";
+  const status = board ? statusIndicator(board) : "status indicator";
   return {
     id: "pair",
     title: "Pair it with the Muse app",
     why: "Pairing links the freshly flashed board to your Muse account.",
     body_md:
-      "In the Muse app, turn on Settings > Devices > Developer mode, then Settings > Devices > Add Device (+). Pick `MuseGadget-XXXXXX` and press the board's button (BOOT on dev kits) when the light breathes blue. Green = connected. Status lights: orange = ready for setup, blue breathing = press the button, green = connected, yellow blinking = reconnecting, red blinking = error. Hold the button for 5 seconds to reset pairing.",
+      `In the Muse app, turn on Settings > Devices > Developer mode, then Settings > Devices > Add Device (+). Pick \`MuseGadget-XXXXXX\` and press ${button} when ${status} breathes blue. Green means connected. Status meanings: orange = ready for setup, blue breathing = press the button, blue = joining Wi-Fi and connecting, green = connected, yellow blinking = reconnecting, purple = unpaired, red blinking = error. Hold the button for 5 seconds to reset pairing.`,
     commands: [],
     links: [
       { label: "Muse Gadgets", url: platform.homepage },
@@ -318,6 +444,80 @@ function printStep(printables: Printable[]): BuildPlanStep {
       { label: `${printable.title} fab.json`, url: printable.fab_url },
     ]),
   };
+}
+
+function sdkconfigPathFor(board: PlatformBoard): string {
+  const museProfile = museProfileFor(board);
+  if (museProfile) return `build-muse-${museProfile}/sdkconfig`;
+  const boardSh = board.build.match(/^tools\/board\.sh\s+(\S+)\s+build$/);
+  if (boardSh?.[1]) return `build-${boardSh[1]}/sdkconfig`;
+  return "build/sdkconfig";
+}
+
+function flashCommandFor(board: PlatformBoard): string {
+  const museBoard = board.build.match(/^tools\/muse\/board\.sh\s+build\s+(\S+)$/)?.[1];
+  if (museBoard) return `tools/muse/board.sh flash ${museBoard} PORT`;
+  const boardSh = board.build.match(/^tools\/board\.sh\s+(\S+)\s+build$/)?.[1];
+  if (boardSh) return `tools/board.sh ${boardSh} flash-monitor PORT`;
+  return "idf.py -p PORT flash monitor";
+}
+
+function museProfileFor(board: PlatformBoard): string | null {
+  const boardName = board.build.match(/^tools\/muse\/board\.sh\s+build\s+(\S+)$/)?.[1];
+  switch (boardName) {
+    case "s3":
+      return "waveshare-s3-175c";
+    case "s3n":
+      return "waveshare-s3-175";
+    case "aipi":
+      return "aipi";
+    case "c6":
+      return "waveshare-c6-18";
+    case "watcher":
+      return "sensecap-watcher";
+    case "sticks3":
+      return "m5stack-sticks3";
+    case "plus2":
+      return "m5stack-stickc-plus2";
+    case "cardputer-adv":
+      return "m5stack-cardputer-adv";
+    case "stopwatch":
+      return "m5stack-stopwatch";
+    case "cores3":
+      return "m5stack-cores3";
+    case "core2":
+      return "m5stack-core2";
+    case "box3":
+      return "espressif-box-3";
+    default:
+      return null;
+  }
+}
+
+function boardButtonName(board: PlatformBoard): string {
+  switch (board.device_id) {
+    case "m5stack-sticks3":
+    case "m5stack-stickc-plus2":
+      return "the front button";
+    case "waveshare-esp32-s3-touch-amoled-1-75c":
+      return "the top button";
+    case "aipi-lite":
+      return "the bottom-right button";
+    case "seeed-sensecap-watcher":
+      return "the wheel";
+    case "home-assistant-voice-pe":
+      return "the center button";
+    default:
+      return "the BOOT button";
+  }
+}
+
+function statusIndicator(board: PlatformBoard): string {
+  if (board.device_id === "home-assistant-voice-pe") return "the LED ring";
+  if (board.tier === "full-ui" || board.kind === "status-screen" || board.kind === "e-paper") {
+    return "the screen or edge status";
+  }
+  return "the status light";
 }
 
 function assembleStep(
@@ -457,24 +657,22 @@ function buildAssembly(args: {
   }
 
   const steps: AssemblyStep[] = [];
-  if (args.printables.length > 0) {
-    const printable = args.printables[0]!;
-    const printInstruction = printable.fab?.print?.orientation
-      ? `Print ${printable.title} ${printable.fab.print.orientation}.`
-      : `Print ${printable.title} from the STL.`;
-    steps.push(assemblyStep(1, "print", [`printed-${printable.part}`], ["3D printer or print service"], printInstruction, "Part is clean, stable and matches the board before final assembly.", false, "Printing is a fabrication job, not a dexterous assembly move."));
-    steps.push(assemblyStep(2, "place", ["board", `printed-${printable.part}`], [], "Put the board into the printed stand or case and keep buttons, screen and ports exposed.", "Board sits flush without forcing and does not wobble.", true, `Clearance should allow placement; check fab.json before automating.`));
-    steps.push(assemblyStep(3, "route_cable", ["board", `printed-${printable.part}`], [], "Route the USB-C cable through the cable slot or open edge.", "Cable exits without lifting the board or blocking buttons.", true, "Cable routing is feasible when the cable path is unobstructed."));
-  } else {
-    steps.push(assemblyStep(1, "place", ["board"], [], "Place the board in its stand, case or a stable spot on the desk.", "Board is stable and ports are reachable.", true, "Simple placement."));
-  }
-
   steps.push(
     assemblyStep(steps.length + 1, "power", ["board"], ["USB-C data cable"], "Connect USB-C power/data.", "Board powers on or appears on the serial port.", true, "USB-C insertion is feasible with a known connector pose."),
     assemblyStep(steps.length + 2, "flash", ["board"], ["computer", "USB-C data cable"], "Build and flash the Muse firmware with the selected board command.", "Flash completes and serial monitor shows startup logs.", false, "Requires a computer, serial-port selection and software commands."),
     assemblyStep(steps.length + 3, "pair", ["board"], ["Muse app"], "In the Muse app, turn on Developer mode, add MuseGadget-XXXXXX and press the board button when the light breathes blue.", "Status turns green and the app shows connected.", false, "Pairing requires the human's Muse app and account."),
     assemblyStep(steps.length + 4, "verify", ["board"], [], "Try the first board-specific prompt.", "The gadget responds in Muse or displays the expected status.", false, "Requires semantic verification."),
   );
+
+  if (args.printables.length > 0) {
+    const printable = args.printables[0]!;
+    const printInstruction = printable.fab?.print?.orientation
+      ? `Print ${printable.title} ${printable.fab.print.orientation}.`
+      : `Print ${printable.title} from the STL.`;
+    steps.push(assemblyStep(steps.length + 1, "print", [`printed-${printable.part}`], ["3D printer or print service"], printInstruction, "Part is clean, stable and matches the board before final assembly.", false, "Printing is a fabrication job, not a dexterous assembly move.", true));
+    steps.push(assemblyStep(steps.length + 1, "place", ["board", `printed-${printable.part}`], [], "Put the board into the printed stand or case and keep buttons, screen and ports exposed.", "Board sits flush without forcing and does not wobble.", true, `Clearance should allow placement; check fab.json before automating.`, true));
+    steps.push(assemblyStep(steps.length + 1, "route_cable", ["board", `printed-${printable.part}`], [], "Route the USB-C cable through the cable slot or open edge.", "Cable exits without lifting the board or blocking buttons.", true, "Cable routing is feasible when the cable path is unobstructed.", true));
+  }
   return renumber(steps);
 }
 
@@ -487,6 +685,7 @@ function assemblyStep(
   check: string,
   feasible: boolean,
   notes: string,
+  optional = false,
 ): AssemblyStep {
   return {
     id: `${order}-${action}`,
@@ -497,6 +696,7 @@ function assemblyStep(
     instruction,
     check,
     robot: { feasible, notes },
+    optional,
   };
 }
 
@@ -536,7 +736,7 @@ function buildAgentBrief(args: Omit<BuildPlan, "agent_brief_md"> & {
     "- Ask the human before any purchase.",
     "- Use `mgst_YOUR_TOKEN` as the placeholder; never commit a real token.",
     "- ESP-IDF v6.0.1 only for ESP32 builds; do not substitute another ESP-IDF version.",
-    "- Confirm the serial port before flashing; ask the human which `PORT` to use.",
+    "- Find the serial port before flashing; only ask the human if the port check is empty or ambiguous.",
     args.terms
       ? `- Terms: ${args.terms.summary} (${args.terms.url})`
       : "- No Muse platform terms apply yet; verify upstream firmware licenses before distributing.",
@@ -555,8 +755,10 @@ function buildAgentBrief(args: Omit<BuildPlan, "agent_brief_md"> & {
     ),
     "",
     "## Verify",
-    args.platform
-      ? "- Status light is green, or the Linux service is paired and healthy."
+    args.platform?.sdk_path === "linux"
+      ? "- The Linux service is paired and healthy."
+      : args.platform
+        ? "- Status indicator is green and the Muse app shows the gadget as connected."
       : "- Device boots and the selected firmware path has a documented recovery route.",
     ...(args.try_saying.length > 0
       ? args.try_saying.map((prompt) => `- Try: ${prompt}`)
@@ -583,7 +785,8 @@ function buildAgentBrief(args: Omit<BuildPlan, "agent_brief_md"> & {
 function briefStepBody(step: BuildPlanStep): string[] {
   if (step.id === "flash") {
     return [
-      "Set the SDK token with `idf.py menuconfig` (ESP32 Device SDK > Muse Gadgets SDK token) before building; never print the full token.",
+      "Run the board build once to create the build sdkconfig, set `CONFIG_GADGET_SDK_TOKEN=\"mgst_YOUR_TOKEN\"`, then run the board build again. `idf.py menuconfig` is the interactive alternative.",
+      "Find the serial port: macOS `ls /dev/cu.usbmodem* /dev/cu.usbserial*`; Linux `ls /dev/ttyACM* /dev/ttyUSB*`; Windows Device Manager shows the COM port for the ESP-IDF shell.",
       "If flashing cannot connect: hold BOOT, tap RESET, release BOOT, retry.",
     ];
   }
@@ -604,7 +807,7 @@ function hardwareBriefLine(part: BuildPlanPart): string {
 function shoppingBriefLine(item: ShoppingList["items"][number]): string {
   const required = item.required ? "required" : "optional";
   const price = item.est_price_usd === null ? "price unknown" : `est. $${item.est_price_usd}`;
-  const url = item.url ? `${item.url_kind}: ${item.url}` : "no URL";
+  const url = item.url && item.url_kind ? `${item.url_kind}: ${item.url}` : "no URL";
   return `${item.name} x${item.qty} (${required}, ${price}; ${url})`;
 }
 
@@ -659,10 +862,6 @@ function formatNumber(value: number): string {
 
 function ebaySearchUrl(name: string): string {
   return `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(name)}`;
-}
-
-function amazonSearchUrl(search: string): string {
-  return `https://www.amazon.com/s?k=${encodeURIComponent(search)}`;
 }
 
 function normalizeSiteUrl(siteUrl: string): string {

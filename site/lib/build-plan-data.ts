@@ -39,8 +39,12 @@ export function buildPlanForDevice(
     device: deviceForBuildPlan(device),
     platform,
     board,
-    printables: printablesForDevice(deviceId),
+    printables: printablesForDevice(deviceId, siteUrl),
     siteUrl,
+    affiliate: {
+      amazonTag: process.env.AMAZON_ASSOCIATE_TAG,
+      ebayCampaignId: process.env.EBAY_CAMPAIGN_ID,
+    },
   });
 }
 
@@ -67,16 +71,17 @@ function platformAndBoardFor(deviceId: string): {
   return { platform: null, board: null };
 }
 
-function printablesForDevice(deviceId: string): Printable[] {
+function printablesForDevice(deviceId: string, siteUrl: string): Printable[] {
+  const base = siteUrl.replace(/\/+$/, "");
   return cadManifest.parts
     .filter((part) => part.device_id === deviceId)
     .map((part) => ({
       part: part.part,
       title: part.title ?? titleForPart(part.part),
-      stl_url: part.files.stl,
-      step_url: part.files.step,
-      svg_url: part.files.svg,
-      fab_url: part.files.fab,
+      stl_url: absoluteUrl(base, part.files.stl),
+      step_url: absoluteUrl(base, part.files.step),
+      svg_url: absoluteUrl(base, part.files.svg),
+      fab_url: absoluteUrl(base, part.files.fab),
       fab: { checks: part.checks },
     }));
 }
@@ -92,6 +97,10 @@ function deviceForBuildPlan(device: DeviceEntry) {
     est_setup_hours_min: device.est_setup_hours_min,
     est_setup_hours_max: device.est_setup_hours_max,
   };
+}
+
+function absoluteUrl(base: string, path: string): string {
+  return path.startsWith("http") ? path : `${base}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
 function titleForPart(part: "desk-stand" | "enclosure"): string {
