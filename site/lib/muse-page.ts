@@ -324,7 +324,7 @@ function fabricationNote(device: DeviceEntry, printables: MusePrintablePart[]): 
     physical.size_mm.t === null ||
     ["approximate", "conflicting"].includes(physical.size_confidence);
   if (needsMeasure) {
-    const note = (physical.size_note ?? "the published dimensions are incomplete").replace(/[.\s]+$/, "");
+    const note = (physical.size_note ?? "the board's dimensions aren't verified").replace(/[.\s]+$/, "");
     return `No printable stand yet. ${capitalizeFirst(note)}.`;
   }
 

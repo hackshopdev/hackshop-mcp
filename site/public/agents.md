@@ -7,10 +7,10 @@ You are helping your human build a physical body for you (an AI agent). Muse is 
 1. Intake: ask at most 4 questions about size, interaction, sensing and budget. If you call `plan_gadget` and it returns `questions`, use those options to refine the next call.
 2. Plan: call `plan_gadget` through MCP or `POST /api/plan`. Let the human choose from the picks.
 3. Build: call `get_build_plan`, fetch `/build/<device_id>/plan.json`, or read `/build/<device_id>/build.md`.
-4. Shopping list: show `shopping_list.items`, estimated total and `purchase_policy`. For the best current prices (new from the seller or Amazon, used on eBay) read `/store.json`. Buy only after the human approves the exact items, sellers and total. Amazon and eBay don't allow automated carts or checkout: for those items, give the human the links and let them check out. On other stores (Waveshare, M5Stack, Seeed, Raspberry Pi resellers), once approved and asked, you may add those items to a cart and check out with a payment method they already set up. Never type card numbers or passwords yourself.
+4. Shopping list: show `shopping_list.items`, estimated total and `purchase_policy`. For the best current prices (new from the seller or Amazon, used on eBay) read `/store.json`. Show the human one list with links and the total, and get explicit approval for the exact items, sellers and total before buying anything. Amazon and eBay don't allow automated carts or checkout, so for those items give the human the links and let them check out. On other stores, once they approve and ask you to, you may add exactly those items to a cart and check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.
 5. Assemble: follow `assembly` in order. Treat `robot.feasible=false` steps as human/app/software steps.
 6. Flash and pair: use the exact commands and pairing text in the build plan. Keep `mgst_YOUR_TOKEN` as the placeholder unless the human provides a real token privately.
-7. Save it: tell the human to click Start a build on the build page so their progress is saved.
+7. Save it: after the human picks a board, tell them to click Start a build on the build page so their progress is saved.
 
 ## Endpoints
 
@@ -44,4 +44,4 @@ Agent: After approval, I follow `assembly`, flash the firmware, pair it in Muse,
 
 ## Safety
 
-Hackshop has no checkout and sells nothing. Purchases happen at the seller, Amazon or eBay, and only after the human approves the exact items, sellers and total. Sign-in is optional; it only syncs saved builds across devices. Controls marked `data-agent-danger` delete local browser data; use them only after explicit confirmation.
+Hackshop has no checkout and sells nothing. Show the human one list with links and the total, and get explicit approval for the exact items, sellers and total before buying anything. Amazon and eBay don't allow automated carts or checkout, so for those items give the human the links and let them check out. On other stores, once they approve and ask you to, you may add exactly those items to a cart and check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself. Sign-in is optional; it only syncs saved builds across devices. Controls marked `data-agent-danger` delete local browser data; use them only after explicit confirmation.

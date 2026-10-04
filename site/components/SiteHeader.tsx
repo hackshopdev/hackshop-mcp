@@ -2,7 +2,13 @@ import Link from "next/link";
 import { ProjectNav } from "./ProjectNav";
 import styles from "./SiteHeader.module.css";
 
-export function SiteHeader() {
+type HeaderCta = { label: string; href: string } | null;
+
+export function SiteHeader({
+  cta = { label: "Start a build", href: "/#start" },
+}: {
+  cta?: HeaderCta;
+} = {}) {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -17,9 +23,11 @@ export function SiteHeader() {
           <Link href="/resources">Field guides</Link>
           <ProjectNav className={styles.projectNav} />
         </nav>
-        <Link className={styles.cta} href="/#start" data-testid="header-start-build">
-          Start a build
-        </Link>
+        {cta ? (
+          <Link className={styles.cta} href={cta.href} data-testid="header-start-build">
+            {cta.label}
+          </Link>
+        ) : null}
       </div>
     </header>
   );

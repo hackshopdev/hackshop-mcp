@@ -35,7 +35,11 @@ const jsonLd = {
       url: "https://www.hackshop.dev",
       description:
         "Helps people and their AI agents build physical gadgets: board picks, parts, build and assembly steps. Starts with Meta's Muse Gadgets.",
-      email: "msanchezgrice@gmail.com",
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        url: "https://www.hackshop.dev/contact",
+      },
     },
     {
       "@type": "WebSite",

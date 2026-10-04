@@ -87,6 +87,10 @@ export const STORE_GROUPS: Array<{ id: StoreGroup; title: string; blurb: string 
 ];
 
 const SITE_URL = "https://www.hackshop.dev";
+const AFFILIATE = {
+  amazonTag: process.env.AMAZON_ASSOCIATE_TAG,
+  ebayCampaignId: process.env.EBAY_CAMPAIGN_ID,
+};
 
 const catalog = Catalog.parse(catalogJson);
 const platforms = Platforms.parse(platformsJson);
@@ -171,7 +175,7 @@ function toStoreBoard(platform: Platform, board: PlatformBoard, device: DeviceEn
         url_kind: part.buy_url ? "buy" : part.search_url ? "search" : null,
         seller: url ? retailerLabel(url) : null,
         est_price_usd: part.est_price_usd,
-        ebay_url: searchTerm ? ebayNewestUrl(searchTerm) : null,
+        ebay_url: searchTerm ? ebayNewestUrl(searchTerm, AFFILIATE) : null,
       };
     });
 
@@ -189,8 +193,13 @@ function toStoreBoard(platform: Platform, board: PlatformBoard, device: DeviceEn
     capabilities: capabilitiesFor(platform, board),
     price_label: priceLabel(device),
     est_board_usd: device.est_used_price_usd_min ?? null,
-    buy: buyLinksFor({ deviceId: device.id, name: device.name, buyUrl: device.buy_url }),
-    ebay: { query, newest_url: ebayNewestUrl(query) },
+    buy: buyLinksFor({
+      deviceId: device.id,
+      name: device.name,
+      buyUrl: device.buy_url,
+      affiliate: AFFILIATE,
+    }),
+    ebay: { query, newest_url: ebayNewestUrl(query, AFFILIATE) },
     parts,
     est_total_usd: plan?.shopping_list.est_total_usd ?? null,
     build_page: `${SITE_URL}/build/${device.id}`,

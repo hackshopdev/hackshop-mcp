@@ -6,6 +6,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   GetPromptRequestSchema,
+  ListResourceTemplatesRequestSchema,
   ListPromptsRequestSchema,
   ListResourcesRequestSchema,
   ListToolsRequestSchema,
@@ -34,6 +35,7 @@ import {
 } from "./core/tools.js";
 import {
   getCorePrompt,
+  listCoreResourceTemplates,
   listCorePrompts,
   listCoreResources,
   readCoreResource,
@@ -41,7 +43,7 @@ import {
 import type { CoreContext } from "./core/types.js";
 
 const NAME = "hackshop-mcp";
-const VERSION = "0.0.5";
+const VERSION = "0.0.6";
 const STDIO_INSTRUCTIONS =
   "Hackshop maps a natural-language project idea to hackable, repurposable, or protocol-native hardware. Use plan_gadget for Muse agent-body gadgets because it is deterministic, instant and key-free. Use propose_hardware for broader repurposing ideas and existing hardware, especially when the host can sample or ANTHROPIC_API_KEY is set. Hackshop never buys anything; show shopping lists and ask the human before any purchase. Anonymous usage telemetry (tool names and timings only) is on by default; set HACKSHOP_TELEMETRY=0 to turn it off.";
 
@@ -174,12 +176,13 @@ async function main(): Promise<void> {
           },
           required: ["idea"],
         },
+        outputSchema: { type: "object", properties: {} },
       },
       ...coreToolDefinitions(),
       {
         name: "simulate_assembly",
         description:
-          "Drop a proposed robot Assembly into a MuJoCo physics world and run a bounded navigation rollout. Returns whether it reached the goal plus honest failure telemetry (stuck/tipped/collisions/heading-oscillation), a natural-language post-mortem, and artifact URLs (rendered mp4, scene.xml, control.py, telemetry.json). Today simulates the diff-drive 'navigate' slice; other goal kinds return an honest 'unsupported'. Requires a running sim-worker (SIM_WORKER_URL).",
+          "Drop a proposed robot Assembly into a MuJoCo physics world and run a bounded navigation rollout. Returns whether it reached the goal plus honest failure telemetry (stuck/tipped/collisions/heading-oscillation), a natural-language post-mortem, and artifact URLs (rendered mp4, scene.xml, control.py, telemetry.json). Today simulates the diff-drive 'navigate' slice; other goal kinds return an honest 'unsupported'. Requires a configured simulation service.",
         inputSchema: {
           type: "object",
           properties: {
@@ -195,12 +198,17 @@ async function main(): Promise<void> {
           },
           required: ["assembly"],
         },
+        outputSchema: { type: "object", properties: {} },
       },
     ],
   }));
 
   server.setRequestHandler(ListResourcesRequestSchema, async () => ({
     resources: listCoreResources(),
+  }));
+
+  server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => ({
+    resourceTemplates: listCoreResourceTemplates(),
   }));
 
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
@@ -245,6 +253,7 @@ async function main(): Promise<void> {
       return {
         ...(isError ? { isError: true } : {}),
         content: [{ type: "text", text: text ?? JSON.stringify(out, null, 2) }],
+        ...(isError ? {} : { structuredContent: out as Record<string, unknown> }),
       };
     } catch (err) {
       telemetry.send({

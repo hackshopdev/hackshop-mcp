@@ -3,6 +3,7 @@ import { z } from "zod";
 const KebabId = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "id must be kebab-case");
 const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "date must be YYYY-MM-DD");
 const FeatureValue = z.union([z.boolean(), z.string(), z.number(), z.null()]);
+const FitSize = z.enum(["pocket", "desk", "wall", "hidden"]);
 
 export const PlatformBoardPart = z.object({
   name: z.string().min(1),
@@ -10,6 +11,7 @@ export const PlatformBoardPart = z.object({
   required: z.boolean(),
   note: z.string().min(1),
   buy_url: z.string().url().optional(),
+  info_url: z.string().url().optional(),
   search: z.string().min(1).optional(),
   est_price_usd: z.number().nonnegative().optional(),
 });
@@ -20,6 +22,8 @@ export const PlatformBoard = z.object({
   tier: z.string().min(1),
   kind: z.string().min(1),
   build: z.string().min(1),
+  chip: z.enum(["esp32", "esp32c5", "esp32c6", "esp32s3"]).optional(),
+  fits: z.array(FitSize).optional(),
   eol: z.boolean().optional(),
   note: z.string().min(1),
   features: z.record(FeatureValue),

@@ -4,7 +4,7 @@ import { z } from "zod";
 import { Assembly, BuildPlan } from "./assembly";
 
 // ─────────────────────────────────────────────────────────────────────────
-// Server-side client for the Python sim-worker (MuJoCo physics + render).
+// Server-side client for the simulation service (MuJoCo physics + render).
 //
 // The worker is a separate process (native deps: mujoco, ffmpeg) reachable at
 // SIM_WORKER_URL. The Next API routes proxy to it: POST kicks a job, GET polls.
@@ -159,15 +159,15 @@ export async function kickSimulation(
   } catch (err) {
     if (isAbortError(err)) {
       throw new Error(
-        `sim-worker unavailable: kick timed out after ${KICK_TIMEOUT_MS / 1000}s`,
+        `simulation service unavailable: kick timed out after ${KICK_TIMEOUT_MS / 1000}s`,
       );
     }
     throw new Error(
-      `sim-worker unavailable: ${err instanceof Error ? err.message : "fetch failed"}`,
+      `simulation service unavailable: ${err instanceof Error ? err.message : "fetch failed"}`,
     );
   }
   if (!res.ok) {
-    throw new Error(`sim-worker ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    throw new Error(`simulation service ${res.status}: ${(await res.text()).slice(0, 200)}`);
   }
   return (await res.json()) as SimJob;
 }
@@ -182,16 +182,16 @@ export async function pollSimulation(jobId: string): Promise<SimJob> {
   } catch (err) {
     if (isAbortError(err)) {
       throw new Error(
-        `sim-worker unavailable: poll timed out after ${POLL_TIMEOUT_MS / 1000}s`,
+        `simulation service unavailable: poll timed out after ${POLL_TIMEOUT_MS / 1000}s`,
       );
     }
     throw new Error(
-      `sim-worker unavailable: ${err instanceof Error ? err.message : "fetch failed"}`,
+      `simulation service unavailable: ${err instanceof Error ? err.message : "fetch failed"}`,
     );
   }
   if (res.status === 404) throw new Error("job not found");
   if (!res.ok) {
-    throw new Error(`sim-worker ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    throw new Error(`simulation service ${res.status}: ${(await res.text()).slice(0, 200)}`);
   }
   return (await res.json()) as SimJob;
 }

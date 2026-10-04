@@ -17,7 +17,7 @@ import styles from "./build.module.css";
 export function BuildExperience({ plan }: { plan: BuildPlan }) {
   return (
     <main className={styles.page}>
-      <SiteHeader />
+      <SiteHeader cta={null} />
       <div className={styles.shell}>
 
         <header className={styles.hero}>
@@ -218,6 +218,17 @@ function PartLink({
 }) {
   const url = part.buy_url ?? part.search_url;
   if (!url) return <span className={styles.muted}>{compact ? "Print" : "Use print files"}</span>;
+  if (part.kind === "printed") {
+    return (
+      <a
+        className={compact ? styles.smallButton : styles.secondaryButton}
+        href={url}
+        onClick={() => track("stand_downloaded", { device_id: plan.device_id, format: "stl" })}
+      >
+        STL file
+      </a>
+    );
+  }
   const host = hostLabel(url);
   const label = part.buy_url ? `Buy from ${host}` : `Find on ${host}`;
   return (

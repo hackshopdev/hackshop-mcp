@@ -1,8 +1,17 @@
 import { buildUrls } from "../build-plan/index.js";
+import { getBuildPlan } from "./tools.js";
 import type { CoreContext, DeviceEntry, Platform, PlatformBoard } from "./types.js";
 
 export interface CoreResource {
   uri: string;
+  name: string;
+  title: string;
+  description: string;
+  mimeType: string;
+}
+
+export interface CoreResourceTemplate {
+  uriTemplate: string;
   name: string;
   title: string;
   description: string;
@@ -44,6 +53,16 @@ export const CORE_RESOURCES: CoreResource[] = [
   },
 ];
 
+export const CORE_RESOURCE_TEMPLATES: CoreResourceTemplate[] = [
+  {
+    uriTemplate: "hackshop://build/{device_id}",
+    name: "build-plan",
+    title: "Build plan",
+    description: "Build plan JSON for a Hackshop catalog device id.",
+    mimeType: "application/json",
+  },
+];
+
 export const CORE_PROMPTS: CorePrompt[] = [
   {
     name: "plan-muse-gadget",
@@ -69,10 +88,25 @@ export function listCoreResources(): CoreResource[] {
   return CORE_RESOURCES;
 }
 
+export function listCoreResourceTemplates(): CoreResourceTemplate[] {
+  return CORE_RESOURCE_TEMPLATES;
+}
+
 export function readCoreResource(
   uri: string,
   ctx: CoreContext,
 ): { uri: string; mimeType: string; text: string } | null {
+  const buildMatch = uri.match(/^hackshop:\/\/build\/([^/]+)$/);
+  if (buildMatch?.[1]) {
+    const plan = getBuildPlan({ device_id: decodeURIComponent(buildMatch[1]) }, ctx);
+    if ("isError" in plan) return null;
+    return {
+      uri,
+      mimeType: "application/json",
+      text: JSON.stringify(plan, null, 2),
+    };
+  }
+
   if (uri === "hackshop://muse/boards") {
     return {
       uri,

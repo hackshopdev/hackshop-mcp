@@ -46,4 +46,8 @@ Local npm server:
 
 ## Agent Rule
 
-Ask intake questions, call `plan_gadget`, let the human choose, fetch `get_build_plan` or `/build/<id>/plan.json`, show the shopping list (best prices from `/store.json`), get approval for the exact items and total before buying, follow `assembly`, then tell the human to click Start a build.
+Ask intake questions, call `plan_gadget`, let the human choose, then tell the human to click Start a build so progress is saved. Fetch `get_build_plan` or `/build/<id>/plan.json`, show the shopping list (best prices from `/store.json`), and get approval for the exact items, sellers and total before buying. Amazon and eBay don't allow automated carts or checkout, so give the human those links and let them check out. Follow `assembly`, then flash and pair.
+
+## Purchase Policy
+
+Show the human one list with links and the total, and get explicit approval for the exact items, sellers and total before buying anything. Amazon and eBay don't allow automated carts or checkout, so for those items give the human the links and let them check out. On other stores, once they approve and ask you to, you may add exactly those items to a cart and check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.

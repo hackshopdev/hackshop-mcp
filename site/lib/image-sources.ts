@@ -163,12 +163,16 @@ export const IMAGE_SOURCES: Record<string, string> = {
     "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c5/_images/esp32-c5-devkitc-1-isometric_v1.1.png",
   "home-assistant-voice-pe":
     "https://www.home-assistant.io/images/voice-pe/vpe-top.webp",
+  "ideaspark-esp32-1-9-lcd":
+    "https://m.media-amazon.com/images/I/71fOYS7KVzL._AC_SL1500_.jpg",
   "m5stack-stickc-plus2":
     "https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/512/K016-P2.webp",
   "m5stack-sticks3":
     "https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/1207/K150-stickS3_main-products_01.webp",
   "seeed-reterminal-e1001":
-    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-104991002-reterminal-e1001-epaper-display.jpg",
+    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-104991002-reterminal-e1001-epaper-display.jpg",
+  "seeed-reterminal-e1002":
+    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-104991003-reterminal-e1002-epaper-display.jpg",
   "seeed-sensecap-indicator":
     "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/_/1/_1_5.png",
   "seeed-sensecap-watcher":

@@ -1,5 +1,6 @@
 import { fetchEbayListingsMany, isEbayConfigured } from "../../lib/ebay";
 import { commonParts, STORE_GROUPS, storeBoards } from "../../lib/store";
+import { PURCHASE_POLICY } from "../../lib/build-plan";
 
 // Agent-readable store: every board, its buy links, the parts each build
 // needs, and (when eBay is configured) the newest Buy It Now listings.
@@ -20,7 +21,7 @@ export async function GET() {
     url: "https://www.hackshop.dev/store",
     updated_at: new Date().toISOString(),
     purchase_policy:
-      "Hackshop doesn't sell hardware; every link goes to the seller, Amazon or eBay. Show the human one list with links and the total, and get explicit approval for the exact items before buying. Amazon and eBay don't allow automated carts or checkout, so the human checks out there themselves. On other stores you may add approved items to a cart and check out only if the human asks. Never buy without approval.",
+      `Hackshop doesn't sell hardware; every link goes to the seller, Amazon or eBay. ${PURCHASE_POLICY}`,
     ebay_live: live,
     groups: STORE_GROUPS,
     boards: boards.map((board) => ({

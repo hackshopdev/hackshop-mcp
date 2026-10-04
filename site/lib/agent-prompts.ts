@@ -27,7 +27,7 @@ export const STORE_AGENT_PROMPT =
   "price for each item: new from the linked seller or Amazon, or used on eBay (check " +
   "condition and shipping). Show me the list with links and the total, and wait for my " +
   "OK before you add anything to a cart or check out. Amazon and eBay don't allow " +
-  "automated checkout, so give me those links to buy myself.";
+  "automated carts or checkout, so give me those links to buy myself.";
 
 export function buyEverythingPrompt(input: {
   name: string;
@@ -48,7 +48,7 @@ export function buyEverythingPrompt(input: {
       "recent eBay listing (check condition and shipping). Give me one list with links " +
       "and the total, then wait for my OK. Only add to cart or check out after I approve " +
       "the exact items and total, and skip anything I already have. Amazon and eBay don't " +
-      `allow automated checkout, so give me those links to buy myself.${idea}`,
+      `allow automated carts or checkout, so give me those links to buy myself.${idea}`,
   );
 }
 

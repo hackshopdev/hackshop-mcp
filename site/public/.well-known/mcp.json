@@ -20,7 +20,8 @@
   "resources": [
     "hackshop://muse/boards",
     "hackshop://muse/sdk-terms",
-    "hackshop://catalog/tags"
+    "hackshop://catalog/tags",
+    "hackshop://build/{device_id}"
   ],
   "prompts": ["plan-muse-gadget"],
   "npm": "hackshop-mcp",

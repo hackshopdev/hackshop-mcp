@@ -150,7 +150,7 @@ export async function simulateAssembly(
     if (!res.ok) {
       return {
         status: "error",
-        message: `Simulation worker returned ${res.status}: ${(await res.text()).slice(0, 200)}`,
+        message: `Simulation service returned ${res.status}: ${(await res.text()).slice(0, 200)}`,
       };
     }
     job = (await res.json()) as WorkerJob;
@@ -162,9 +162,9 @@ export async function simulateAssembly(
       status: "unavailable",
       message: aborted
         ? `Simulation worker did not respond within ${SYNC_TIMEOUT_MS / 1000}s; treating it as unavailable. ` +
-          "Set SIM_WORKER_URL and ensure the sim-worker is running and reachable."
-        : "Could not reach the simulation worker. Set SIM_WORKER_URL and ensure the " +
-          `sim-worker is running. (${err instanceof Error ? err.message : "fetch failed"})`,
+          "Set SIM_WORKER_URL and ensure the simulation service is running and reachable."
+        : "Could not reach the simulation service. Set SIM_WORKER_URL and ensure it is running. " +
+          `(${err instanceof Error ? err.message : "fetch failed"})`,
     };
   }
 

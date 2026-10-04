@@ -1,6 +1,7 @@
 {
   "name": "hackshop-mcp",
-  "version": "0.0.5",
+  "version": "0.0.6",
+  "mcpName": "dev.hackshop/hackshop-mcp",
   "description": "Hardware-literate AI scout for tinkerers. Idea-to-hardware mapping via MCP.",
   "type": "module",
   "bin": {
@@ -37,7 +38,7 @@
     "agent"
   ],
   "license": "MIT",
-  "author": "Miguel Sanchez-Grice <msanchezgrice@gmail.com>",
+  "author": "hackshop (https://www.hackshop.dev)",
   "homepage": "https://github.com/msanchezgrice/hackshop-mcp",
   "repository": {
     "type": "git",

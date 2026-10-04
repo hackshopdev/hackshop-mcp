@@ -326,7 +326,7 @@ export function ProjectDetailClient({ id }: { id: string }) {
 function ProjectShell({ children }: { children: React.ReactNode }) {
   return (
     <main className={styles.page}>
-      <SiteHeader />
+      <SiteHeader cta={null} />
       <div className={styles.shell}>{children}</div>
       <SiteFooter />
     </main>

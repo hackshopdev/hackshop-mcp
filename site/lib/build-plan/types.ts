@@ -17,6 +17,7 @@ export interface PlatformBoardPart {
   required: boolean;
   note: string;
   buy_url?: string;
+  info_url?: string;
   search?: string;
   est_price_usd?: number;
 }
@@ -27,6 +28,7 @@ export interface PlatformBoard {
   tier: string;
   kind: string;
   build: string;
+  chip?: "esp32" | "esp32c5" | "esp32c6" | "esp32s3";
   eol?: boolean;
   note: string;
   features: Record<string, FeatureValue>;
@@ -90,7 +92,9 @@ export interface BuildPlanPart {
   required: boolean;
   note: string;
   buy_url: string | null;
+  info_url: string | null;
   search_url: string | null;
+  search: string | null;
   kind: "board" | "part" | "printed";
   est_price_usd: number | null;
 }
@@ -126,6 +130,7 @@ export interface AssemblyStep {
     feasible: boolean;
     notes: string;
   };
+  optional: boolean;
 }
 
 export interface ShoppingList {
@@ -134,13 +139,22 @@ export interface ShoppingList {
     name: string;
     qty: number;
     url: string | null;
-    url_kind: "buy" | "search";
+    url_kind: "buy" | "search" | "print" | null;
     est_price_usd: number | null;
     required: boolean;
+    buy_options: Array<{
+      label: string;
+      url: string;
+      kind: "seller" | "retailer" | "search" | "print";
+      condition: "new" | "used" | null;
+    }>;
   }>;
   est_total_usd: number | null;
   currency: "USD";
   purchase_policy: string;
+  notes: string[];
+  store_url: string;
+  store_json_url: string;
 }
 
 export interface BuildPlan {

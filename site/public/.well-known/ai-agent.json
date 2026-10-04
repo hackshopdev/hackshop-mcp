@@ -18,11 +18,13 @@
     ],
     "disallowed_actions": [
       "Do not buy anything without explicit approval for the exact items and total.",
-      "Do not complete checkout on eBay, manufacturer stores or any other site.",
+      "Amazon and eBay don't allow automated carts or checkout, so give the human those links and let them check out.",
+      "On other stores, do not add items to a cart or check out unless the human approved the exact items, sellers and total and asked you to continue.",
       "Do not activate controls tagged data-agent-danger without explicit confirmation.",
       "Do not loop or retry rate-limited endpoints.",
       "Do not expose real Muse SDK tokens; use mgst_YOUR_TOKEN as the placeholder in docs and code."
     ],
-    "contact": "msanchezgrice@gmail.com"
+    "purchase_policy": "Show the human one list with links and the total, and get explicit approval for the exact items, sellers and total before buying anything. Amazon and eBay don't allow automated carts or checkout, so for those items give the human the links and let them check out. On other stores, once they approve and ask you to, you may add exactly those items to a cart and check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.",
+    "contact": "https://www.hackshop.dev/contact"
   }
 }
