@@ -134,7 +134,7 @@ export default async function StorePage() {
         <section className={styles.group} id="from-meta" aria-labelledby="from-meta-h">
           <div className={ui.sectionHead}>
             <h2 id="from-meta-h">From Meta</h2>
-            <p>Meta&apos;s own Muse hardware, for homes that already have devices to reach.</p>
+            <p>Muse hardware Meta makes itself. Nothing to build.</p>
           </div>
           <div className={styles.metaCards}>
             <article className={styles.metaCard}>
