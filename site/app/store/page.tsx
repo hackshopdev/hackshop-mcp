@@ -29,7 +29,7 @@ const FAQ = [
   {
     question: "Can my agent buy everything for me?",
     answer:
-      "Yes, with your OK. Use \"Tell my agent to buy everything\": your agent finds the best current price for each part, shows you one list with the total, and only adds to cart or checks out after you approve the exact items.",
+      "With your OK. Use \"Tell my agent to buy everything\": your agent finds the best current price for each part and shows you one list with the total. After you approve, it can order from seller stores like Waveshare or M5Stack. Amazon and eBay don't allow automated checkout, so it hands you those links to buy yourself.",
   },
   {
     question: "New or used?",

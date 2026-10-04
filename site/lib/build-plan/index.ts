@@ -186,7 +186,7 @@ function buildShoppingList(parts: BuildPlanPart[]): ShoppingList {
     est_total_usd,
     currency: "USD",
     purchase_policy:
-      "Show the human this list and get explicit approval for the exact items, sellers and total before buying anything. Once they approve, you may add exactly those items to a cart and, if they ask you to, check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.",
+      "Show the human this list and get explicit approval for the exact items, sellers and total before buying anything. Amazon and eBay don't allow automated carts or checkout, so for those items give the human the links and let them check out. On other stores, once they approve and ask you to, you may add exactly those items to a cart and check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.",
   };
 }
 

@@ -70,7 +70,9 @@ describe("buy-everything prompts", () => {
     expect(prompt).toContain("1 × USB-C data cable");
     expect(prompt).toMatch(/wait for my OK/);
     expect(prompt).toMatch(/only add to cart or check out after I approve/i);
+    expect(prompt).toMatch(/Amazon and eBay don't allow automated checkout/);
     expect(STORE_AGENT_PROMPT).toMatch(/wait for my OK before you add anything to a cart or check out/);
+    expect(STORE_AGENT_PROMPT).toMatch(/Amazon and eBay don't allow automated checkout/);
   });
 });
 
