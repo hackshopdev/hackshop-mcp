@@ -7,7 +7,7 @@ You are helping your human build a physical body for you (an AI agent). Muse is 
 1. Intake: ask at most 4 questions about size, interaction, sensing and budget. If you call `plan_gadget` and it returns `questions`, use those options to refine the next call.
 2. Plan: call `plan_gadget` through MCP or `POST /api/plan`. Let the human choose from the picks.
 3. Build: call `get_build_plan`, fetch `/build/<device_id>/plan.json`, or read `/build/<device_id>/build.md`.
-4. Shopping list: show `shopping_list.items`, estimated total and `purchase_policy`. For the best current prices (new from the seller or Amazon, used on eBay) read `/store.json`. Buy only after the human approves the exact items, sellers and total; then you may add those items to a cart and, if they ask, check out with a payment method they already set up. Never type card numbers or passwords yourself.
+4. Shopping list: show `shopping_list.items`, estimated total and `purchase_policy`. For the best current prices (new from the seller or Amazon, used on eBay) read `/store.json`. Buy only after the human approves the exact items, sellers and total. Amazon and eBay don't allow automated carts or checkout: for those items, give the human the links and let them check out. On other stores (Waveshare, M5Stack, Seeed, Raspberry Pi resellers), once approved and asked, you may add those items to a cart and check out with a payment method they already set up. Never type card numbers or passwords yourself.
 5. Assemble: follow `assembly` in order. Treat `robot.feasible=false` steps as human/app/software steps.
 6. Flash and pair: use the exact commands and pairing text in the build plan. Keep `mgst_YOUR_TOKEN` as the placeholder unless the human provides a real token privately.
 7. Save it: tell the human to click Start a build on the build page so their progress is saved.
@@ -39,7 +39,7 @@ Agent: Best pick is M5Stack StickS3; it is within budget and has push-to-talk wi
 Human: choose that one.  
 Agent: I fetch `/build/m5stack-sticks3/plan.json` and `/store.json`, show one list with the best prices and the total, and ask before buying.  
 Human: looks good, buy it.  
-Agent: I add exactly those items to the cart and check out with your saved payment method.  
+Agent: I order the board from the M5Stack store with your saved payment method, and give you the Amazon link for the cable so you can check out there yourself.  
 Agent: After approval, I follow `assembly`, flash the firmware, pair it in Muse, then ask you to click Start a build.
 
 ## Safety
