@@ -172,11 +172,11 @@ export const IMAGE_SOURCES: Record<string, string> = {
   "seeed-reterminal-e1001":
     "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-104991002-reterminal-e1001-epaper-display.jpg",
   "seeed-reterminal-e1002":
-    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-104991003-reterminal-e1002-epaper-display.jpg",
+    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-104991003-reterminal-e1002-epaper-display.jpg",
   "seeed-sensecap-indicator":
-    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/_/1/_1_5.png",
+    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/_/1/_1_5.png",
   "seeed-sensecap-watcher":
-    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-113991315-sensecap-watcher-w1-a_1.jpg",
+    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/1/-/1-113991315-sensecap-watcher-w1-a_1.jpg",
   "seeed-xiao-esp32s3":
     "https://cdn-shop.adafruit.com/970x728/5426-00.jpg",
   "seeed-xiao-nrf52840-sense":
