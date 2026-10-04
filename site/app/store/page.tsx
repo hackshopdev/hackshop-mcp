@@ -48,6 +48,7 @@ export default async function StorePage() {
   const boards = storeBoards();
   const parts = commonParts();
   const ebayLive = isEbayConfigured();
+  const showAffiliateDisclosure = Boolean(process.env.AMAZON_ASSOCIATE_TAG || process.env.EBAY_CAMPAIGN_ID);
   const listings = ebayLive
     ? await fetchEbayListingsMany(
         Object.fromEntries(boards.map((board) => [board.device_id, board.ebay.query])),
@@ -88,7 +89,7 @@ export default async function StorePage() {
             <p className={ui.eyebrow}>Store</p>
             <h1>Everything you need to build a Muse gadget</h1>
             <p className={styles.lede}>
-              Every board Muse supports, with a link to buy it new, the newest used
+              Every board Muse supports, with a link to buy it new, links to the newest used
               listings on eBay, and the parts each build needs. Pick a board, get
               the parts, then follow the build.
             </p>
@@ -105,6 +106,11 @@ export default async function StorePage() {
               <li>Hackshop doesn&apos;t sell hardware</li>
               <li>Your agent asks before it buys anything</li>
             </ul>
+            {showAffiliateDisclosure ? (
+              <p className={styles.affiliateDisclosure}>
+                Some links are affiliate links. If you buy, hackshop may earn a small commission at no cost to you.
+              </p>
+            ) : null}
           </div>
           <TellMyAgent
             variant="hero"
@@ -116,6 +122,7 @@ export default async function StorePage() {
         </section>
 
         <nav className={styles.jump} aria-label="Store sections">
+          <a href="#from-meta">From Meta</a>
           {groups.map((group) => (
             <a key={group.id} href={`#${group.id}`}>
               {group.title} <span>{group.boards.length}</span>
@@ -123,6 +130,51 @@ export default async function StorePage() {
           ))}
           <a href="#parts">Parts</a>
         </nav>
+
+        <section className={styles.group} id="from-meta" aria-labelledby="from-meta-h">
+          <div className={ui.sectionHead}>
+            <h2 id="from-meta-h">From Meta</h2>
+            <p>Meta&apos;s own Muse hardware, for homes that already have devices to reach.</p>
+          </div>
+          <div className={styles.metaCards}>
+            <article className={styles.metaCard}>
+              <span className={styles.metaMark} aria-hidden="true" />
+              <div className={styles.metaHead}>
+                <h3>Muse Home Link</h3>
+                <span className={ui.pillAccent}>Free with Muse</span>
+              </div>
+              <p>
+                Connects Muse to your home Wi-Fi so it can reach compatible devices you already own, or anything you
+                build with a local HTTP API.
+              </p>
+              <p className={styles.finePrint}>
+                Free with an active Muse subscription, US only, one per subscriber. Ships in October.
+              </p>
+              <StoreLinkOut
+                href="https://gadgets.muse.ai/home-link"
+                className={styles.chipLink}
+                event={{ kind: "meta_device", seller: "Meta" }}
+              >
+                Claim it on gadgets.muse.ai
+              </StoreLinkOut>
+            </article>
+            <article className={styles.metaCard}>
+              <span className={styles.metaMark} aria-hidden="true" />
+              <div className={styles.metaHead}>
+                <h3>Muse on your TV</h3>
+                <span className={ui.pill}>Coming soon</span>
+              </div>
+              <p>An HDMI stick so Muse can put things on the TV.</p>
+              <StoreLinkOut
+                href="https://gadgets.muse.ai/"
+                className={styles.textLink}
+                event={{ kind: "meta_device", seller: "Meta" }}
+              >
+                See gadgets.muse.ai
+              </StoreLinkOut>
+            </article>
+          </div>
+        </section>
 
         {groups.map((group) => (
           <section className={styles.group} id={group.id} key={group.id} aria-labelledby={`${group.id}-h`}>

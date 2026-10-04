@@ -17,7 +17,7 @@ import styles from "./build.module.css";
 export function BuildExperience({ plan }: { plan: BuildPlan }) {
   return (
     <main className={styles.page}>
-      <SiteHeader />
+      <SiteHeader cta={null} />
       <div className={styles.shell}>
 
         <header className={styles.hero}>

@@ -32,7 +32,7 @@ export function ProjectsIndexClient() {
 
   return (
     <main className={styles.page}>
-      <SiteHeader />
+      <SiteHeader cta={null} />
       <div className={styles.shell}>
 
         <header className={styles.projectsHero}>
