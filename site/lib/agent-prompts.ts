@@ -20,6 +20,36 @@ export function boardAgentPrompt(input: { name: string; deviceId: string }): str
   );
 }
 
+export const STORE_AGENT_PROMPT =
+  "Help me buy the parts for a Muse gadget. Read https://www.hackshop.dev/store.json " +
+  "(every board, its parts, seller links and newest eBay listings). Ask me what I want " +
+  "it to do or which board I picked, then make one shopping list with the best current " +
+  "price for each item: new from the linked seller or Amazon, or used on eBay (check " +
+  "condition and shipping). Show me the list with links and the total, and wait for my " +
+  "OK before you add anything to a cart or check out.";
+
+export function buyEverythingPrompt(input: {
+  name: string;
+  deviceId: string;
+  items?: Array<{ qty: number; name: string }>;
+  idea?: string;
+}): string {
+  const need =
+    input.items && input.items.length > 0
+      ? ` I still need: ${input.items.map((item) => `${item.qty} × ${item.name}`).join("; ")}.`
+      : "";
+  const idea = input.idea?.trim() ? ` It's for: ${input.idea.trim()}` : "";
+  return clampForUrl(
+    `Buy everything I need to build my ${input.name} gadget for Muse. ` +
+      `The shopping list is in ${SITE_URL}/build/${input.deviceId}/plan.json (shopping_list), ` +
+      `and ${SITE_URL}/store.json has seller links and newest eBay listings.${need} ` +
+      "For each item, find the best current price from the linked seller, Amazon or a " +
+      "recent eBay listing (check condition and shipping). Give me one list with links " +
+      "and the total, then wait for my OK. Only add to cart or check out after I approve " +
+      `the exact items and total, and skip anything I already have.${idea}`,
+  );
+}
+
 export function projectAgentPrompt(input: {
   name: string;
   deviceId: string;

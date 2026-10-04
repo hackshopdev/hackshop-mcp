@@ -83,6 +83,9 @@ export default function MusePage() {
             <a className={styles.secondaryButton} href="#compare">
               Compare the boards
             </a>
+            <a className={styles.secondaryButton} href="/store">
+              Shop the parts
+            </a>
           </div>
           <p className={styles.verifyLine}>
             Last verified {data.esp32.platform.last_verified} · Sources linked below.

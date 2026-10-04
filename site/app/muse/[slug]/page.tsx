@@ -92,6 +92,9 @@ export default async function BoardPage({ params }: Props) {
                   Buy from {hostOf(buyUrl)}
                 </a>
               ) : null}
+              <Link className={ui.linkArrow} href={`/store#${slug}`}>
+                Compare prices, new and used
+              </Link>
             </div>
           </div>
         </section>

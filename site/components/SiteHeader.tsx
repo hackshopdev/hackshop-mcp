@@ -12,6 +12,7 @@ export function SiteHeader() {
         </Link>
         <nav className={styles.links} aria-label="Primary">
           <Link href="/muse">Muse gadgets</Link>
+          <Link href="/store">Store</Link>
           <Link href="/templates">Templates</Link>
           <Link href="/resources">Field guides</Link>
           <ProjectNav className={styles.projectNav} />

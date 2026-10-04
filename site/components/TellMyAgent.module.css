@@ -111,6 +111,7 @@
   position: relative;
   display: inline-flex;
   align-items: stretch;
+  max-width: 100%;
 }
 
 .splitMain,
@@ -179,4 +180,12 @@
 .menu a:hover,
 .menu button:hover {
   background: #242424;
+}
+
+@media (max-width: 480px) {
+  .splitMain {
+    min-width: 0;
+    white-space: normal;
+    text-align: left;
+  }
 }

@@ -23,3 +23,18 @@ export function clerkMiddleware(
   return (request: NextRequest, event: NextFetchEvent) =>
     handler?.({}, request, event) ?? NextResponse.next();
 }
+
+type CurrentUserResult = {
+  primaryEmailAddress?: {
+    emailAddress: string;
+    verification?: { status: string } | null;
+  } | null;
+} | null;
+
+export async function currentUser(): Promise<CurrentUserResult> {
+  const mock = (globalThis as typeof globalThis & {
+    __clerkCurrentUserMock?: () => Promise<CurrentUserResult> | CurrentUserResult;
+  }).__clerkCurrentUserMock;
+  if (mock) return await mock();
+  return null;
+}

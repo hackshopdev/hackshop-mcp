@@ -125,3 +125,102 @@ export async function fetchEbayLiveData(query: string): Promise<EbayLiveData | n
     return null;
   }
 }
+
+export interface EbayListing {
+  title: string;
+  price_usd: number | null;
+  currency: string | null;
+  condition: string | null;
+  image_url: string | null;
+  url: string;
+  listed_at: string | null;
+}
+
+/**
+ * Newest Buy It Now listings for a query (US marketplace, ships to the US).
+ * Returns null when eBay isn't configured or the call fails, so callers can
+ * fall back to a plain "newest on eBay" search link.
+ */
+export async function fetchEbayListings(
+  query: string,
+  limit = 3,
+): Promise<EbayListing[] | null> {
+  const token = await getEbayToken();
+  if (!token) return null;
+
+  const filter = [
+    "buyingOptions:{FIXED_PRICE}",
+    "priceCurrency:USD",
+    "price:[3..]",
+    "deliveryCountry:US",
+  ].join(",");
+  const url =
+    "https://api.ebay.com/buy/browse/v1/item_summary/search" +
+    `?q=${encodeURIComponent(query)}` +
+    `&limit=${Math.max(1, Math.min(limit, 10))}` +
+    "&sort=newlyListed" +
+    `&filter=${encodeURIComponent(filter)}`;
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "X-EBAY-C-MARKETPLACE-ID": "EBAY_US",
+        "Content-Type": "application/json",
+      },
+      next: { revalidate: 3600 },
+    } as RequestInit);
+    if (!res.ok) {
+      console.error(`[ebay] listings search failed: ${res.status}`);
+      return null;
+    }
+    const data = (await res.json()) as {
+      itemSummaries?: Array<{
+        title?: string;
+        price?: { value?: string; currency?: string };
+        condition?: string;
+        image?: { imageUrl?: string };
+        thumbnailImages?: Array<{ imageUrl?: string }>;
+        itemWebUrl?: string;
+        itemCreationDate?: string;
+      }>;
+    };
+    return (data.itemSummaries ?? [])
+      .filter((item) => item.itemWebUrl && item.title)
+      .map((item) => {
+        const value = Number.parseFloat(item.price?.value ?? "");
+        return {
+          title: item.title as string,
+          price_usd: Number.isFinite(value) ? value : null,
+          currency: item.price?.currency ?? null,
+          condition: item.condition ?? null,
+          image_url: item.thumbnailImages?.[0]?.imageUrl ?? item.image?.imageUrl ?? null,
+          url: item.itemWebUrl as string,
+          listed_at: item.itemCreationDate ?? null,
+        };
+      });
+  } catch (err) {
+    console.error(`[ebay] listings error: ${(err as Error).message}`);
+    return null;
+  }
+}
+
+/** Listings for many queries at once; one failed query never sinks the rest. */
+export async function fetchEbayListingsMany(
+  queries: Record<string, string>,
+  limit = 3,
+): Promise<Record<string, EbayListing[] | null>> {
+  if (!isEbayConfigured()) {
+    return Object.fromEntries(Object.keys(queries).map((key) => [key, null]));
+  }
+  const entries = Object.entries(queries);
+  const results = await Promise.allSettled(
+    entries.map(([, query]) => fetchEbayListings(query, limit)),
+  );
+  return Object.fromEntries(
+    entries.map(([key], index) => {
+      const result = results[index];
+      return [key, result?.status === "fulfilled" ? result.value : null];
+    }),
+  );
+}
