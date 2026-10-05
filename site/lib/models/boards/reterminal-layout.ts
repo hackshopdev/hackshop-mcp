@@ -1,0 +1,163 @@
+import { COLORS } from "../palette";
+import { FACT_SOURCES, outerFor, sourceUrlsFor } from "../sources";
+import type { BoardModel, ModelPart } from "../types";
+
+// The reTerminal E1001 and E1002 are the same board with different e-paper
+// panels (Muse devices README), so both models share this layout. Outer size
+// is Seeed's 176 x 120 x 17 mm; the panel window and inside are simplified.
+
+export function reTerminalModel(args: {
+  deviceId: "seeed-reterminal-e1001" | "seeed-reterminal-e1002";
+  name: string;
+  panel: Pick<ModelPart, "name" | "lesson" | "display">;
+  esp32Lesson: string;
+  batteryLesson: string;
+}): BoardModel {
+  const outer = outerFor(args.deviceId);
+  return {
+    deviceId: args.deviceId,
+    name: args.name,
+    outer: { ...outer, shape: "box" },
+    orientation: "upright",
+    cornerRadius: 6,
+    parts: [
+      {
+        id: "front-frame",
+        name: "Front frame",
+        kind: "shell-front",
+        shape: "roundedBox",
+        radius: 6,
+        size: [176, 120, 4],
+        position: [0, 0, 6.5],
+        cutouts: [{ shape: "rect", size: [164, 99], offset: [0, 2], radius: 1.5 }],
+        color: COLORS.caseWhite,
+        finish: "plastic",
+        explode: [0, 0, 90],
+        lesson: "The front frame holds the panel in place and leaves a window for the picture.",
+      },
+      {
+        id: "epaper",
+        kind: "screen",
+        shape: "box",
+        size: [170, 111, 1.2],
+        position: [0, 1, 3.9],
+        color: COLORS.epaper,
+        finish: "epaper",
+        explode: [0, 0, 61],
+        approx: true,
+        ...args.panel,
+      },
+      {
+        id: "esp32-s3",
+        name: "ESP32-S3",
+        kind: "chip",
+        shape: "box",
+        size: [7, 7, 1],
+        position: [-40, 10, 2.5],
+        color: COLORS.chip,
+        finish: "chip",
+        explode: [0, 0, 35],
+        approx: true,
+        lesson: args.esp32Lesson,
+      },
+      {
+        id: "temp-humidity",
+        name: "Temperature and humidity sensor",
+        kind: "sensor",
+        shape: "box",
+        size: [3, 3, 1],
+        position: [60, -30, 2.5],
+        color: COLORS.sensor,
+        explode: [0, 0, 35],
+        approx: true,
+        lesson: "A temperature and humidity sensor sits inside the case.",
+      },
+      {
+        id: "pcb",
+        name: "Main board",
+        kind: "pcb",
+        shape: "roundedBox",
+        radius: 4,
+        size: [140, 90, 1.6],
+        position: [0, 0, 1.2],
+        color: COLORS.pcbBlack,
+        finish: "pcb",
+        explode: [0, 0, 10],
+        approx: true,
+        lesson: "The main board inside the case. The E1001 and E1002 use the same board with different panels.",
+      },
+      {
+        id: "battery",
+        name: "Battery",
+        kind: "battery",
+        shape: "roundedBox",
+        radius: 2,
+        size: [62, 48, 6],
+        position: [35, -10, -2.6],
+        color: COLORS.battery,
+        finish: "metal",
+        explode: [0, 0, -32],
+        approx: true,
+        lesson: args.batteryLesson,
+      },
+      {
+        id: "green-button",
+        name: "Green button",
+        kind: "button",
+        shape: "roundedBox",
+        radius: 1,
+        size: [10, 3.5, 4],
+        position: [70, 58.25, 0],
+        color: COLORS.greenButton,
+        finish: "rubber",
+        explode: [0, 29, 0],
+        approx: true,
+        lesson: "Muse uses the green button to confirm pairing. Hold it for 5 seconds to reset setup.",
+      },
+      {
+        id: "usb-c",
+        name: "USB-C port",
+        kind: "port",
+        shape: "roundedBox",
+        radius: 1.4,
+        size: [7.3, 8.9, 3.2],
+        position: [-84.35, -20, -2],
+        color: COLORS.connector,
+        finish: "metal",
+        explode: [-32, 0, 0],
+        approx: true,
+        lesson:
+          "USB-C on the left edge for charging and flashing. A CH340 bridge makes it show up as /dev/cu.usbserial-* or /dev/ttyUSB*.",
+      },
+      {
+        id: "back-shell",
+        name: "Back shell",
+        kind: "shell-back",
+        shape: "roundedBox",
+        radius: 6,
+        hollow: { wall: 2, floor: "back" },
+        size: [176, 120, 13],
+        position: [0, 0, -2],
+        color: COLORS.caseWhite,
+        finish: "plastic",
+        explode: [0, 0, -64],
+        lesson: "The back has a hole for hanging it on a wall and nuts for the included stand.",
+      },
+      {
+        id: "included-stand",
+        name: "Included stand",
+        kind: "stand",
+        shape: "roundedBox",
+        radius: 3,
+        size: [90, 10, 36],
+        position: [0, -55, -26.5],
+        color: COLORS.caseLight,
+        finish: "plastic",
+        explode: [0, -35, -70],
+        approx: true,
+        lesson: "The stand in the box screws into nuts on the back. With it, the frame is 53 mm deep.",
+      },
+    ],
+    sources: sourceUrlsFor(args.deviceId, [FACT_SOURCES.museDevices, FACT_SOURCES.museEsp32Agents]),
+  };
+}

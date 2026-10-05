@@ -1,0 +1,167 @@
+import { LESSONS } from "../lessons";
+import { COLORS } from "../palette";
+import { FACT_SOURCES, outerFor, sourceUrlsFor } from "../sources";
+import type { BoardModel } from "../types";
+import { piPcb, piPos } from "./pi-layout";
+
+// Positions from Raspberry Pi's Pi 5 mechanical drawing (RP-008347-DS-1):
+// header along the top edge, USB 2.0 / USB 3.0 / Ethernet down the right
+// edge at 47 / 29.1 / 10.2 mm, USB-C and two micro HDMI on the bottom edge
+// at 11.2 / 25.8 / 39.2 mm. Lies flat; +z is the component side.
+
+const ID = "raspberry-pi-5";
+const outer = outerFor(ID);
+const TOP = -6.25; // top face of the PCB
+
+export const raspberryPi5: BoardModel = {
+  deviceId: ID,
+  name: "Raspberry Pi 5",
+  outer: { ...outer, shape: "board" },
+  orientation: "flat",
+  cornerRadius: 3,
+  parts: [
+    piPcb({
+      z: TOP - 0.8,
+      lesson:
+        "The Raspberry Pi 5 board, 85 by 56 mm. Muse uses it as a Linux gadget, so there is no screen or battery.",
+    }),
+    {
+      id: "soc",
+      name: "Broadcom BCM2712 processor",
+      kind: "chip",
+      shape: "box",
+      size: [17.5, 17, 2.4],
+      position: piPos(33.5, 22.8, TOP + 1.2),
+      color: COLORS.shield,
+      finish: "metal",
+      explode: [0, 0, 20],
+      approx: true,
+      lesson: "The Broadcom BCM2712: four Cortex-A76 cores at 2.4 GHz. " + LESSONS.piSoc,
+    },
+    {
+      id: "ram",
+      name: "LPDDR4X memory",
+      kind: "chip",
+      shape: "box",
+      size: [14.5, 10.6, 1.2],
+      position: piPos(33.2, 39.2, TOP + 0.6),
+      color: COLORS.chip,
+      finish: "chip",
+      explode: [0, 0, 20],
+      approx: true,
+      lesson:
+        "LPDDR4X memory, from 1 GB to 16 GB depending on the model. Raspberry Pi raised Pi 5 prices in 2026 because of memory costs.",
+    },
+    {
+      id: "wireless",
+      name: "Wi-Fi and Bluetooth",
+      kind: "antenna",
+      shape: "box",
+      size: [10.7, 14, 1.8],
+      position: piPos(12.2, 42.6, TOP + 0.9),
+      color: COLORS.shield,
+      finish: "metal",
+      explode: [0, 0, 20],
+      approx: true,
+      lesson: "Dual-band Wi-Fi and Bluetooth 5.0 with BLE. " + LESSONS.piPair,
+    },
+    {
+      id: "gpio-header",
+      name: "40-pin GPIO header",
+      kind: "port",
+      shape: "box",
+      size: [50.8, 5.08, 8.5],
+      position: piPos(32.5, 52.5, TOP + 4.25),
+      color: COLORS.header,
+      explode: [0, 0, 30],
+      lesson: "The standard 40-pin header for HATs, sensors and jumper wires.",
+    },
+    {
+      id: "usb2",
+      name: "USB 2.0 ports (2)",
+      kind: "port",
+      shape: "box",
+      size: [17.5, 13.1, 16],
+      position: piPos(76.25, 47, TOP + 8),
+      color: COLORS.connector,
+      finish: "metal",
+      explode: [18, 0, 6],
+      lesson: "Two USB 2.0 ports for keyboards and other small devices.",
+    },
+    {
+      id: "usb3",
+      name: "USB 3.0 ports (2)",
+      kind: "port",
+      shape: "box",
+      size: [17.5, 13.1, 16],
+      position: piPos(76.25, 29.1, TOP + 8),
+      color: COLORS.connector,
+      finish: "metal",
+      explode: [18, 0, 6],
+      lesson: "Two USB 3.0 ports for fast drives and adapters.",
+    },
+    {
+      id: "ethernet",
+      name: "Gigabit Ethernet",
+      kind: "port",
+      shape: "box",
+      size: [21, 16, 13.5],
+      position: piPos(74.5, 10.2, TOP + 6.75),
+      color: COLORS.connector,
+      finish: "metal",
+      explode: [18, 0, 6],
+      lesson: "Gigabit Ethernet for a wired network. It supports PoE+ with an add-on board.",
+    },
+    {
+      id: "usb-c-power",
+      name: "USB-C power input",
+      kind: "port",
+      shape: "roundedBox",
+      radius: 1.4,
+      size: [9, 7.5, 3.2],
+      position: piPos(11.2, 3.75, TOP + 1.6),
+      color: COLORS.connector,
+      finish: "metal",
+      explode: [0, -14, 6],
+      lesson: "Power comes in here: 5 V at up to 5 A over USB-C. Use the official 27 W supply.",
+    },
+    {
+      id: "hdmi-0",
+      name: "Micro HDMI port 0",
+      kind: "port",
+      shape: "box",
+      size: [7.5, 7, 3.4],
+      position: piPos(25.8, 3.5, TOP + 1.7),
+      color: COLORS.connector,
+      finish: "metal",
+      explode: [0, -14, 6],
+      lesson: "A micro HDMI port for a display. Muse does not need a screen.",
+    },
+    {
+      id: "hdmi-1",
+      name: "Micro HDMI port 1",
+      kind: "port",
+      shape: "box",
+      size: [7.5, 7, 3.4],
+      position: piPos(39.2, 3.5, TOP + 1.7),
+      color: COLORS.connector,
+      finish: "metal",
+      explode: [0, -14, 6],
+      lesson: "The second micro HDMI port, so the Pi 5 can drive two displays.",
+    },
+    {
+      id: "microsd",
+      name: "microSD slot (underside)",
+      kind: "port",
+      shape: "box",
+      size: [15, 14.5, 1.9],
+      position: piPos(7.5, 28, -outer.t / 2 + 0.95),
+      color: COLORS.connector,
+      finish: "metal",
+      explode: [-12, 0, -16],
+      approx: true,
+      lesson: "Raspberry Pi OS boots from a microSD card here. Use one of 32 GB or more.",
+    },
+  ],
+  sources: sourceUrlsFor(ID, [FACT_SOURCES.pi5Product, FACT_SOURCES.museLinuxReadme]),
+};
