@@ -1,0 +1,296 @@
+[
+  {
+    "page": "/tools",
+    "width": 375,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=375 body=375 innerWidth=375"
+  },
+  {
+    "page": "/tools",
+    "width": 375,
+    "name": "links to the four tools",
+    "ok": true,
+    "detail": "5 links"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 375,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=375 body=375 innerWidth=375"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 375,
+    "name": "returns picks from /api/plan",
+    "ok": true,
+    "detail": "3 picks"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 375,
+    "name": "answers in the URL",
+    "ok": true,
+    "detail": "http://localhost:3103/tools/muse-board-picker?size=desk&interaction=voice&sensing=none&budget=under-50"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 375,
+    "name": "sends answers plus mapped size/needs/budget",
+    "ok": true,
+    "detail": "{\"idea\":\"A desk gadget I can talk to, for under $50\",\"size\":\"desk\",\"needs\":[\"voice\"],\"budget_usd\":50,\"answers\":{\"size\":\"desk\",\"interaction\":\"voice\",\"sensing\":\"none\",\"budget\":\"under-50\"}}"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 375,
+    "name": "pick actions",
+    "ok": true,
+    "detail": "3 start, 3 steps"
+  },
+  {
+    "page": "/tools/muse-board-picker (results)",
+    "width": 375,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=375 body=375 innerWidth=375"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 375,
+    "name": "shared link shows results",
+    "ok": true,
+    "detail": "first pick: M5Stack StickS3"
+  },
+  {
+    "page": "/tools/3d-print-cost-calculator",
+    "width": 375,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=375 body=375 innerWidth=375"
+  },
+  {
+    "page": "/tools/3d-print-cost-calculator",
+    "width": 375,
+    "name": "verdict updates",
+    "ok": true,
+    "detail": "Use an online print service -> Buy a printer: the Bambu Lab A1 mini (parts 150); At 52 parts a year, buying the Bambu Lab A1 mini pays for itself compared with the library. You're past that point."
+  },
+  {
+    "page": "/tools/3d-print-cost-calculator (open)",
+    "width": 375,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=375 body=375 innerWidth=375"
+  },
+  {
+    "page": "/tools/does-my-board-run-muse",
+    "width": 375,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=375 body=375 innerWidth=375"
+  },
+  {
+    "page": "/tools/does-my-board-run-muse",
+    "width": 375,
+    "name": "finds the Watcher with its flash notes and page",
+    "ok": true,
+    "detail": "Seeed SenseCAP Watcher"
+  },
+  {
+    "page": "/tools/does-my-board-run-muse (result)",
+    "width": 375,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=375 body=375 innerWidth=375"
+  },
+  {
+    "page": "/tools/does-my-board-run-muse",
+    "width": 375,
+    "name": "unknown board guidance",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "page": "/tools/esp32-port-finder",
+    "width": 375,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=375 body=375 innerWidth=375"
+  },
+  {
+    "page": "/tools/esp32-port-finder",
+    "width": 375,
+    "name": "Linux + Watcher guide",
+    "ok": true,
+    "detail": "The Watcher's CH342 bridge adds two ports. The ESP32-S3 console is the second one. | copy buttons 6"
+  },
+  {
+    "page": "/tools/esp32-port-finder",
+    "width": 375,
+    "name": "macOS + CH340 guide",
+    "ok": true,
+    "detail": "Boards with a USB bridge chip show up as /dev/cu.usbserial followed by a number, like /dev/cu.usbserial-110."
+  },
+  {
+    "page": "/tools/esp32-port-finder (result)",
+    "width": 375,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=375 body=375 innerWidth=375"
+  },
+  {
+    "page": "all",
+    "width": 375,
+    "name": "no console errors",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "page": "/tools",
+    "width": 1366,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=1366 body=1366 innerWidth=1366"
+  },
+  {
+    "page": "/tools",
+    "width": 1366,
+    "name": "links to the four tools",
+    "ok": true,
+    "detail": "5 links"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 1366,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=1366 body=1366 innerWidth=1366"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 1366,
+    "name": "returns picks from /api/plan",
+    "ok": true,
+    "detail": "3 picks"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 1366,
+    "name": "answers in the URL",
+    "ok": true,
+    "detail": "http://localhost:3103/tools/muse-board-picker?size=desk&interaction=voice&sensing=none&budget=under-50"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 1366,
+    "name": "sends answers plus mapped size/needs/budget",
+    "ok": true,
+    "detail": "{\"idea\":\"A desk gadget I can talk to, for under $50\",\"size\":\"desk\",\"needs\":[\"voice\"],\"budget_usd\":50,\"answers\":{\"size\":\"desk\",\"interaction\":\"voice\",\"sensing\":\"none\",\"budget\":\"under-50\"}}"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 1366,
+    "name": "pick actions",
+    "ok": true,
+    "detail": "3 start, 3 steps"
+  },
+  {
+    "page": "/tools/muse-board-picker (results)",
+    "width": 1366,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=1366 body=1366 innerWidth=1366"
+  },
+  {
+    "page": "/tools/muse-board-picker",
+    "width": 1366,
+    "name": "shared link shows results",
+    "ok": true,
+    "detail": "first pick: M5Stack StickS3"
+  },
+  {
+    "page": "/tools/3d-print-cost-calculator",
+    "width": 1366,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=1366 body=1366 innerWidth=1366"
+  },
+  {
+    "page": "/tools/3d-print-cost-calculator",
+    "width": 1366,
+    "name": "verdict updates",
+    "ok": true,
+    "detail": "Use an online print service -> Buy a printer: the Bambu Lab A1 mini (parts 150); At 52 parts a year, buying the Bambu Lab A1 mini pays for itself compared with the library. You're past that point."
+  },
+  {
+    "page": "/tools/3d-print-cost-calculator (open)",
+    "width": 1366,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=1366 body=1366 innerWidth=1366"
+  },
+  {
+    "page": "/tools/does-my-board-run-muse",
+    "width": 1366,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=1366 body=1366 innerWidth=1366"
+  },
+  {
+    "page": "/tools/does-my-board-run-muse",
+    "width": 1366,
+    "name": "finds the Watcher with its flash notes and page",
+    "ok": true,
+    "detail": "Seeed SenseCAP Watcher"
+  },
+  {
+    "page": "/tools/does-my-board-run-muse (result)",
+    "width": 1366,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=1366 body=1366 innerWidth=1366"
+  },
+  {
+    "page": "/tools/does-my-board-run-muse",
+    "width": 1366,
+    "name": "unknown board guidance",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "page": "/tools/esp32-port-finder",
+    "width": 1366,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=1366 body=1366 innerWidth=1366"
+  },
+  {
+    "page": "/tools/esp32-port-finder",
+    "width": 1366,
+    "name": "Linux + Watcher guide",
+    "ok": true,
+    "detail": "The Watcher's CH342 bridge adds two ports. The ESP32-S3 console is the second one. | copy buttons 6"
+  },
+  {
+    "page": "/tools/esp32-port-finder",
+    "width": 1366,
+    "name": "macOS + CH340 guide",
+    "ok": true,
+    "detail": "Boards with a USB bridge chip show up as /dev/cu.usbserial followed by a number, like /dev/cu.usbserial-110."
+  },
+  {
+    "page": "/tools/esp32-port-finder (result)",
+    "width": 1366,
+    "name": "no horizontal scroll",
+    "ok": true,
+    "detail": "scrollWidth=1366 body=1366 innerWidth=1366"
+  },
+  {
+    "page": "all",
+    "width": 1366,
+    "name": "no console errors",
+    "ok": true,
+    "detail": ""
+  }
+]
