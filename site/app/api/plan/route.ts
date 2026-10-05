@@ -11,13 +11,29 @@ const WINDOW_MS = 10 * 60 * 1000;
 const MAX_REQUESTS = 120;
 const hits = new Map<string, { count: number; resetAt: number }>();
 
+// GET mirrors POST for simple links: ?idea=&budget_usd=&needs=voice,camera
+// &platform=&limit= plus the intake answers ?size=&interaction=&sensing=&budget=
+// (same option values as the planner questions).
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const body: Record<string, unknown> = {
-    idea: url.searchParams.get("idea") ?? "",
-  };
-  const budget = url.searchParams.get("budget_usd");
+  const params = url.searchParams;
+  const body: Record<string, unknown> = {};
+  const idea = params.get("idea");
+  if (idea !== null && idea !== "") body.idea = idea;
+  const budget = params.get("budget_usd");
   if (budget !== null && budget !== "") body.budget_usd = Number(budget);
+  const limit = params.get("limit");
+  if (limit !== null && limit !== "") body.limit = Number(limit);
+  const platform = params.get("platform");
+  if (platform) body.platform = platform;
+  const needs = params.get("needs");
+  if (needs) body.needs = needs.split(",").map((need) => need.trim()).filter(Boolean);
+  const answers: Record<string, string> = {};
+  for (const key of ["size", "interaction", "sensing", "budget"]) {
+    const value = params.get(key);
+    if (value) answers[key] = value;
+  }
+  if (Object.keys(answers).length > 0) body.answers = answers;
   return handlePlan(request, body);
 }
 
@@ -49,7 +65,9 @@ async function handlePlan(request: Request, body: unknown) {
       need_count: output.inferred_needs.length,
       fit: output.fit,
       pick_count: output.picks.length,
-      has_budget: parsed.data.budget_usd !== undefined,
+      has_budget: output.budget_usd !== null,
+      has_answers: parsed.data.answers !== undefined,
+      intake_complete: output.intake.complete,
     },
   });
   return json(output, 200);

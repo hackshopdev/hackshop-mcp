@@ -6,6 +6,7 @@ import {
   ListPromptsRequestSchema,
   ListResourcesRequestSchema,
   ListToolsRequestSchema,
+  McpError,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import packageJson from "../../../package.json";
@@ -14,17 +15,19 @@ import {
   executeCoreTool,
 } from "../core/tools";
 import {
+  RESOURCE_NOT_FOUND_CODE,
   getCorePrompt,
   listCoreResourceTemplates,
   listCorePrompts,
   listCoreResources,
   readCoreResource,
+  resourceNotFoundMessage,
 } from "../core/resources";
 import { anonymousRequestId, captureServerEvent } from "../serverAnalytics";
 import type { CoreContext } from "../core/types";
 
 const HOSTED_INSTRUCTIONS =
-  "Hackshop maps a project idea to hardware and build steps. Use plan_gadget for Muse agent-body gadgets because it is deterministic, instant and key-free. Use get_build_plan for shopping lists, machine-readable assembly and the agent brief, then ask the human before buying anything. Hosted MCP exposes deterministic tools only; propose_hardware and simulate_assembly are npm-only because they can cost money or require external workers. Hackshop never buys anything. Hosted MCP logs tool names and timings only.";
+  "hackshop maps a project idea to hardware and build steps. For a Muse agent body, ask the human the intake questions from intake_gadget, then call plan_gadget with their answers; it is deterministic, instant and key-free. Use get_build_plan for the flash warnings, shopping list, machine-readable assembly and the agent brief. hackshop never buys anything: show the exact items, sellers and total, ask \"Place this order for $<total> at <seller>?\" and wait for a clear yes. Hosted MCP exposes deterministic tools only and is stateless (POST only); propose_hardware and simulate_assembly are in the npm server (npx -y hackshop-mcp) because they can cost money or need external workers. Hosted MCP logs tool names and timings only.";
 
 export function createHostedMcpServer(ctx: CoreContext, request: Request): Server {
   const server = new Server(
@@ -64,6 +67,9 @@ export function createHostedMcpServer(ctx: CoreContext, request: Request): Serve
       return {
         isError: true,
         content: [{ type: "text" as const, text: result.text }],
+        ...(result.try_instead
+          ? { structuredContent: { error: result.text, try_instead: result.try_instead } }
+          : {}),
       };
     }
 
@@ -83,7 +89,12 @@ export function createHostedMcpServer(ctx: CoreContext, request: Request): Serve
 
   server.setRequestHandler(ReadResourceRequestSchema, async (resourceRequest) => {
     const resource = readCoreResource(resourceRequest.params.uri, ctx);
-    if (!resource) throw new Error(`Unknown resource: ${resourceRequest.params.uri}`);
+    if (!resource) {
+      throw new McpError(
+        RESOURCE_NOT_FOUND_CODE,
+        resourceNotFoundMessage(resourceRequest.params.uri, ctx),
+      );
+    }
     return { contents: [resource] };
   });
 
