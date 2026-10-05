@@ -1,6 +1,5 @@
 -- Idea submissions and upvotes for hackshop.dev/ideas (Supabase project
--- "hackshop", ref gcmrtdevzgwvhdzromda). NOT applied yet: the lead reviews
--- and applies it.
+-- "hackshop", ref gcmrtdevzgwvhdzromda). Applied 2026-10-05.
 --
 -- Auth: Clerk is configured as a Supabase third-party auth provider, so the
 -- Clerk session JWT is the Supabase access token and `auth.jwt()->>'sub'` is
