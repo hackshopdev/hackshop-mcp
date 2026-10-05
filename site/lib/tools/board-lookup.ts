@@ -613,7 +613,7 @@ export const BOARDS: readonly BoardEntry[] = [
       "Its USB bridge is a CP2104 or CH9102F, so the SDK flashes it at 230400 baud.",
       BACKUP_FIRST,
     ],
-    deviceIds: ["m5stack-core2"],
+    deviceIds: ["m5stack-core2-v1-0", "m5stack-core2"],
     sdkUrl: SDK_DEVICES_README_URL,
   },
   {

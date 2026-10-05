@@ -164,7 +164,7 @@ describe("board search", () => {
     });
     expect(resolveLinks(boardById("raspberry-pi-zero-2w")!, ctx).boardPage).toBe("/muse/raspberry-pi-zero-2w");
     expect(resolveLinks(boardById("linux-computer")!, ctx).buildPage).toBe("/build/dell-wyse-5070");
-    expect(resolveLinks(boardById("freenove-fnk0104b")!, ctx).boardPage).toBeNull();
+    expect(resolveLinks(boardById("freenove-fnk0104b")!, ctx).boardPage).toBe("/muse/fnk0104b");
 
     // Every board hackshop already has a page for is reachable from the tool.
     const reachable = new Set(BOARDS.map((entry) => resolveLinks(entry, ctx).deviceId).filter(Boolean));

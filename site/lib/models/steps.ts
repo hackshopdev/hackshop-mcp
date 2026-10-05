@@ -15,6 +15,7 @@ export const STEP_LABELS: Record<Action, string> = {
   route_cable: "Route the cable",
   fasten: "Fasten",
   power: "Power",
+  backup: "Back up",
   flash: "Flash",
   pair: "Pair",
   verify: "Verify",
@@ -29,6 +30,7 @@ export const STEP_PART_KINDS: Record<Action, PartKind[]> = {
   route_cable: ["port", "stand"],
   fasten: ["shell-front", "shell-back"],
   power: ["port", "battery"],
+  backup: ["chip", "port"],
   flash: ["chip", "port", "button"],
   pair: ["button", "led", "screen", "antenna"],
   verify: ["screen", "led", "speaker", "mic", "camera"],
@@ -90,6 +92,9 @@ export function partsForStep(model: BoardModel, step: Pick<AssemblyStep, "action
       break;
     case "power":
       picked = [...powerPorts(parts), ...ofKind(parts, "battery").filter((part) => !part.optional)];
+      break;
+    case "backup":
+      picked = [...mainChips(parts), ...powerPorts(parts)];
       break;
     case "flash":
       picked = [
