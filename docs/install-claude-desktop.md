@@ -1,6 +1,6 @@
 # Installing hackshop-mcp into Claude Desktop
 
-This is the install path the founder will run first to dogfood the server and verify the smoke test.
+This is the install path to dogfood the server and verify the smoke test.
 
 ## 1. Smoke test (sampling/createMessage host probe)
 
@@ -12,17 +12,17 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (create t
 {
   "mcpServers": {
     "hackshop-smoke": {
-      "command": "/Users/miguel/.local/bin/node",
+      "command": "~/.local/bin/node",
       "args": [
-        "/Users/miguel/.bun/bin/tsx",
-        "/Users/miguel/hackshop-mcp/scripts/smoke.ts"
+        "~/.bun/bin/tsx",
+        "~/hackshop-mcp/scripts/smoke.ts"
       ]
     }
   }
 }
 ```
 
-Adjust paths if your `node` or `tsx` are elsewhere. Verify with:
+Replace `~` with your full home directory path (Claude Desktop doesn't expand `~`), and adjust paths if your `node` or `tsx` are elsewhere. Verify with:
 
 ```bash
 which node
@@ -47,8 +47,8 @@ After smoke passes, replace the smoke entry with the real server:
 {
   "mcpServers": {
     "hackshop": {
-      "command": "/Users/miguel/.local/bin/node",
-      "args": ["/Users/miguel/hackshop-mcp/dist/server.js"]
+      "command": "~/.local/bin/node",
+      "args": ["~/hackshop-mcp/dist/server.js"]
     }
   }
 }

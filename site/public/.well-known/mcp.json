@@ -1,29 +1,47 @@
 {
   "name": "hackshop",
-  "description": "Hosted MCP for planning Muse gadget bodies, build plans, shopping lists and machine-readable assembly instructions.",
+  "description": "Hosted MCP for planning Muse gadget bodies: intake questions, board picks with difficulty, build plans with flash warnings, shopping lists and machine-readable assembly steps.",
   "url": "https://www.hackshop.dev/mcp",
   "transport": "streamable-http",
+  "stateless": true,
+  "methods": [
+    "POST"
+  ],
+  "transport_notes": "Stateless, POST only. No mcp-session-id is issued; GET and DELETE return 405. CORS allows any origin.",
   "tools": [
     {
+      "name": "intake_gadget",
+      "description": "The 4 intake questions, why they matter and how answers map to plan_gadget."
+    },
+    {
       "name": "plan_gadget",
-      "description": "Plan a Muse gadget body with questions, fit, notes, warnings and build links."
+      "description": "Plan a Muse gadget body from the intake answers: fit, warnings, notes, picks with difficulty and build links."
     },
     {
       "name": "get_build_plan",
-      "description": "Return parts, shopping list, assembly steps, commands and agent brief for a device."
+      "description": "Return difficulty, flash warnings, parts, shopping list, assembly steps with checks, commands and agent brief for a device."
     },
     {
       "name": "assess_hackability",
       "description": "Look up catalog hackability, brick risk, firmware links and build support."
     }
   ],
+  "npm_only_tools": [
+    "propose_hardware",
+    "simulate_assembly"
+  ],
   "resources": [
     "hackshop://muse/boards",
     "hackshop://muse/sdk-terms",
-    "hackshop://catalog/tags",
+    "hackshop://catalog/tags"
+  ],
+  "resource_templates": [
     "hackshop://build/{device_id}"
   ],
-  "prompts": ["plan-muse-gadget"],
+  "prompts": [
+    "plan-muse-gadget"
+  ],
+  "openapi": "https://www.hackshop.dev/openapi.json",
   "npm": "hackshop-mcp",
   "docs": "https://github.com/hackshopdev/hackshop-mcp"
 }

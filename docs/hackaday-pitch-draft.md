@@ -14,11 +14,11 @@ A few months ago I had to revive an Electric Objects EO1 picture frame after the
 
 It's deliberately small: two tools, 50 hand-vetted devices, a closed-set tag vocabulary, and a safety rule that refuses to hallucinate brick-risk for hardware classes where bricks are unrecoverable (handhelds, SBCs). The server delegates LLM reasoning to the host via MCP `sampling/createMessage`, so there's no API key for users to manage.
 
-Source + install instructions: github.com/USERNAME/hackshop-mcp
+Source + install instructions: github.com/hackshopdev/hackshop-mcp
 
 Built for myself first. Now sharing it because I can't be the only person who'd use this.
 
-— Miguel
+— the hackshop authors
 
 ## Demo image
 

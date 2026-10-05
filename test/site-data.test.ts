@@ -45,19 +45,22 @@ describe("site data mirrors", () => {
     expect(parsed.map((platform) => platform.id)).toEqual(["muse-esp32", "muse-linux"]);
   });
 
+  it("keeps the site platform schema identical to the root schema", () => {
+    expect(readFileSync(join(process.cwd(), "site", "lib", "platform-types.ts"), "utf8")).toBe(
+      readFileSync(join(process.cwd(), "src", "platforms", "schema.ts"), "utf8"),
+    );
+  });
+
   it("keeps agent purchase policy text consistent", () => {
     const agents = readFileSync(join(process.cwd(), "site", "public", "agents.md"), "utf8");
     const llms = readFileSync(join(process.cwd(), "site", "public", "llms.txt"), "utf8");
     const aiAgent = JSON.parse(
       readFileSync(join(process.cwd(), "site", "public", ".well-known", "ai-agent.json"), "utf8"),
-    ) as { guardrails: { contact: string; disallowed_actions: string[]; allowed_actions: string[] } };
+    ) as { guardrails: { contact: string; purchase_policy: string } };
 
     for (const text of [agents, llms, JSON.stringify(aiAgent)]) {
-      expect(text).toContain("Amazon and eBay don't allow automated carts or checkout");
+      expect(text).toContain("Place this order for $<total> at <seller>?");
     }
     expect(aiAgent.guardrails.contact).toBe("https://www.hackshop.dev/contact");
-    expect(aiAgent.guardrails.disallowed_actions.join("\n")).not.toContain(
-      "Do not complete checkout on eBay, manufacturer stores or any other site.",
-    );
   });
 });

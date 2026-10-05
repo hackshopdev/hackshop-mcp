@@ -70,7 +70,7 @@ This is the one field where being honest matters most. The server applies a hard
 
 | Value | Means | Examples |
 |---|---|---|
-| `founder-verified` | The maintainer has personally flashed/used this device | Reserved — only Miguel sets this |
+| `founder-verified` | The maintainer has personally flashed/used this device | Reserved — only the maintainers set this |
 | `community-reported` | Public, reproducible reports from 3+ unique sources (forum threads, GitHub issues, blog posts), not all linking back to one source | A jailbreak documented on MobileRead + XDA + a YouTube tutorial |
 | `llm-inferred` | LLM general knowledge says it's hackable, but no reproducible evidence collected | Anything you couldn't substantiate in 5 minutes of search |
 

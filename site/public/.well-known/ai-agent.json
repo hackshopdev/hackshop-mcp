@@ -6,25 +6,35 @@
   "mcp": {
     "url": "https://www.hackshop.dev/mcp",
     "transport": "streamable-http",
-    "tools": ["plan_gadget", "get_build_plan", "assess_hackability"]
+    "stateless": true,
+    "tools": [
+      "intake_gadget",
+      "plan_gadget",
+      "get_build_plan",
+      "assess_hackability"
+    ]
   },
   "guardrails": {
     "allowed_actions": [
       "Read public pages and agent files.",
-      "Call hosted MCP at https://www.hackshop.dev/mcp.",
-      "Call POST /api/plan for deterministic Muse planning.",
+      "Call hosted MCP at https://www.hackshop.dev/mcp (stateless, POST only).",
+      "Call POST /api/plan for deterministic Muse planning (see /openapi.json).",
       "Fetch /build/<device_id>/plan.json or /build/<device_id>/build.md for build instructions.",
-      "Open outbound product, firmware and reference links for research."
+      "Open outbound product, firmware and reference links for research.",
+      "Check out on a seller's site only after the human answers yes to \"Place this order for $<total> at <seller>?\"."
     ],
     "disallowed_actions": [
-      "Do not buy anything without explicit approval for the exact items and total.",
-      "Amazon and eBay don't allow automated carts or checkout, so give the human those links and let them check out.",
-      "On other stores, do not add items to a cart or check out unless the human approved the exact items, sellers and total and asked you to continue.",
+      "Do not place any order without a clear yes to \"Place this order for $<total> at <seller>?\" for the exact items, sellers and total.",
+      "Do not try automated checkout on sites that don't allow it; give the human the link instead.",
+      "Do not type card numbers or passwords.",
+      "Do not flash a SenseCAP Watcher before backing up its nvsfactory partition; read the build plan's warnings first.",
       "Do not activate controls tagged data-agent-danger without explicit confirmation.",
       "Do not loop or retry rate-limited endpoints.",
       "Do not expose real Muse SDK tokens; use mgst_YOUR_TOKEN as the placeholder in docs and code."
     ],
-    "purchase_policy": "Show the human one list with links and the total, and get explicit approval for the exact items, sellers and total before buying anything. Amazon and eBay don't allow automated carts or checkout, so for those items give the human the links and let them check out. On other stores, once they approve and ask you to, you may add exactly those items to a cart and check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.",
+    "purchase_policy": "hackshop never buys anything. Your agent can help you buy the parts: it shows you the exact items, sellers and total, then asks \"Place this order for $<total> at <seller>?\" and waits for a clear yes before it checks out. If it can't check out on a site, or the site doesn't allow automated checkout (Amazon and eBay don't), it gives you the link to buy yourself.",
     "contact": "https://www.hackshop.dev/contact"
-  }
+  },
+  "openapi": "https://www.hackshop.dev/openapi.json",
+  "source": "https://github.com/hackshopdev/hackshop-mcp"
 }

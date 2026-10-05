@@ -2,19 +2,33 @@
 
 Hardware-literate AI scout for tinkerers. Idea-to-hardware mapping via MCP.
 
-You describe a project. The agent surfaces 3-5 hackable hardware options you wouldn't have thought of, with brick risk, firmware links, and a suggested eBay search query. Compose with [`ebay-mcp`](https://github.com/YosefHayim/ebay-mcp) for live listings.
+You describe a project. The agent surfaces 3-5 hackable hardware options you wouldn't have thought of, with brick risk, firmware links, and a search query for used parts.
 
 ## Why
 
 A tinkerer has an idea. The idea would be cooler with the right piece of hardware attached: an old screen, an abandoned smart speaker, a bricked frame, a hackable handheld. The tinkerer doesn't know what hardware exists, what's hackable, or what would creatively *fit* the idea. So the idea stays purely software, or gets paired with a Raspberry Pi.
 
-This is a hardware-knowledge layer on top of LLMs. Four tools, 80 researched devices, one closed-set tag vocabulary, and a brick-risk safety rule that won't let the agent fabricate a score for hardware classes where bricks are unrecoverable. `simulate_assembly` drops a proposed robot into a MuJoCo physics world and tells you, honestly, whether it would actually move.
+This is a hardware-knowledge layer on top of LLMs. Six tools, 80+ researched devices, one closed-set tag vocabulary, and a brick-risk safety rule that won't let the agent fabricate a score for hardware classes where bricks are unrecoverable. `simulate_assembly` drops a proposed robot into a MuJoCo physics world and tells you, honestly, whether it would actually move.
 
-Hackshop now knows about Meta's Muse Gadgets SDK: ESP32 boards and Linux machines that can become a physical body for Muse, Meta's personal AI agent. Muse recommendations include the SDK tier, setup path, supported features, printable stand/enclosure links when available, and the required terms caveat: personal, non-commercial use only, at most 50 devices per token, no selling or public marketplace listing, and revocable access.
+hackshop knows Meta's Muse Gadgets SDK: ESP32 boards and Linux machines that can become a physical body for Muse, Meta's personal AI agent. Muse recommendations include the SDK tier, a ski-style difficulty level, board-specific flash warnings, setup path, supported features, printable stand/enclosure links when available, and the required terms caveat: personal, non-commercial use only, at most 50 devices per token, no selling or public marketplace listing, and revocable access.
 
 ## Status
 
-v0.0.5 - published on npm and hosted at `https://www.hackshop.dev/mcp`. The hosted MCP exposes the deterministic tools (`plan_gadget`, `get_build_plan`, `assess_hackability`); the npm server also includes `propose_hardware` and `simulate_assembly`. The simulation layer is live at [hackshop.dev](https://hackshop.dev).
+v0.0.6 - published on npm and hosted at `https://www.hackshop.dev/mcp`. The hosted MCP exposes the deterministic tools (`intake_gadget`, `plan_gadget`, `get_build_plan`, `assess_hackability`); the npm server also includes `propose_hardware` and `simulate_assembly`. The simulation layer is live at [hackshop.dev](https://hackshop.dev). Source: [github.com/hackshopdev/hackshop-mcp](https://github.com/hackshopdev/hackshop-mcp).
+
+### Changelog
+
+- **0.0.6**
+  - Shared intake: `intake_gadget` returns the 4 questions; `plan_gadget` and `/api/plan` take `answers`, report `intake.complete` and keep asking until it is.
+  - Budget-honest ranking: boards that meet the hard needs and fit the budget rank first, cheapest first. `fit` is `none` when nothing that works fits the budget, with a note naming the cheapest board that does.
+  - Warnings when the top pick or the requested size misses a hard need, and for ideas that need movement or arms.
+  - Board flash overlays from the Muse SDK docs: SenseCAP Watcher `nvsfactory` backup, CH342 port and paced 3-minute flash; StickS3 first flash; HA Voice PE; CH340 and native USB port names.
+  - Ski-style difficulty (green, blue, black) on every board, pick, build plan and `build.md`.
+  - Assembly steps carry connector, pose, force and machine-checkable `verify` checks, ending in a final verify step.
+  - Prices refreshed and labeled with `price_checked`; concrete USB-C data cable links; optional USB-C power adapter.
+  - New purchase policy: the agent asks "Place this order for $<total> at <seller>?" and waits for a clear yes.
+  - Hosted MCP: CORS for browser agents, stateless POST-only `Allow` header, build resource template listed, friendlier input errors, `try_instead` for npm-only tools. OpenAPI for `/api/plan` at `/openapi.json`.
+- **0.0.5**: hosted MCP at `/mcp`, `get_build_plan`, resources and prompts.
 
 ## Install in 30 seconds
 
@@ -55,18 +69,24 @@ Returns 3-5 hardware proposals, each with:
 - `brick_risk_disclaimer` — present when llm-inferred but score retained
 - `firmware_links` — github repos, hackaday articles
 - `community_size` — `tiny | small | active | thriving`
-- `ebay_query_suggestion` — pass to `ebay-mcp`'s search tool for live listings
+- `ebay_query_suggestion` — a search query for used parts you can paste into a marketplace search
 
 ### `assess_hackability(device_name)`
 
 Lookup by id, exact name, or substring. Returns the same shape as a single proposal. Use when you have a device in mind and want to verify hackability before searching for one to buy.
 
-### `plan_gadget(idea, platform?, budget_usd?, owned_device_ids?, needs?, size?, limit?)`
+### `intake_gadget()`
 
-Deterministically plans a physical gadget for an AI agent, with Meta Muse Gadgets as the first supported platform. It infers needs such as voice, screen, camera, air sensors, e-paper, round display, home-network tunnel, or Linux control; ranks supported boards; and returns:
+Returns the 4 intake questions (where it lives, how you interact, room sensing, budget), why each matters, and exactly how each answer maps to `plan_gadget` needs, size and budget. Ask the human these, then call `plan_gadget` with `answers`.
 
-- `inferred_needs`, `fit` (`all | partial | none`), `notes`, `warnings`, `questions`, and ranked `picks`
-- each pick's Muse platform, support level, tier, score, concrete `why`, gaps, `needs_met`, `within_budget`, price label, firmware/build links, setup steps, and caveats
+### `plan_gadget(idea?, answers?, platform?, budget_usd?, owned_device_ids?, needs?, size?, limit?)`
+
+Deterministically plans a physical gadget for an AI agent, with Meta Muse Gadgets as the first supported platform. It infers needs such as voice, screen, camera, air sensors, e-paper, round display, home-network tunnel, or Linux control, adds the needs from the intake `answers`, ranks supported boards, and returns:
+
+- `inferred_needs`, `fit` (`all | partial | none`), `notes`, `warnings`, `intake` (`complete`, `missing`), the unanswered `questions`, and ranked `picks`
+- ranking: boards that meet the hard needs (voice, camera, air sensors, e-paper, Linux) first, then within budget, then cheapest all-in total, then size fit
+- each pick's Muse platform, support level, tier, `difficulty`, concrete `why`, gaps, `needs_met`, `within_budget`, price label, firmware/build links, setup steps, flash `warnings`, and caveats
+- `difficulty_note` and a warning when the idea needs the body to move or use arms; Muse boards can't
 - `fabrication.printables` with STL/STEP/SVG/fab.json URLs when a stand or enclosure exists
 - Muse SDK `terms` for every platform represented in the picks
 - concrete `next_steps`, starting with the build page where the human can save progress
@@ -75,16 +95,23 @@ This tool does not call an LLM and does not use the network. It never suggests s
 
 ### `get_build_plan(device_id)`
 
-Returns the full, deterministic build plan for one device: parts (with store or search links), `shopping_list` with explicit purchase policy, numbered steps with exact commands, machine-readable `assembly`, `try_saying` prompts, caveats, the Muse SDK terms, and `agent_brief_md`, a self-contained Markdown brief a coding agent can follow. It also returns the human page (`https://www.hackshop.dev/build/<device_id>`), raw JSON (`/build/<device_id>/plan.json`) and raw brief (`/build/<device_id>/build.md`). It never buys anything; ordering parts is left to the human.
+Returns the full, deterministic build plan for one device: `difficulty`, board-specific flash `warnings` and the raw `flash` overlay, parts (with seller or search links), `shopping_list` with `price_checked` and the purchase policy, numbered steps with exact commands, machine-readable `assembly` (connector, pose, force notes and `verify` checks), `try_saying` prompts, caveats, the Muse SDK terms, and `agent_brief_md`, a self-contained Markdown brief a coding agent can follow. It also returns the human page (`https://www.hackshop.dev/build/<device_id>`), raw JSON (`/build/<device_id>/plan.json`) and raw brief (`/build/<device_id>/build.md`).
+
+## Buying parts
+
+hackshop never buys anything. Every build plan carries the purchase policy: the agent shows the exact items, sellers and total, asks "Place this order for $<total> at <seller>?" and waits for a clear yes before it checks out. Where a site doesn't allow automated checkout, it gives the human the link instead. Prices are estimates with a `price_checked` date.
 
 ## Resources and Prompts
 
 Both hosted MCP and npm expose:
 
-- `hackshop://muse/boards` - JSON for every Muse board: ids, names, platform, tier, price, features, build command and build page URL.
+- `hackshop://muse/boards` - JSON for every Muse board: ids, names, platform, tier, price, difficulty, features, build command and build page URL.
 - `hackshop://muse/sdk-terms` - text summary of Muse SDK token terms.
 - `hackshop://catalog/tags` - catalog tag list.
+- Template `hackshop://build/{device_id}` (from `resources/templates/list`) - the build plan JSON, e.g. `hackshop://build/seeed-sensecap-watcher`.
 - Prompt `plan-muse-gadget` - tells an agent to do intake, call `plan_gadget`, call `get_build_plan`, show the shopping list, ask before buying, assemble, flash and pair.
+
+The hosted MCP is stateless: JSON-RPC over POST, no `mcp-session-id`; GET and DELETE return 405. CORS allows any origin so browser agents can call it. The planner is also a plain HTTP API: `POST https://www.hackshop.dev/api/plan` (OpenAPI at `https://www.hackshop.dev/openapi.json`).
 
 ### `simulate_assembly(assembly)`
 
@@ -123,12 +150,11 @@ The `simulate_assembly` MCP tool above is the bounded, single-call entry point i
 - `simulate_assembly` calls out to a separate Python MuJoCo **sim-worker** over HTTP (`SIM_WORKER_URL`); the worker isn't bundled in the npm package
 - Catalog stored as `catalog.json` in the repo (JSON, version-controllable, 80 devices and growing)
 - Tag vocabulary in `tags.md`, validated at boot — server refuses to start on tag drift
-- eBay integration is **not** in this server. Compose with [`ebay-mcp`](https://github.com/YosefHayim/ebay-mcp) at the host level.
 
 ## Install (local dev)
 
 ```bash
-git clone <this-repo>
+git clone https://github.com/hackshopdev/hackshop-mcp
 cd hackshop-mcp
 npm install
 npm run validate   # verifies catalog + tags
@@ -149,13 +175,11 @@ To run a locally built copy instead of `npx`, add to your MCP client config:
   "mcpServers": {
     "hackshop": {
       "command": "node",
-      "args": ["/Users/YOU/hackshop-mcp/dist/server.js"]
+      "args": ["/path/to/hackshop-mcp/dist/server.js"]
     }
   }
 }
 ```
-
-For idea-to-hardware-to-listings flow, also install `ebay-mcp` from `YosefHayim/ebay-mcp`.
 
 ## The Story
 
@@ -180,4 +204,4 @@ See `CONTRIBUTING.md`. New devices come in via PR; tag changes require a `tags.m
 
 ## License
 
-MIT.
+MIT. Copyright (c) 2026 the hackshop authors.
