@@ -72,11 +72,11 @@ describe("item 19: less eBay", () => {
 });
 
 describe("HS-DOC-001 / HS-DOC-002: version and repo URL", () => {
-  it("README status is 0.0.6 with a changelog", () => {
+  it("README status matches package.json with a changelog", () => {
     const readme = read("README.md");
-    expect(readme).toMatch(/## Status\n\nv0\.0\.6/);
+    expect(readme).toContain(`## Status\n\nv${packageJson.version} `);
     expect(readme).toContain("### Changelog");
-    expect(packageJson.version).toBe("0.0.6");
+    expect(readme).toContain(`- **${packageJson.version}**`);
   });
 
   it("uses one canonical repo URL everywhere", () => {

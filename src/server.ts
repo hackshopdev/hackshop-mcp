@@ -48,7 +48,7 @@ import {
 import type { CoreContext } from "./core/types.js";
 
 const NAME = "hackshop-mcp";
-const VERSION = "0.0.6";
+const VERSION = "0.0.7";
 const STDIO_INSTRUCTIONS =
   "hackshop maps a natural-language project idea to hackable, repurposable, or protocol-native hardware. For Muse agent-body gadgets, ask the intake questions from intake_gadget, then call plan_gadget with the answers; it is deterministic, instant and key-free. get_build_plan returns the parts, flash warnings and assembly checks. Use propose_hardware for broader repurposing ideas and existing hardware, especially when the host can sample or ANTHROPIC_API_KEY is set. hackshop never buys anything: show the exact items, sellers and total, ask \"Place this order for $<total> at <seller>?\" and wait for a clear yes. Anonymous usage telemetry (tool names and timings only) is on by default; set HACKSHOP_TELEMETRY=0 to turn it off.";
 

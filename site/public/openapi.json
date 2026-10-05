@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "hackshop planner API",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Deterministic Muse gadget planner (no LLM, no key). The same planner as the plan_gadget MCP tool at https://www.hackshop.dev/mcp. Ask the human the intake questions first, then send their answers. hackshop never buys anything.",
     "license": {
       "name": "MIT",
