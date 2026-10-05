@@ -117,6 +117,8 @@
 }
 
 .parts li {
+  min-width: 0;
+  overflow-wrap: anywhere;
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -181,6 +183,40 @@
   margin: 0;
   padding-left: 20px;
   color: #c4c4be;
+}
+
+.caveats li {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.difficulty {
+  margin: 0 0 14px;
+}
+
+.devDetails {
+  padding: 16px 18px;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  background: #121212;
+}
+
+.devDetails summary {
+  color: #f4f4f2;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.devDetails[open] summary {
+  margin-bottom: 12px;
+}
+
+.devNote {
+  margin: 0 0 12px;
+  color: #c4c4be;
+  font-size: 15px;
+  overflow-wrap: anywhere;
 }
 
 .compareCard {
