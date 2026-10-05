@@ -403,7 +403,7 @@ export function printerOption(printer: Printer, raw: CostInputs): OptionCost {
   return {
     id: `printer:${printer.id}`,
     kind: "printer",
-    name: `Buy a ${printer.name}`,
+    name: `Buy the ${printer.name}`,
     total: round2(total),
     lines: [
       { label: `${printer.name}`, amount: printer.price },
@@ -445,7 +445,7 @@ export function serviceOption(raw: CostInputs): OptionCost {
   return {
     id: "service",
     kind: "service",
-    name: "Order from a print service (JLC3DP)",
+    name: "Order from a print service: JLC3DP",
     total: round2(printing + shipping),
     lines: [
       {
@@ -486,7 +486,7 @@ export function libraryOption(raw: CostInputs): OptionCost {
   return {
     id: "library",
     kind: "library",
-    name: `Use the library (${library.name})`,
+    name: `Use the library: ${library.name}`,
     total: round2(total),
     lines: [
       free !== undefined
@@ -521,7 +521,7 @@ export function makerspaceOption(raw: CostInputs): OptionCost {
   return {
     id: "makerspace",
     kind: "makerspace",
-    name: `Join a makerspace (${space.name})`,
+    name: `Join a makerspace: ${space.name}`,
     total: round2(membership + filament),
     lines: [
       {
@@ -583,6 +583,7 @@ export interface BreakEven {
   parts: number | null;
   /** Name of the alternative at that point; null when nothing else fits. */
   versus: string | null;
+  versusKind: OptionKind | null;
 }
 
 /**
@@ -595,11 +596,18 @@ export function breakEven(raw: CostInputs, printer = bestPrinter(raw)): BreakEve
     const at = { ...inputs, partsPerYear: parts };
     const alternative = bestAlternative(at);
     const own = printerOption(printer, at).total;
-    if (!alternative) return { printer, parts, versus: null };
-    if (own <= alternative.total) return { printer, parts, versus: alternative.name };
+    if (!alternative) return { printer, parts, versus: null, versusKind: null };
+    if (own <= alternative.total) {
+      return { printer, parts, versus: alternative.name, versusKind: alternative.kind };
+    }
   }
   const alternative = bestAlternative(inputs);
-  return { printer, parts: null, versus: alternative?.name ?? null };
+  return {
+    printer,
+    parts: null,
+    versus: alternative?.name ?? null,
+    versusKind: alternative?.kind ?? null,
+  };
 }
 
 /**

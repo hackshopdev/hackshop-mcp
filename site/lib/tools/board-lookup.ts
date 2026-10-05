@@ -46,6 +46,8 @@ export interface BoardEntry {
   tunnel: boolean | null;
   build: string | null;
   buildNote?: string;
+  /** The SDK's command to back up the stock flash before the first Muse flash. */
+  backup?: string;
   port: PortKind | null;
   flashNotes: string[];
   /** hackshop device ids that may have a /muse or /build page for this board. */
@@ -426,6 +428,7 @@ export const BOARDS: readonly BoardEntry[] = [
     camera: "off-by-default",
     tunnel: true,
     build: "tools/muse/board.sh build watcher",
+    backup: "tools/muse/paced_esptool.py --chip esp32s3 -p PORT read-flash 0x9000 0x32000 nvsfactory.bin",
     buildNote: "Flash it only with tools/muse/board.sh flash watcher. Plain esptool fails on its USB bridge.",
     port: "ch342",
     flashNotes: [
@@ -454,6 +457,7 @@ export const BOARDS: readonly BoardEntry[] = [
     camera: "none",
     tunnel: false,
     build: "tools/muse/board.sh build cardputer-adv",
+    backup: "python -m esptool --chip esp32s3 -p PORT read-flash 0 0x800000 cardputer-adv-backup.bin",
     port: "native",
     flashNotes: [
       "To enter download mode: switch it off, hold GO while you plug in USB, then let go.",
@@ -479,6 +483,7 @@ export const BOARDS: readonly BoardEntry[] = [
     camera: "none",
     tunnel: true,
     build: "tools/muse/board.sh build sticks3",
+    backup: "python -m esptool --chip esp32s3 -p PORT --after no-reset read-flash 0 0x800000 sticks3.bin",
     port: "native",
     flashNotes: [
       "First flash only: it ships with UiFlow2, which turns off the chip's USB serial port, and it has no BOOT button. Paste the SDK's REPL snippet to turn USB serial back on.",
@@ -549,6 +554,7 @@ export const BOARDS: readonly BoardEntry[] = [
     camera: "none",
     tunnel: true,
     build: "tools/muse/board.sh build jc3248w535",
+    backup: "python -m esptool --chip esp32s3 -p PORT read-flash 0 0x1000000 jc3248w535.bin",
     port: "native",
     flashNotes: [
       "It has no microphone. Push-to-talk records silence until you wire in an I2S MEMS mic such as an INMP441.",
@@ -574,6 +580,7 @@ export const BOARDS: readonly BoardEntry[] = [
     camera: "none",
     tunnel: true,
     build: "tools/muse/board.sh build plus2",
+    backup: "python -m esptool --chip esp32 -p PORT -b 230400 read-flash 0 0x800000 plus2.bin",
     port: "ch9102",
     flashNotes: [
       "Its CH9102 USB bridge drops out above 230400 baud. The SDK's flash script uses 230400.",
@@ -599,6 +606,7 @@ export const BOARDS: readonly BoardEntry[] = [
     camera: "none",
     tunnel: true,
     build: "tools/muse/board.sh build core2",
+    backup: "python -m esptool --chip esp32 -p PORT -b 230400 read-flash 0 0x1000000 core2.bin",
     port: "cp2104-or-ch9102",
     flashNotes: [
       "Check the revision on the back sticker or the board. Only v1.0 (AXP192) works.",

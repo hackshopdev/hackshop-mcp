@@ -282,3 +282,19 @@ export function detectOs(userAgent: string | null | undefined): OsId | null {
 export function isOsId(value: string | null | undefined): value is OsId {
   return value === "mac" || value === "linux" || value === "windows";
 }
+
+/**
+ * The SDK's flash command for a board, from its build command:
+ * `tools/board.sh X build` -> `tools/board.sh X flash PORT`,
+ * `tools/muse/board.sh build Y` -> `tools/muse/board.sh flash Y PORT`,
+ * `idf.py build` -> `idf.py -p PORT flash monitor`.
+ */
+export function flashCommandFor(build: string | null | undefined, port = "PORT"): string | null {
+  if (!build) return null;
+  const helper = /^tools\/board\.sh (\S+) build$/.exec(build);
+  if (helper) return `tools/board.sh ${helper[1]} flash ${port}`;
+  const muse = /^tools\/muse\/board\.sh build (\S+)$/.exec(build);
+  if (muse) return `tools/muse/board.sh flash ${muse[1]} ${port}`;
+  if (build === "idf.py build") return `idf.py -p ${port} flash monitor`;
+  return null;
+}

@@ -174,3 +174,14 @@ describe("board search", () => {
     }
   });
 });
+
+describe("backup commands", () => {
+  it("carries the SDK backup command for boards that need one", () => {
+    expect(boardById("sensecap-watcher")!.backup).toBe(
+      "tools/muse/paced_esptool.py --chip esp32s3 -p PORT read-flash 0x9000 0x32000 nvsfactory.bin",
+    );
+    expect(boardById("sticks3")!.backup).toContain("--after no-reset read-flash 0 0x800000");
+    expect(boardById("stickc-plus2")!.backup).toContain("-b 230400");
+    expect(boardById("esp32-c5-devkitc-1")!.backup).toBeUndefined();
+  });
+});

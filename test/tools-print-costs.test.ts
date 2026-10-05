@@ -195,3 +195,30 @@ describe("break-even and recommendation", () => {
     expect(bestAlternative(inputs({ urgency: "same-day", partsPerYear: 150 }))?.kind).toBe("library");
   });
 });
+
+describe("calculator advice", () => {
+  it("explains the default case: a service at its starting price, with the quote that flips it", async () => {
+    const { adviceFor } = await import("../site/lib/tools/print-advice");
+    const advice = adviceFor(inputs());
+    expect(advice.headline).toBe("Use an online print service");
+    expect(advice.body.join(" ")).toContain("$52");
+    expect(advice.body.join(" ")).toContain("above $12.29 a part");
+    expect(advice.breakEvenLine).toMatch(/doesn't pay for itself/);
+    for (const line of [advice.headline, ...advice.body, advice.breakEvenLine, ...advice.tips]) {
+      expect(line).not.toMatch(/\u2014/);
+    }
+  });
+
+  it("gives the break-even line against the library", async () => {
+    const { adviceFor } = await import("../site/lib/tools/print-advice");
+    const advice = adviceFor(inputs({ urgency: "no-rush", servicePricePerPart: 50, partsPerYear: 20 }));
+    expect(advice.headline).toBe("Use your public library");
+    expect(advice.breakEvenLine).toBe(
+      "At 52 parts a year, buying the Bambu Lab A1 mini pays for itself compared with the library. You're 32 parts a year short of that.",
+    );
+    expect(adviceFor(inputs({ urgency: "same-day", partsPerYear: 150 })).headline).toBe(
+      "Buy a printer: the Bambu Lab A1 mini",
+    );
+    expect(adviceFor(inputs({ material: "abs-asa" })).tips.join(" ")).toMatch(/vents outside/);
+  });
+});

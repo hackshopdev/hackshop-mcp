@@ -68,3 +68,16 @@ describe("ESP32 port finder", () => {
     expect(detectOs(undefined)).toBeNull();
   });
 });
+
+describe("flash commands", () => {
+  it("turns the SDK build command into its flash command", async () => {
+    const { flashCommandFor } = await import("../site/lib/tools/serial-ports");
+    expect(flashCommandFor("idf.py build")).toBe("idf.py -p PORT flash monitor");
+    expect(flashCommandFor("tools/board.sh ideaspark build", "/dev/cu.usbserial-110")).toBe(
+      "tools/board.sh ideaspark flash /dev/cu.usbserial-110",
+    );
+    expect(flashCommandFor("tools/muse/board.sh build watcher")).toBe("tools/muse/board.sh flash watcher PORT");
+    expect(flashCommandFor("bash install.sh --sdk-token mgst_...")).toBeNull();
+    expect(flashCommandFor(null)).toBeNull();
+  });
+});
