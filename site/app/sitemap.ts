@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { allBoardSlugs } from "@/lib/board-slugs";
 import { platformBuildDeviceIds } from "@/lib/build-plan-data";
 import { editorialPosts } from "@/lib/editorial";
+import { TOOLS } from "@/lib/tools/catalog";
 
 const site = "https://www.hackshop.dev";
 
@@ -14,6 +15,7 @@ const TEMPLATES_UPDATED = new Date("2026-10-03T00:00:00Z");
 const RESOURCES_INDEX_UPDATED = new Date("2026-10-03T00:00:00Z");
 const INVENTORY_UPDATED = new Date("2026-07-13T00:00:00Z");
 const LEGAL_UPDATED = new Date("2026-07-13T00:00:00Z");
+const TOOLS_UPDATED = new Date("2026-10-05T00:00:00Z");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -39,6 +41,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(post.updatedAt),
       changeFrequency: "monthly" as const,
       priority: post.pillar ? 0.75 : 0.6,
+    })),
+    { url: `${site}/tools`, lastModified: TOOLS_UPDATED, changeFrequency: "monthly", priority: 0.75 },
+    ...TOOLS.map((tool) => ({
+      url: `${site}${tool.path}`,
+      lastModified: TOOLS_UPDATED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
     })),
     { url: `${site}/inventory`, lastModified: INVENTORY_UPDATED, changeFrequency: "monthly", priority: 0.4 },
     ...["about", "contact", "privacy", "terms"].map((path) => ({
