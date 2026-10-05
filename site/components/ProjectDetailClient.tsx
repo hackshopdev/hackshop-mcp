@@ -7,7 +7,7 @@ import ReactMarkdown from "react-markdown";
 import { buildPlanForDevice } from "@/lib/build-plan-data";
 import { clerkEnabled } from "@/lib/auth-config";
 import type { BuildPlan } from "@/lib/build-plan/types";
-import type { PartStatus, Project, ProjectStatus } from "@/lib/projects/types";
+import type { Project, ProjectStatus } from "@/lib/projects/types";
 import { ideaAgentPrompt, projectAgentPrompt } from "@/lib/agent-prompts";
 import {
   appendProjectNotesToBrief,
@@ -15,42 +15,70 @@ import {
   shoppingListText,
   stillNeededPartIds,
 } from "@/lib/projects/build";
-import { getProject, saveProject } from "@/lib/projects/store";
+import { getLocalProject } from "@/lib/projects/local";
 import { track } from "@/lib/analytics";
+import { difficultyMap } from "@/lib/ui/difficulty";
+import { projectStatusLabel } from "@/lib/ui/labels";
+import { getProjectFor, saveProjectFor, useSyncAuth } from "@/lib/ui/project-sync";
 import { AgentHandoff } from "./AgentHandoff";
-import { BuyEverythingPanel } from "./BuyEverythingPanel";
 import { CopyButton } from "./CopyButton";
 import { GadgetPlanner } from "./GadgetPlanner";
+import { GetPartsPanel } from "./GetPartsPanel";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
 import { TellMyAgent } from "./TellMyAgent";
 import styles from "./build.module.css";
 
 const statuses: ProjectStatus[] = ["draft", "ordering", "building", "done"];
-const partStatuses: PartStatus[] = ["need", "ordered", "have"];
+const LOCAL_LABEL = "Saved in this browser";
 
 export function ProjectDetailClient({ id }: { id: string }) {
+  const auth = useSyncAuth();
   const [project, setProject] = useState<Project | null | undefined>(undefined);
-  const [saveLabel, setSaveLabel] = useState("Saved locally");
+  const [saveLabel, setSaveLabel] = useState(LOCAL_LABEL);
   const lastSavedJson = useRef<string | null>(null);
+  const loadedId = useRef<string | null>(null);
 
+  // Load once per id. The browser copy shows right away; the server copy is
+  // only asked for when someone is signed in (no 401s when signed out).
   useEffect(() => {
+    if (loadedId.current === id) return;
     let active = true;
-    void getProject(id).then((loaded) => {
-      if (!active) return;
+    const apply = (loaded: Project | null) => {
+      if (!active || loadedId.current === id) return;
+      if (loaded) loadedId.current = id;
       setProject(loaded);
       lastSavedJson.current = loaded ? JSON.stringify(loaded) : null;
-      setSaveLabel(loaded?.synced ? "Saved · just now" : "Saved locally");
-    });
+      setSaveLabel(loaded?.synced ? "Saved · just now" : LOCAL_LABEL);
+    };
+    const local = getLocalProject(id);
+    if (local) {
+      apply(local);
+    } else if (auth.ready) {
+      void getProjectFor(id, auth.signedIn).then(apply);
+    }
     return () => {
       active = false;
     };
-  }, [id]);
+  }, [id, auth.ready, auth.signedIn]);
 
   const plan = useMemo(
     () => buildPlanForDevice(project?.device_ids[0] ?? ""),
     [project?.device_ids],
   );
+
+  // The page renders after the build loads, so the browser's own jump to
+  // #step-3 (from "Continue" on My builds) happens too early. Redo it once.
+  const jumped = useRef(false);
+  useEffect(() => {
+    if (jumped.current || !project || !plan) return;
+    jumped.current = true;
+    const hash = window.location.hash.slice(1);
+    if (!hash) return;
+    window.requestAnimationFrame(() => {
+      document.getElementById(decodeURIComponent(hash))?.scrollIntoView({ block: "start" });
+    });
+  }, [project, plan]);
 
   useEffect(() => {
     if (!project) return;
@@ -58,14 +86,14 @@ export function ProjectDetailClient({ id }: { id: string }) {
     if (snapshot === lastSavedJson.current) return;
     setSaveLabel("Saving...");
     const timer = window.setTimeout(async () => {
-      const result = await saveProject(project);
+      const result = await saveProjectFor(project, auth.signedIn);
       const saved = result.project;
       lastSavedJson.current = JSON.stringify(saved);
       setProject(saved);
-      setSaveLabel(result.synced ? "Saved · just now" : result.error ? "Sync failed, saved locally" : "Saved locally");
+      setSaveLabel(result.synced ? "Saved · just now" : result.error ? "Sync failed, saved in this browser" : LOCAL_LABEL);
     }, 600);
     return () => window.clearTimeout(timer);
-  }, [project]);
+  }, [project, auth.signedIn]);
 
   if (project === undefined) {
     return <ProjectShell><p className={styles.muted}>Loading build...</p></ProjectShell>;
@@ -138,8 +166,8 @@ export function ProjectDetailClient({ id }: { id: string }) {
             })}
             surface="project_page"
           />
-          <a className={styles.secondaryButton} href="#buy">
-            Buy everything
+          <a className={styles.secondaryButton} href="#parts">
+            Review parts
           </a>
           <Link className={styles.secondaryButton} href={`/build/${plan.device_id}`}>
             Build page
@@ -175,7 +203,7 @@ export function ProjectDetailClient({ id }: { id: string }) {
                 >
                   {statuses.map((status) => (
                     <option key={status} value={status}>
-                      {status}
+                      {projectStatusLabel(status)}
                     </option>
                   ))}
                 </select>
@@ -183,67 +211,21 @@ export function ProjectDetailClient({ id }: { id: string }) {
             </div>
           </section>
 
-          <BuyEverythingPanel
+          <GetPartsPanel
             plan={plan}
             projectId={project.id}
             projectTitle={project.title}
             idea={project.idea}
-            stillNeeded={stillNeeded}
-            allHave={Object.keys(project.parts).length > 0 && stillNeeded.size === 0}
+            parts={project.parts}
+            onPartStatus={(partId, status) =>
+              update({ parts: { ...project.parts, [partId]: status } })
+            }
             listText={shoppingListText(plan, stillNeeded.size > 0 ? stillNeeded : undefined)}
           />
 
-          <section id="parts" className={styles.panel}>
-            <h2>Parts</h2>
-            <div className={styles.partsTable}>
-              {plan.parts.map((part) => (
-                <article className={styles.partCard} key={part.id}>
-                  <div>
-                    <div className={styles.partTitle}>
-                      {part.qty} × {part.name}
-                    </div>
-                    <p className={styles.muted}>{part.note}</p>
-                    {part.buy_url ?? part.search_url ? (
-                      <a
-                        className={styles.smallButton}
-                        href={(part.buy_url ?? part.search_url) as string}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={() =>
-                          track("part_link_clicked", { device_id: plan.device_id, kind: part.kind })
-                        }
-                      >
-                        {part.buy_url ? "Buy" : "Find"} on {hostOf((part.buy_url ?? part.search_url) as string)}
-                      </a>
-                    ) : part.kind === "printed" ? (
-                      <a className={styles.smallButton} href="#step-print">
-                        Print files
-                      </a>
-                    ) : null}
-                  </div>
-                  <div className={styles.segment} aria-label={`${part.name} status`}>
-                    {partStatuses.map((status) => (
-                      <button
-                        type="button"
-                        key={status}
-                        aria-pressed={project.parts[part.id] === status}
-                        onClick={() =>
-                          update({
-                            parts: { ...project.parts, [part.id]: status },
-                          })
-                        }
-                      >
-                        {status}
-                      </button>
-                    ))}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-
           {plan.steps.map((step, index) => (
-            <section className={styles.stepCard} id={`step-${step.id}`} key={step.id}>
+            <section className={styles.stepCard} id={`step-${index + 1}`} key={step.id}>
+              <span id={`step-${step.id}`} className={styles.stepAnchor} aria-hidden="true" />
               <div className={styles.stepHeader}>
                 <label className={styles.stepCheck}>
                   <input
@@ -269,7 +251,7 @@ export function ProjectDetailClient({ id }: { id: string }) {
               </div>
               {step.id === "parts" ? (
                 <p className={styles.muted}>
-                  Track each part in the <a href="#parts">Parts</a> list above, then tick this step.
+                  Track each part in <a href="#parts">Get the parts</a> above, then tick this step.
                 </p>
               ) : (
                 <div className={styles.markdown}>
@@ -388,7 +370,7 @@ function IdeaProjectView({
               >
                 {statuses.map((status) => (
                   <option key={status} value={status}>
-                    {status}
+                    {projectStatusLabel(status)}
                   </option>
                 ))}
               </select>
@@ -405,6 +387,7 @@ function IdeaProjectView({
             heading="Pick a board"
             subhead="Find boards that can do it, then choose one. Your parts list, steps and checklist appear here."
             onUseBoard={onUseBoard}
+            difficulties={difficultyMap()}
           />
         </section>
 
@@ -425,12 +408,11 @@ function IdeaProjectView({
 function ProjectRail({ plan, project }: { plan: BuildPlan; project: Project }) {
   return (
     <aside className={styles.rail} aria-label="Project progress">
-      <a href="#buy">Buy everything</a>
       <a href="#parts">
-        Parts <span>{partsDone(project)}</span>
+        Parts list <span>{partsDone(project)}</span>
       </a>
       {plan.steps.map((step, index) => (
-        <a href={`#step-${step.id}`} key={step.id}>
+        <a href={`#step-${index + 1}`} key={step.id}>
           {index + 1}. {step.title}
           <span>{project.checklist[step.id] ? "✓" : ""}</span>
         </a>
@@ -466,12 +448,4 @@ function partsDone(project: Project): string {
   const values = Object.values(project.parts);
   const done = values.filter((value) => value !== "need").length;
   return `${done}/${values.length}`;
-}
-
-function hostOf(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return "store";
-  }
 }

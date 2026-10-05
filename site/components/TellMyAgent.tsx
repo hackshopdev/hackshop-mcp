@@ -34,6 +34,9 @@ export function TellMyAgent({
   title = "Or point your agent at hackshop.dev",
   blurb = "Paste this into Claude, ChatGPT or your coding agent. It will ask you a few questions, pick the board, make the shopping list and walk you through the build.",
   label = "Tell my agent",
+  badge = "Tell my agent",
+  showPrompt = true,
+  headingLevel = 2,
   className,
 }: {
   prompt: string;
@@ -42,6 +45,9 @@ export function TellMyAgent({
   title?: string;
   blurb?: string;
   label?: string;
+  badge?: string;
+  showPrompt?: boolean;
+  headingLevel?: 2 | 3;
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -82,15 +88,17 @@ export function TellMyAgent({
 
   if (variant === "hero") {
     return (
-      <section className={`${styles.hero} ${className ?? ""}`} aria-label="Tell my agent">
+      <section className={`${styles.hero} ${className ?? ""}`} aria-label={title}>
         <div className={styles.heroTop}>
-          <span className={styles.badge}>Tell my agent</span>
-          <h2>{title}</h2>
+          <span className={styles.badge}>{badge}</span>
+          {headingLevel === 3 ? <h3>{title}</h3> : <h2>{title}</h2>}
           <p>{blurb}</p>
         </div>
-        <pre className={styles.prompt}>
-          <code>{prompt}</code>
-        </pre>
+        {showPrompt ? (
+          <pre className={styles.prompt}>
+            <code>{prompt}</code>
+          </pre>
+        ) : null}
         <div className={styles.heroActions}>
           <button type="button" className={styles.primary} onClick={onCopy}>
             {copied ? "Copied. Paste it into your agent." : "Copy prompt"}

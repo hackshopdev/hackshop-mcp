@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DifficultyBadge } from "@/components/DifficultyBadge";
 import { ProductTile } from "@/components/ProductTile";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -6,17 +7,27 @@ import { StartBuildButton } from "@/components/StartBuildButton";
 import { StoreLinkOut } from "@/components/StoreLinkOut";
 import { TellMyAgent } from "@/components/TellMyAgent";
 import ui from "@/components/ui.module.css";
-import { buyEverythingPrompt, SITE_URL, STORE_AGENT_PROMPT } from "@/lib/agent-prompts";
+import {
+  ASK_AGENT_BADGE,
+  ASK_AGENT_BLURB,
+  ASK_AGENT_TITLE,
+  buildWithAgentPrompt,
+  SITE_URL,
+  STORE_AGENT_PROMPT,
+} from "@/lib/agent-prompts";
 import { fetchEbayListingsMany, isEbayConfigured, type EbayListing } from "@/lib/ebay";
 import { pageMetadata } from "@/lib/page-metadata";
 import { commonParts, storeBoards, storeBoardsByGroup, type StoreBoard } from "@/lib/store";
+import { difficultyFor } from "@/lib/ui/difficulty";
+import { humanNote, plainTierLabel } from "@/lib/ui/labels";
+import { boardAndTotalLabel } from "@/lib/ui/price";
 import styles from "./store.module.css";
 
 export const revalidate = 3600;
 
 export const metadata = pageMetadata(
   "Store: every board and part for a Muse gadget · Hackshop",
-  "Buy the boards and parts for a Muse gadget: seller and Amazon links for every Muse-supported board, the newest used listings on eBay, and the full parts list for each build.",
+  "Buy the boards and parts for a Muse gadget: seller links for every Muse-supported board and the full parts list for each build.",
   "/store",
 );
 
@@ -27,9 +38,9 @@ const FAQ = [
       "No. Hackshop doesn't stock or ship hardware. Every link goes to the seller, Amazon or eBay, and you check out there.",
   },
   {
-    question: "Can my agent buy everything for me?",
+    question: "Can my agent help me build one?",
     answer:
-      "With your OK. Use \"Tell my agent to buy everything\": your agent finds the best current price for each part and shows you one list with the total. After you approve, it can order from seller stores like Waveshare or M5Stack. Amazon and eBay don't allow automated checkout, so it hands you those links to buy yourself.",
+      "Yes. Use \"Ask my agent to help me build one\". Your agent asks what you want the gadget to do, helps you pick the board, and lists the parts with prices and the total. Before it buys anything it asks \"Place this order for $<total> at <seller>?\" and waits for a clear yes. If a site doesn't allow automated checkout (Amazon and eBay don't), it gives you the links to buy yourself.",
   },
   {
     question: "New or used?",
@@ -89,9 +100,8 @@ export default async function StorePage() {
             <p className={ui.eyebrow}>Store</p>
             <h1>Everything you need to build a Muse gadget</h1>
             <p className={styles.lede}>
-              Every board Muse supports, with a link to buy it new, links to the newest used
-              listings on eBay, and the parts each build needs. Pick a board, get
-              the parts, then follow the build.
+              Every board Muse supports, with a link to buy it new and the parts
+              each build needs. Pick a board, get the parts, then follow the build.
             </p>
             <div className={ui.actions}>
               <a className={ui.btnPrimary} href="#featured">
@@ -102,9 +112,9 @@ export default async function StorePage() {
               </Link>
             </div>
             <ul className={styles.trust}>
-              <li>Links go straight to the seller, Amazon or eBay</li>
+              <li>Links go straight to the seller</li>
               <li>Hackshop doesn&apos;t sell hardware</li>
-              <li>Your agent asks before it buys anything</li>
+              <li>Your agent never buys anything without your OK</li>
             </ul>
             {showAffiliateDisclosure ? (
               <p className={styles.affiliateDisclosure}>
@@ -116,8 +126,9 @@ export default async function StorePage() {
             variant="hero"
             prompt={STORE_AGENT_PROMPT}
             surface="store_hero"
-            title="Tell my agent to buy everything"
-            blurb="Paste this into Claude, ChatGPT or your agent. It asks what you're building, finds the best price for each part (new or used), and shows you one list with the total before it buys anything."
+            badge={ASK_AGENT_BADGE}
+            title={ASK_AGENT_TITLE}
+            blurb={ASK_AGENT_BLURB}
           />
         </section>
 
@@ -282,17 +293,15 @@ function StoreCard({
         <div className={styles.cardHead}>
           <div className={ui.pillRow}>
             {board.muse_featured ? <span className={ui.pillAccent}>On gadgets.muse.ai</span> : null}
-            <span className={ui.pill}>{board.tier_label}</span>
+            <span className={ui.pill}>{plainTierLabel(board.tier_label) ?? board.tier_label}</span>
             {board.support === "possible" ? <span className={ui.pillWarn}>Community path</span> : null}
           </div>
           <h3>{board.name}</h3>
           <p className={styles.price}>
-            {board.price_label}
-            {board.est_total_usd !== null ? (
-              <span> · about ${Math.round(board.est_total_usd)} with parts</span>
-            ) : null}
+            {boardAndTotalLabel(board.price_label, board.est_total_usd) ?? board.price_label}
           </p>
-          <p className={styles.desc}>{board.description}</p>
+          <DifficultyBadge difficulty={difficultyFor(board.device_id)} />
+          <p className={styles.desc}>{humanNote(board.description) || board.description}</p>
           {board.capabilities.length > 0 ? (
             <p className={styles.caps}>{board.capabilities.join(" · ")}</p>
           ) : null}
@@ -328,7 +337,7 @@ function StoreCard({
 
       <div className={styles.ebay}>
         <div className={styles.ebayHead}>
-          <strong>Newest on eBay</strong>
+          <strong>{ebayLive ? "Newest on eBay" : "Used"}</strong>
           {listings && listings.length > 0 ? (
             <StoreLinkOut
               href={board.ebay.newest_url}
@@ -378,7 +387,7 @@ function StoreCard({
               className={styles.textLink}
               event={{ kind: "ebay_search", seller: "eBay", device_id: board.device_id }}
             >
-              See the newest listings
+              {ebayLive ? "See all listings" : "Search eBay yourself"}
             </StoreLinkOut>
           </p>
         )}
@@ -424,9 +433,9 @@ function StoreCard({
       <div className={styles.cardActions}>
         <StartBuildButton className={`${ui.btnSecondary} ${ui.btnSmall}`} deviceId={board.device_id} source="store" />
         <TellMyAgent
-          prompt={buyEverythingPrompt({ name: board.name, deviceId: board.device_id })}
+          prompt={buildWithAgentPrompt({ name: board.name, deviceId: board.device_id })}
           surface="store_card"
-          label="Tell my agent to buy it all"
+          label={ASK_AGENT_TITLE}
         />
         {board.board_page ? (
           <Link className={styles.innerLink} href={`/muse/${board.slug}`}>

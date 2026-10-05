@@ -206,6 +206,7 @@
   position: sticky;
   left: 0;
   z-index: 2;
+  min-width: 170px;
   max-width: 300px;
   background: var(--panel);
   white-space: normal;
@@ -216,10 +217,124 @@
   background: #111;
 }
 
-.compareTable thead th:nth-child(9),
 .priceCell {
-  text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+.priceCell span {
+  display: block;
+}
+
+.priceTotal {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+/* Phones: stacked cards instead of the wide table. */
+.compareCards {
+  display: none;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compareCard {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.compareCardTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.compareCardName {
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.compareCardPrice {
+  margin: 0;
+  color: #ffb066 !important;
+  font-weight: 700;
+  line-height: 1.4 !important;
+}
+
+.compareChecks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.95rem;
+}
+
+.compareChecks li {
+  margin: 0;
+}
+
+.compareChecks em {
+  color: var(--muted);
+  font-style: normal;
+}
+
+.checkYes {
+  color: #e9e9e4;
+}
+
+.checkYes > span:first-child {
+  color: #7ad88a;
+  font-weight: 800;
+}
+
+.checkNo {
+  color: #77776f;
+}
+
+.compareCard .button {
+  justify-self: start;
+}
+
+.devDetails {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.devDetails summary {
+  color: #c9c9c4;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.devDetails p {
+  margin: 10px 0 0;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  .tableFrame {
+    display: none;
+  }
+
+  .compareCards {
+    display: grid;
+  }
 }
 
 .compareTable tbody tr:hover th,

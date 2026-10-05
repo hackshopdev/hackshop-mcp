@@ -5,6 +5,7 @@ import {
   buildPlanForDevice,
 } from "@/lib/build-plan-data";
 import { pageMetadata } from "@/lib/page-metadata";
+import { difficultyFor } from "@/lib/ui/difficulty";
 
 export const dynamic = "force-static";
 
@@ -31,5 +32,5 @@ export default async function BuildPage({
   const { deviceId } = await params;
   const plan = buildPlanForDevice(deviceId);
   if (!plan) notFound();
-  return <BuildExperience plan={plan} />;
+  return <BuildExperience plan={plan} difficulty={difficultyFor(deviceId)} />;
 }

@@ -11,7 +11,7 @@ export function StartBuildButton({
   source,
   className,
   style,
-  label = "Start a build",
+  label = "Start this build",
 }: {
   deviceId: string;
   idea?: string;
@@ -32,11 +32,11 @@ export function StartBuildButton({
       onClick={async () => {
         setBusy(true);
         // Loaded on click so pages with this button don't ship the catalog up front.
-        const [{ buildPlanForDevice }, { createProjectFromPlan }, { saveProject }] =
+        const [{ buildPlanForDevice }, { createProjectFromPlan }, { saveProjectFor, isSignedInNow }] =
           await Promise.all([
             import("@/lib/build-plan-data"),
             import("@/lib/projects/build"),
-            import("@/lib/projects/store"),
+            import("@/lib/ui/project-sync"),
           ]);
         const plan = buildPlanForDevice(deviceId);
         if (!plan) {
@@ -45,12 +45,12 @@ export function StartBuildButton({
         }
         track("build_started", { device_id: deviceId, source });
         const project = createProjectFromPlan({ plan, idea, source });
-        const result = await saveProject(project);
+        const result = await saveProjectFor(project, isSignedInNow());
         track("project_saved", { synced: result.synced });
         router.push(`/projects/${result.project.id}`);
       }}
     >
-      {busy ? "Starting..." : label}
+      {busy ? "Starting…" : label}
     </button>
   );
 }

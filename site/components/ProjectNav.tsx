@@ -7,10 +7,39 @@ import { clerkEnabled } from "@/lib/auth-config";
 import { track } from "@/lib/analytics";
 import { importLocalProjects } from "@/lib/projects/store";
 import { listLocalProjects, PROJECTS_CHANGED_EVENT } from "@/lib/projects/local";
+import { MY_BUILDS_LABEL, SIGN_IN_LABEL } from "@/lib/ui/nav";
+import styles from "./SiteHeader.module.css";
 
-export function ProjectNav({ className }: { className?: string }) {
+type Variant = "inline" | "panel";
+
+// "My builds" (with a count of builds saved in this browser) and Sign in.
+// Rendered in the header row and again in the mobile menu panel.
+export function ProjectNav({
+  className,
+  variant = "inline",
+  onNavigate,
+}: {
+  className?: string;
+  variant?: Variant;
+  onNavigate?: () => void;
+}) {
+  const count = useLocalProjectCount();
+
+  return (
+    <div className={`${variant === "panel" ? styles.projectPanel : styles.projectInline} ${className ?? ""}`}>
+      <Link href="/projects" onClick={onNavigate} prefetch={variant === "panel" ? false : undefined}>
+        {MY_BUILDS_LABEL}
+        {count > 0 ? (
+          <span aria-label={`, ${count} saved build${count === 1 ? "" : "s"}`}>&nbsp;· {count}</span>
+        ) : null}
+      </Link>
+      {clerkEnabled ? <AuthControls variant={variant} /> : null}
+    </div>
+  );
+}
+
+function useLocalProjectCount(): number {
   const [count, setCount] = useState(0);
-
   useEffect(() => {
     const refresh = () => setCount(listLocalProjects().length);
     refresh();
@@ -21,21 +50,13 @@ export function ProjectNav({ className }: { className?: string }) {
       window.removeEventListener("storage", refresh);
     };
   }, []);
-
-  return (
-    <div className={className} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <Link href="/projects">
-        My builds{count > 0 ? <span aria-label={`${count} builds`}> · {count}</span> : null}
-      </Link>
-      {clerkEnabled ? <AuthControls /> : null}
-    </div>
-  );
+  return count;
 }
 
-function AuthControls() {
-  const { isSignedIn } = useUser();
+function AuthControls({ variant }: { variant: Variant }) {
+  const { isLoaded, isSignedIn } = useUser();
 
-  if (isSignedIn) {
+  if (isLoaded && isSignedIn) {
     return (
       <>
         <ImportPrompt />
@@ -48,18 +69,10 @@ function AuthControls() {
     <SignInButton mode="modal">
       <button
         type="button"
+        className={variant === "panel" ? styles.panelSignIn : styles.signIn}
         onClick={() => track("sign_in_clicked", {})}
-        style={{
-          background: "transparent",
-          border: "1px solid var(--border)",
-          color: "var(--fg)",
-          borderRadius: 6,
-          padding: "7px 11px",
-          minHeight: 40,
-          cursor: "pointer",
-        }}
       >
-        Sign in
+        {SIGN_IN_LABEL}
       </button>
     </SignInButton>
   );
@@ -67,29 +80,26 @@ function AuthControls() {
 
 function ImportPrompt() {
   const [unsynced, setUnsynced] = useState(0);
-  const [done, setDone] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    setUnsynced(listLocalProjects().filter((project) => !project.synced).length);
+    const refresh = () => setUnsynced(listLocalProjects().filter((project) => !project.synced).length);
+    refresh();
+    window.addEventListener(PROJECTS_CHANGED_EVENT, refresh);
+    return () => window.removeEventListener(PROJECTS_CHANGED_EVENT, refresh);
   }, []);
 
-  if (done || unsynced === 0) return null;
+  if (unsynced === 0) return null;
 
   return (
     <button
       type="button"
+      className={styles.importButton}
+      disabled={busy}
       onClick={async () => {
+        setBusy(true);
         await importLocalProjects();
-        setDone(true);
-      }}
-      style={{
-        background: "var(--code-bg)",
-        color: "var(--fg)",
-        border: "1px solid var(--accent)",
-        borderRadius: 6,
-        padding: "7px 11px",
-        minHeight: 40,
-        cursor: "pointer",
+        setBusy(false);
       }}
     >
       Save {unsynced} local build{unsynced === 1 ? "" : "s"}

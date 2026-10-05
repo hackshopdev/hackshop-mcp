@@ -13,6 +13,8 @@ import { hasImage } from "@/lib/image-sources";
 import { boardPath } from "@/lib/board-slugs";
 import { getMusePageData, type MuseBoardRow } from "@/lib/muse-page";
 import { TEMPLATES } from "@/lib/templates";
+import { difficultyMap } from "@/lib/ui/difficulty";
+import { plainTierLabel } from "@/lib/ui/labels";
 import styles from "./home.module.css";
 
 export const dynamic = "force-static";
@@ -75,7 +77,7 @@ export default function Home() {
               </Link>
             </div>
             <p className={styles.trust}>
-              Free and open source · No account needed to start · Never buys anything for you
+              Free and open source · No account needed to start · Never buys anything without your OK
             </p>
           </div>
           <TellMyAgent variant="hero" prompt={GENERAL_AGENT_PROMPT} surface="home_hero" />
@@ -120,13 +122,20 @@ export default function Home() {
             </article>
             <article className={styles.path}>
               <span className={styles.pathBadgeAlt}>On your own</span>
-              <h3>Use the planner on this page</h3>
+              <h3>
+                <a className={styles.pathLink} href="#start">
+                  Use the planner on this page
+                </a>
+              </h3>
               <ol>
-                <li>Describe the gadget, or pick an example.</li>
+                <li>Answer a few quick questions, or describe the gadget.</li>
                 <li>Compare the boards that can do it, with prices.</li>
-                <li>Start a build: parts, steps and a checklist save to My builds.</li>
+                <li>Press Start this build: parts, steps and a checklist save to My builds.</li>
                 <li>Hand any step to your agent with one click.</li>
               </ol>
+              <a className={ui.linkArrow} href="#start">
+                Find your board →
+              </a>
             </article>
           </div>
           <Flow />
@@ -136,9 +145,9 @@ export default function Home() {
         </section>
 
         {/* Planner */}
-        <section className={ui.section} id="start" aria-label="Start a build">
+        <section className={`${ui.section} ${styles.plannerSection}`} id="start" aria-label="Find your board">
           <div className={ui.panel}>
-            <GadgetPlanner source="home" readQuery />
+            <GadgetPlanner source="home" readQuery difficulties={difficultyMap()} />
           </div>
         </section>
 
@@ -147,7 +156,7 @@ export default function Home() {
           <div className={ui.sectionHead}>
             <p className={ui.eyebrow}>Ideas</p>
             <h2 id="gadgets">Gadgets you can build this weekend</h2>
-            <p>Each one starts from an officially supported board. Start a build to save it.</p>
+            <p>Each one starts from an officially supported board. Press Start this build to save it.</p>
           </div>
           <div className={ui.grid3}>
             {museTemplates.map((template) => {
@@ -279,7 +288,7 @@ function BoardCard({ row }: { row: MuseBoardRow }) {
         <span className={styles.boardName}>{row.device.name}</span>
       </Link>
       <div className={ui.pillRow}>
-        <span className={row.tier === "full-ui" ? ui.pillAccent : ui.pill}>{row.tierLabel}</span>
+        <span className={row.tier === "full-ui" ? ui.pillAccent : ui.pill}>{plainTierLabel(row.tier) ?? row.tierLabel}</span>
         <span className={ui.pill}>{row.priceLabel}</span>
       </div>
       <p className={styles.boardFeatures}>{featureChips(row).join(" · ") || "Status light and button"}</p>
@@ -295,8 +304,8 @@ function BoardCard({ row }: { row: MuseBoardRow }) {
 function featureChips(row: MuseBoardRow): string[] {
   const f = row.board.features;
   const chips: string[] = [];
-  if (row.voiceLabel === "Spoken") chips.push("Voice");
-  else if (row.voiceLabel) chips.push(row.voiceLabel === "Text replies" ? "Text replies" : "Voice in");
+  if (row.voiceLabel === "Voice in, text replies") chips.push("Voice in");
+  else if (row.voiceLabel) chips.push(row.voiceLabel === "Text replies" ? "Text replies" : "Voice in, no speaker");
   if (f.touch === true) chips.push("Touch");
   if (f.camera === true) chips.push("Camera");
   if (f.air_sensors === true) chips.push("Air sensors");
@@ -364,7 +373,7 @@ function homeFaq(cheapest: number, boardCount: number) {
     {
       question: "Does hackshop buy anything for me?",
       answer:
-        "No. Store links open the store. If your agent helps you shop, it has to show you the list and get your OK before buying anything.",
+        "No. Store links open the store. If your agent helps you buy the parts, it shows you the exact items and total and waits for a clear yes before it checks out. Amazon and eBay checkout is always yours.",
     },
     {
       question: "Can I use it without Muse?",

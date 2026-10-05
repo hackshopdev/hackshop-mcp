@@ -1,18 +1,22 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/CopyButton";
+import { DifficultyBadge } from "@/components/DifficultyBadge";
 import { ProductTile } from "@/components/ProductTile";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StartBuildButton } from "@/components/StartBuildButton";
 import { TellMyAgent } from "@/components/TellMyAgent";
 import ui from "@/components/ui.module.css";
-import { boardAgentPrompt, SITE_URL } from "@/lib/agent-prompts";
+import { ASK_AGENT_TITLE, buildWithAgentPrompt, SITE_URL } from "@/lib/agent-prompts";
 import { allBoardSlugs, boardPath, deviceIdForSlug } from "@/lib/board-slugs";
 import { hasImage } from "@/lib/image-sources";
 import { buildPlanForDevice } from "@/lib/build-plan-data";
 import { getMusePageData, type MuseBoardRow } from "@/lib/muse-page";
 import { pageMetadata } from "@/lib/page-metadata";
+import { difficultyFor } from "@/lib/ui/difficulty";
+import { hasDeveloperDetail, humanNote, plainTierLabel } from "@/lib/ui/labels";
+import { boardAndTotalLabel } from "@/lib/ui/price";
 import styles from "./board.module.css";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -44,6 +48,11 @@ export default async function BoardPage({ params }: Props) {
   const features = featureRows(row);
   const compare = closestByPrice(row, siblings).slice(0, 3);
   const buyUrl = row.device.buy_url ?? null;
+  const difficulty = difficultyFor(row.device.id);
+  const priceLine = boardAndTotalLabel(row.priceLabel, plan?.shopping_list.est_total_usd ?? null);
+  const summary = humanNote(row.device.notes);
+  const boardNote = humanNote(row.board.note);
+  const devNotes = [row.device.notes, row.board.note].filter((note) => hasDeveloperDetail(note));
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -66,7 +75,7 @@ export default async function BoardPage({ params }: Props) {
           <ProductTile deviceId={row.device.id} name={row.device.name} priority hasPhoto={hasImage(row.device.id)} className={styles.heroTile} />
           <div className={styles.heroCopy}>
             <div className={ui.pillRow}>
-              <span className={row.tier === "full-ui" ? ui.pillAccent : ui.pill}>{row.tierLabel}</span>
+              <span className={row.tier === "full-ui" ? ui.pillAccent : ui.pill}>{plainTierLabel(row.tier) ?? row.tierLabel}</span>
               <span className={ui.pill}>
                 {row.board.support === "official" ? "Officially supported" : "Community path"}
               </span>
@@ -74,13 +83,19 @@ export default async function BoardPage({ params }: Props) {
               {row.board.eol ? <span className={ui.pillWarn}>End of life</span> : null}
             </div>
             <h1>{row.device.name}</h1>
-            <p className={styles.price}>{row.priceLabel}</p>
-            <p className={styles.summary}>{row.device.notes}</p>
+            <p className={styles.price}>{priceLine ?? row.priceLabel}</p>
+            {difficulty ? (
+              <div className={styles.difficulty}>
+                <DifficultyBadge difficulty={difficulty} showWhy />
+              </div>
+            ) : null}
+            <p className={styles.summary}>{summary || boardNote}</p>
             <div className={ui.actions}>
               <StartBuildButton className={ui.btnPrimary} deviceId={row.device.id} source="board_page" />
               <TellMyAgent
-                prompt={boardAgentPrompt({ name: row.device.name, deviceId: row.device.id })}
+                prompt={buildWithAgentPrompt({ name: row.device.name, deviceId: row.device.id })}
                 surface="board_page"
+                label={ASK_AGENT_TITLE}
               />
             </div>
             <div className={styles.secondaryLinks}>
@@ -167,7 +182,12 @@ export default async function BoardPage({ params }: Props) {
             {row.printables.map((part) => (
               <div className={styles.stand} key={part.urls.fab}>
                 <div className={styles.standPreview}>
-                  <img src={part.urls.svg} alt={`${row.device.name} printable stand preview`} />
+                  <img
+                    src={part.urls.svg}
+                    alt={`${row.device.name} printable stand preview`}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div>
                   <h3>{part.title}</h3>
@@ -192,24 +212,31 @@ export default async function BoardPage({ params }: Props) {
           </section>
         ) : null}
 
-        <section className={ui.section} aria-labelledby="build-cmd">
-          <div className={ui.sectionHead}>
-            <p className={ui.eyebrow}>Firmware</p>
-            <h2 id="build-cmd">Build command</h2>
-            <p>
+        <section className={ui.section} aria-labelledby="dev-details">
+          <details className={styles.devDetails}>
+            <summary>
+              <span id="dev-details">Developer details</span>
+              <span className={ui.muted}> · build command and SDK notes</span>
+            </summary>
+            <p className={ui.muted}>
               Your coding agent runs this for you. The full sequence (token, flash, pair) is on the{" "}
               <Link className={ui.linkArrow} href={`/build/${row.device.id}`}>
                 build page
               </Link>
               .
             </p>
-          </div>
-          <pre className={ui.codeBox}>
-            <code>{row.board.build}</code>
-          </pre>
-          <div style={{ marginTop: 10 }}>
-            <CopyButton className={`${ui.btnSecondary} ${ui.btnSmall}`} text={row.board.build} label="Copy command" />
-          </div>
+            {devNotes.map((note) => (
+              <p className={styles.devNote} key={note}>
+                {note}
+              </p>
+            ))}
+            <pre className={ui.codeBox}>
+              <code>{row.board.build}</code>
+            </pre>
+            <div style={{ marginTop: 10 }}>
+              <CopyButton className={`${ui.btnSecondary} ${ui.btnSmall}`} text={row.board.build} label="Copy command" />
+            </div>
+          </details>
         </section>
 
         {plan && plan.caveats.length > 0 ? (
@@ -242,7 +269,7 @@ export default async function BoardPage({ params }: Props) {
                   <ProductTile deviceId={other.device.id} name={other.device.name} hasPhoto={hasImage(other.device.id)} />
                   <strong>{other.device.name}</strong>
                   <span className={ui.muted}>
-                    {other.tierLabel} · {other.priceLabel}
+                    {plainTierLabel(other.tier) ?? other.tierLabel} · {other.priceLabel}
                   </span>
                 </Link>
               ))}

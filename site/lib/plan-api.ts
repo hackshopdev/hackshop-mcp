@@ -7,12 +7,15 @@ export interface PlanPick {
   platform_id: string;
   platform_name?: string;
   support?: "official" | "possible";
+  tier?: string;
   tier_label?: string;
   why: string;
   gaps: string[];
   needs_met?: string[];
   within_budget?: boolean | null;
+  est_total_usd?: number | null;
   price_label: string | null;
+  difficulty?: { level: string; label?: string; why?: string } | null;
   build_page_url: string;
   agent_brief_url?: string;
 }
@@ -46,6 +49,8 @@ export async function requestPlan(input: {
   budget_usd?: number;
   needs?: string[];
   size?: string;
+  /** Intake chip answers ({ size, interaction, sensing, budget } option values). */
+  answers?: Record<string, string>;
 }): Promise<PlanResponse> {
   const response = await fetch("/api/plan", {
     method: "POST",

@@ -12,7 +12,8 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
 }
 
-.heroTop h2 {
+.heroTop h2,
+.heroTop h3 {
   margin: 10px 0 6px;
   color: #f4f4f2;
   font-size: 22px;
@@ -130,9 +131,11 @@
 }
 
 .splitMain {
+  min-width: 0;
   padding: 10px 14px;
   border-radius: 10px 0 0 10px;
-  white-space: nowrap;
+  line-height: 1.25;
+  text-align: left;
 }
 
 .splitCaret {
@@ -182,10 +185,4 @@
   background: #242424;
 }
 
-@media (max-width: 480px) {
-  .splitMain {
-    min-width: 0;
-    white-space: normal;
-    text-align: left;
-  }
-}
+

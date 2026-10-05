@@ -20,37 +20,57 @@ export function boardAgentPrompt(input: { name: string; deviceId: string }): str
   );
 }
 
-export const STORE_AGENT_PROMPT =
-  "Help me buy the parts for a Muse gadget. Read https://www.hackshop.dev/store.json " +
-  "(every board, its parts, seller links and newest eBay listings). Ask me what I want " +
-  "it to do or which board I picked, then make one shopping list with the best current " +
-  "price for each item: new from the linked seller or Amazon, or used on eBay (check " +
-  "condition and shipping). Show me the list with links and the total, and wait for my " +
-  "OK before you add anything to a cart or check out. Amazon and eBay don't allow " +
-  "automated carts or checkout, so give me those links to buy myself.";
+export const ASK_AGENT_BADGE = "Ask my agent";
+export const ASK_AGENT_TITLE = "Ask my agent to help me build one";
+export const ASK_AGENT_BLURB =
+  "Paste this into Claude, ChatGPT or your agent. It asks what you want the gadget to do, helps you pick the board, lists the parts with prices, and walks you through setup. It never buys anything without your OK.";
 
-export function buyEverythingPrompt(input: {
-  name: string;
-  deviceId: string;
+// "Ask my agent to help me build one": the agent reads the build plan, asks a
+// few questions, recommends a board, lists the parts with prices, and only
+// buys after a clear yes to the exact order. Used on the store, project
+// pages and build pages.
+export function buildWithAgentPrompt(input: {
+  name?: string;
+  deviceId?: string;
   items?: Array<{ qty: number; name: string }>;
   idea?: string;
-}): string {
+} = {}): string {
+  const planUrl = input.deviceId
+    ? `${SITE_URL}/build/${input.deviceId}/build.md`
+    : `${SITE_URL}/agents.md`;
+  const gadget = input.name ? `a ${input.name} gadget for Muse` : "a gadget for Muse";
+  const items = (input.items ?? []).slice(0, 8);
   const need =
-    input.items && input.items.length > 0
-      ? ` I still need: ${input.items.map((item) => `${item.qty} × ${item.name}`).join("; ")}.`
+    items.length > 0
+      ? ` I still need: ${items.map((item) => `${item.qty} × ${item.name}`).join("; ")}.`
       : "";
-  const idea = input.idea?.trim() ? ` It's for: ${input.idea.trim()}` : "";
+  // The idea goes up front and is capped, so the buying rules below are
+  // never cut off by the chat-URL length limit.
+  const ideaText = input.idea?.trim() ?? "";
+  const idea = ideaText
+    ? ` It's for: ${ideaText.length > 280 ? `${ideaText.slice(0, 279).trimEnd()}…` : `${ideaText.replace(/[.\s]+$/, "")}.`}`
+    : "";
+  const pick = input.name
+    ? `3. Tell me if the ${input.name} is the right board or recommend a better one, and say why, including how hard it is to build.`
+    : "3. Recommend a board and say why, including how hard it is to build.";
   return clampForUrl(
-    `Buy everything I need to build my ${input.name} gadget for Muse. ` +
-      `The shopping list is in ${SITE_URL}/build/${input.deviceId}/plan.json (shopping_list), ` +
-      `and ${SITE_URL}/store.json has seller links and newest eBay listings.${need} ` +
-      "For each item, find the best current price from the linked seller, Amazon or a " +
-      "recent eBay listing (check condition and shipping). Give me one list with links " +
-      "and the total, then wait for my OK. Only add to cart or check out after I approve " +
-      "the exact items and total, and skip anything I already have. Amazon and eBay don't " +
-      `allow automated carts or checkout, so give me those links to buy myself.${idea}`,
+    `Help me build ${gadget}.${idea} ` +
+      `1. Read ${planUrl}. ` +
+      "2. Ask me 2 to 4 short questions: where it will live, how I'll use it (talk, touch, or light and button), " +
+      "whether it should sense the room, and my budget. Skip anything I've already told you. " +
+      `${pick} ` +
+      `4. List each part with a seller link, its price and the total.${need} ` +
+      '5. To buy: show me the exact items and total, then ask "Place this order for $<total> at <seller>?" ' +
+      "and wait for a clear yes. If you can't check out on a site, or it doesn't allow automated checkout " +
+      "(Amazon and eBay don't), give me the links instead. " +
+      "6. Then walk me through flashing and pairing step by step, and tell me where to pick up next time.",
   );
 }
+
+/** @deprecated Use buildWithAgentPrompt. */
+export const buyEverythingPrompt = buildWithAgentPrompt;
+
+export const STORE_AGENT_PROMPT = buildWithAgentPrompt();
 
 export function projectAgentPrompt(input: {
   name: string;
