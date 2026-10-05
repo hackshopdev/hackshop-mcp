@@ -156,7 +156,7 @@ export function setPartState(built: BuiltPart, state: PartState): void {
     mat.transparent = memo.transparent;
     mat.depthWrite = memo.depthWrite;
     if (state === "selected" || state === "related" || state === "hover") {
-      const strength = state === "selected" ? 0.55 : state === "related" ? 0.38 : 0.22;
+      const strength = state === "selected" ? 0.45 : state === "related" ? 0.3 : 0.04;
       if (mat.emissiveMap) {
         mat.emissiveIntensity = memo.emissiveIntensity * 0.75;
       } else {
@@ -170,8 +170,9 @@ export function setPartState(built: BuiltPart, state: PartState): void {
     }
     mat.needsUpdate = true;
   }
-  built.outline.visible = state === "selected" || state === "related";
-  (built.outline.material as THREE.LineBasicMaterial).opacity = state === "selected" ? 0.95 : 0.6;
+  built.outline.visible = state === "selected" || state === "related" || state === "hover";
+  (built.outline.material as THREE.LineBasicMaterial).opacity =
+    state === "selected" ? 0.95 : state === "related" ? 0.65 : 0.45;
 }
 
 /** Swaps a stand placeholder for the printable STL geometry. */
@@ -468,9 +469,40 @@ function portOpenings(part: ModelPart, outer: BoardModel["outer"]): THREE.Mesh[]
   return meshes;
 }
 
+/** Gold pins (or pads) on Raspberry Pi GPIO headers, 2.54 mm pitch, pointing up. */
+function headerPins(part: ModelPart): THREE.Mesh[] {
+  const match = /(\d+)-pin/.exec(part.name);
+  if (part.kind !== "port" || !match || !/gpio/.test(part.id)) return [];
+  const pins = Number(match[1]);
+  const rows = 2;
+  const cols = Math.ceil(pins / rows);
+  const pitch = 2.54;
+  const sz = part.size[2];
+  const pad = /pads/.test(part.id);
+  const geometry = pad
+    ? new THREE.CylinderGeometry(0.55, 0.55, 0.06, 12).rotateX(Math.PI / 2)
+    : new THREE.BoxGeometry(0.64, 0.64, 1.6);
+  const material = new THREE.MeshStandardMaterial({ color: "#d4b25c", roughness: 0.3, metalness: 0.9 });
+  const mesh = new THREE.InstancedMesh(geometry, material, cols * rows);
+  const matrix = new THREE.Matrix4();
+  let i = 0;
+  for (let r = 0; r < rows; r += 1) {
+    for (let c = 0; c < cols; c += 1) {
+      const u = (c - (cols - 1) / 2) * pitch;
+      const v = (r - (rows - 1) / 2) * pitch;
+      matrix.makeTranslation(u, v, sz / 2 + (pad ? 0.03 : 0.5));
+      mesh.setMatrixAt(i, matrix);
+      i += 1;
+    }
+  }
+  mesh.name = `${part.id}-pins`;
+  mesh.instanceMatrix.needsUpdate = true;
+  return [mesh];
+}
+
 function detailMeshes(part: ModelPart, textures: TextureCache, outer: BoardModel["outer"]): THREE.Mesh[] {
   const [sx, sy, sz] = part.size;
-  const meshes: THREE.Mesh[] = [...portOpenings(part, outer)];
+  const meshes: THREE.Mesh[] = [...portOpenings(part, outer), ...headerPins(part)];
 
   if (part.kind === "screen" && part.display) {
     const texture = textures.screen(part.display, sx, sy, part.shape === "cylinder");
