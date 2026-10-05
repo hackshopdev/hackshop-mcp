@@ -152,9 +152,9 @@ export default function TemplatesPage() {
       <header>
         <h1>Project templates</h1>
         <p className="tagline">
-          {TEMPLATE_COUNT} project templates. Each one is a real path. Start a
-          build to save the parts and steps to My builds, or try the idea in the
-          planner.
+          {TEMPLATE_COUNT} project templates. Each one is a real path. Press
+          Start this build to save the parts and steps to My builds, or try the
+          idea in the planner.
         </p>
         <ul style={{ margin: "0 0 18px", paddingLeft: 18, color: "var(--muted)", fontSize: 14, lineHeight: 1.7 }}>
           <li>
@@ -211,7 +211,7 @@ export default function TemplatesPage() {
         <p>
           Each template is a prompt that the live agent on the homepage can
           process. The agent picks 3-5 hardware candidates from the catalog and
-          ranks them with brick-risk, firmware links, and live eBay search URLs.
+          ranks them with brick risk, firmware links and eBay search links.
         </p>
         <p>
           Missing a project? <a href="https://github.com/hackshopdev/hackshop-mcp/issues">Open an issue</a>{" "}
