@@ -28,7 +28,7 @@ npx vercel deploy --prod
 ### One-time setup (Dashboard route)
 
 1. Go to https://vercel.com/new
-2. Import `msanchezgrice/hackshop-mcp`
+2. Import `hackshopdev/hackshop-mcp`
 3. **Set Root Directory to `site/`** (critical — this monorepo has the npm package at root)
 4. Framework: Next.js (auto-detected)
 5. Add env var: `ANTHROPIC_API_KEY` = your key

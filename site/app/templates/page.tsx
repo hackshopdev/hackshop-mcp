@@ -174,7 +174,7 @@ export default function TemplatesPage() {
           <Link className="badge" href="/">
             ← Home
           </Link>
-          <a className="badge" href="https://github.com/msanchezgrice/hackshop-mcp">
+          <a className="badge" href="https://github.com/hackshopdev/hackshop-mcp">
             GitHub
           </a>
           <span className="badge">{TEMPLATE_COUNT} templates</span>
@@ -214,7 +214,7 @@ export default function TemplatesPage() {
           ranks them with brick-risk, firmware links, and live eBay search URLs.
         </p>
         <p>
-          Missing a project? <a href="https://github.com/msanchezgrice/hackshop-mcp/issues">Open an issue</a>{" "}
+          Missing a project? <a href="https://github.com/hackshopdev/hackshop-mcp/issues">Open an issue</a>{" "}
           and we&apos;ll add it.
         </p>
       </footer>

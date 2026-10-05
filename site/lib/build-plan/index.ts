@@ -455,9 +455,14 @@ function sdkconfigPathFor(board: PlatformBoard): string {
 }
 
 function flashCommandFor(board: PlatformBoard): string {
-  const museBoard = board.build.match(/^tools\/muse\/board\.sh\s+build\s+(\S+)$/)?.[1];
+  return flashCommandForBuild(board.build);
+}
+
+/** The flash command that matches a board's build command. */
+export function flashCommandForBuild(build: string): string {
+  const museBoard = build.match(/^tools\/muse\/board\.sh\s+build\s+(\S+)$/)?.[1];
   if (museBoard) return `tools/muse/board.sh flash ${museBoard} PORT`;
-  const boardSh = board.build.match(/^tools\/board\.sh\s+(\S+)\s+build$/)?.[1];
+  const boardSh = build.match(/^tools\/board\.sh\s+(\S+)\s+build$/)?.[1];
   if (boardSh) return `tools/board.sh ${boardSh} flash-monitor PORT`;
   return "idf.py -p PORT flash monitor";
 }

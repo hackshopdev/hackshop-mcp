@@ -26,7 +26,7 @@
     "homepage": "https://www.hackshop.dev",
     "muse": "https://www.hackshop.dev/muse",
     "planner_api": "https://www.hackshop.dev/api/plan",
-    "documentation": "https://github.com/msanchezgrice/hackshop-mcp",
+    "documentation": "https://github.com/hackshopdev/hackshop-mcp",
     "npm": "https://www.npmjs.com/package/hackshop-mcp",
     "llms_txt": "https://www.hackshop.dev/llms.txt",
     "agents_md": "https://www.hackshop.dev/agents.md",

@@ -46,7 +46,7 @@ export default function InventoryPage() {
         <p>
           <a href="/">← Back to the agent</a> · {devices.length} devices in
           catalog ·{" "}
-          <a href="https://github.com/msanchezgrice/hackshop-mcp/blob/main/CONTRIBUTING.md">
+          <a href="https://github.com/hackshopdev/hackshop-mcp/blob/main/CONTRIBUTING.md">
             request a missing device
           </a>
         </p>

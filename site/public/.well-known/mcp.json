@@ -25,5 +25,5 @@
   ],
   "prompts": ["plan-muse-gadget"],
   "npm": "hackshop-mcp",
-  "docs": "https://github.com/msanchezgrice/hackshop-mcp"
+  "docs": "https://github.com/hackshopdev/hackshop-mcp"
 }

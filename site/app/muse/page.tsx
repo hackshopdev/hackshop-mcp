@@ -268,7 +268,7 @@ export default function MusePage() {
           </p>
           <p>
             Need a stand for a board that doesn&apos;t have one yet?{" "}
-            <a href="https://github.com/msanchezgrice/hackshop-mcp/issues/new?title=Printable%20stand%20request">
+            <a href="https://github.com/hackshopdev/hackshop-mcp/issues/new?title=Printable%20stand%20request">
               Request one
             </a>
             .
@@ -476,7 +476,7 @@ function BoardCard({ row }: { row: MuseBoardRow }) {
               <>
                 {" "}
                 <a
-                  href={`https://github.com/msanchezgrice/hackshop-mcp/issues/new?title=${encodeURIComponent(`Printable stand for ${row.device.name}`)}`}
+                  href={`https://github.com/hackshopdev/hackshop-mcp/issues/new?title=${encodeURIComponent(`Printable stand for ${row.device.name}`)}`}
                 >
                   Request one
                 </a>

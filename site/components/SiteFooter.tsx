@@ -33,7 +33,7 @@ export function SiteFooter() {
           </div>
           <div>
             <h2>About</h2>
-            <a href="https://github.com/msanchezgrice/hackshop-mcp">GitHub</a>
+            <a href="https://github.com/hackshopdev/hackshop-mcp">GitHub</a>
             <Link href="/resources">Field guides</Link>
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>
