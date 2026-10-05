@@ -1,0 +1,145 @@
+.page {
+  max-width: none;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: #0a0a0a;
+  color: #f4f4f2;
+}
+
+.shell {
+  width: min(780px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.article {
+  padding: 56px 0 40px;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #ff7a00;
+  font: 800 0.75rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.article h1 {
+  margin: 0 0 8px;
+  font-size: clamp(36px, 7vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.updated {
+  margin: 0 0 24px;
+  color: #9a9a95;
+  font-size: 15px;
+}
+
+.intro p {
+  color: #d5d5d0;
+}
+
+.toc {
+  margin: 28px 0 8px;
+  padding: 16px 20px;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  background: #121212;
+}
+
+.toc p {
+  margin: 0 0 8px;
+  color: #f4f4f2;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.toc ol {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 22px;
+  font-size: 15px;
+}
+
+.toc li {
+  margin: 0;
+}
+
+.toc a {
+  color: #ffb066;
+}
+
+.section {
+  padding-top: 18px;
+  scroll-margin-top: 80px;
+}
+
+.section h2 {
+  margin: 22px 0 10px;
+  color: #f4f4f2;
+  font-size: 24px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.section h3 {
+  margin: 18px 0 6px;
+  color: #f4f4f2;
+  font-size: 18px;
+}
+
+.section p,
+.section li {
+  color: #d5d5d0;
+  overflow-wrap: anywhere;
+}
+
+.section p {
+  margin: 0 0 14px;
+}
+
+.section ul,
+.section ol {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+
+.section li {
+  margin: 0 0 8px;
+}
+
+.section a,
+.intro a,
+.contact a {
+  color: #ffb066;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.section code {
+  overflow-wrap: anywhere;
+}
+
+.contact {
+  margin: 32px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid #242424;
+  color: #d5d5d0;
+}
+
+@media (max-width: 640px) {
+  .article {
+    padding-top: 36px;
+    font-size: 16px;
+  }
+
+  .section h2 {
+    font-size: 21px;
+  }
+}
