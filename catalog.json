@@ -66,14 +66,14 @@
     "hack_difficulty": 1,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-05-04",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/"
     ],
     "community_size_bucket": "thriving",
     "notes": "Smaller than Pi 4B, lower power. Good for projects that need to be embedded/hidden. Reasonable Wi-Fi. Slightly slow CPU but usually enough.",
     "est_used_price_usd_min": 15,
-    "est_used_price_usd_max": 25,
+    "est_used_price_usd_max": 15,
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2,
     "buy_url": "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/"
@@ -1815,7 +1815,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://wiki.seeedstudio.com/getting_started_with_reterminal_e1001/",
@@ -1869,7 +1869,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-04",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://www.seeedstudio.com/reTerminal-E1002-p-6533.html",
@@ -1878,7 +1878,7 @@
     "community_size_bucket": "small",
     "notes": "7.3\" E Ink Spectra 6 full-color ePaper with ESP32-S3 and up to 3-month battery life. Muse shows status text and six-color images. Official SDK build command is reterminal-e1002.",
     "est_used_price_usd_min": 99,
-    "est_used_price_usd_max": 99,
+    "est_used_price_usd_max": 109,
     "image_url": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-104991003-reterminal-e1002-epaper-display.jpg",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 3,
@@ -1898,14 +1898,14 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://github.com/esphome/home-assistant-voice-pe",
       "https://www.home-assistant.io/voice-pe/"
     ],
     "community_size_bucket": "thriving",
-    "notes": "ESP32-S3 + XMOS voice puck: dual mics, speaker, 3.5mm out, LED ring, rotary dial, hardware mute. Under Muse it is push-to-talk with status on the LED ring and the dial as volume. Flashing Muse replaces the ESPHome firmware; reflash ESPHome to go back to Home Assistant.",
+    "notes": "ESP32-S3 + XMOS voice puck: dual mics, speaker, 3.5mm out, LED ring, rotary dial, hardware mute. Under Muse it is push-to-talk with status on the LED ring and the dial as volume; replies show as text in the Muse app. Flashing Muse replaces the ESPHome firmware; reflash ESPHome to go back to Home Assistant.",
     "est_used_price_usd_min": 69,
     "est_used_price_usd_max": 69,
     "image_url": "https://www.home-assistant.io/images/voice-pe/vpe-top.webp",
@@ -1952,7 +1952,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://docs.waveshare.com/ESP32-S3-Touch-AMOLED-1.75C",
@@ -2007,7 +2007,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://aipi.com/pages/manual",
@@ -2113,7 +2113,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://wiki.seeedstudio.com/watcher_hardware_overview/",
@@ -2121,7 +2121,7 @@
     ],
     "community_size_bucket": "small",
     "notes": "ESP32-S3 + Himax vision chip, 5MP camera, 1.45\" round touch LCD, mic, speaker, scroll wheel. Full Muse UI plus camera.capture, so Muse can look at a room or a 3D printer. Camera and on-device vision mean high privacy exposure; place it deliberately.",
-    "est_used_price_usd_min": 55,
+    "est_used_price_usd_min": 61,
     "est_used_price_usd_max": 61,
     "image_url": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-113991315-sensecap-watcher-w1-a_1.jpg",
     "est_setup_hours_min": 1,
@@ -2168,7 +2168,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://docs.m5stack.com/en/core/StickS3",
@@ -2231,7 +2231,7 @@
       "https://github.com/m5stack/M5StickCPlus2"
     ],
     "community_size_bucket": "active",
-    "notes": "ESP32 stick (2MB PSRAM) with 1.14\" LCD, mic, buzzer, IMU, IR, 200mAh battery. Full Muse UI with push-to-talk, but buzzer only, so replies can't be spoken on-device. M5Stack lists it as end-of-life; buy the StickS3 unless you already own one.",
+    "notes": "ESP32 stick (2MB PSRAM) with 1.14\" LCD, mic, buzzer, IMU, IR, 200mAh battery. Full Muse UI with push-to-talk, but it has a buzzer, not a speaker, so replies are quiet; they show as text on the screen. M5Stack lists it as end-of-life; buy the StickS3 unless you already own one.",
     "est_used_price_usd_min": 15,
     "est_used_price_usd_max": 20,
     "image_url": "https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/512/K016-P2.webp",
@@ -2279,15 +2279,15 @@
     "hack_difficulty": 1,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/linux",
       "https://www.raspberrypi.com/documentation/"
     ],
     "community_size_bucket": "thriving",
-    "notes": "The board gadgets.muse.ai features for the Muse Linux SDK: install script, systemd service, and Muse gets shell, file and health commands as your user. Good host for Home Assistant plus a Muse bridge. Anything Muse runs here runs with your account's permissions.",
-    "est_used_price_usd_min": 50,
-    "est_used_price_usd_max": 120,
+    "notes": "The board gadgets.muse.ai features for the Muse Linux SDK: install script, systemd service, and Muse gets shell, file and health commands as your user. Good host for Home Assistant plus a Muse bridge. Anything Muse runs here runs with your account's permissions. List price after the April 2026 rise: 4GB $110, 8GB $175; prices vary by seller.",
+    "est_used_price_usd_min": 110,
+    "est_used_price_usd_max": 175,
     "est_setup_hours_min": 0.5,
     "est_setup_hours_max": 2,
     "buy_url": "https://www.raspberrypi.com/products/raspberry-pi-5/"

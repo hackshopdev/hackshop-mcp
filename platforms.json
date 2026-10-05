@@ -77,14 +77,39 @@
           "display_in": null
         },
         "note": "Status light and button. Muse's recommended starting point. The direct `idf.py build` command is correct; `tools/board.sh devkit build` also works.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command. No backup or workaround."
+        },
+        "flash": {
+          "port": "Native USB on the C5: /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -114,14 +139,40 @@
           "display_in": 1.9
         },
         "note": "No PSRAM, so no home-network tunnel; draws images straight to the screen.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command over its CH340 bridge."
+        },
+        "flash": {
+          "port": "This board has a CH340 USB bridge. It shows up as /dev/cu.usbserial-* or /dev/cu.wchusbserial* on macOS and /dev/ttyUSB* on Linux, not as usbmodem or ttyACM. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbserial-* /dev/cu.wchusbserial* 2>/dev/null || ls /dev/ttyUSB* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -151,14 +202,36 @@
           "display_in": 3.95
         },
         "note": "Air sensors only on D1S/D1Pro (temp/humidity via the bundled Grove AHT20).",
+        "difficulty": {
+          "level": "blue",
+          "why": "Its air sensors need Seeed's stock RP2040 firmware, which you keep while flashing the ESP32-S3."
+        },
+        "flash": {
+          "port": "This board has a CH340 USB bridge. It shows up as /dev/cu.usbserial-* or /dev/cu.wchusbserial* on macOS and /dev/ttyUSB* on Linux, not as usbmodem or ttyACM. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbserial-* /dev/cu.wchusbserial* 2>/dev/null || ls /dev/ttyUSB* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md",
+          "warning": "Seeed SenseCAP Indicator: keep Seeed's stock RP2040 firmware. Muse reads the D1S and D1Pro sensors through the RP2040; the Muse build flashes only the ESP32-S3.",
+          "before": [
+            "Muse reads the D1S and D1Pro sensors through the RP2040, which needs Seeed's stock RP2040 firmware. Leave the RP2040 as it shipped; the Muse build flashes the ESP32-S3."
+          ]
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Seeed cable is USB-C to USB-A and carries USB 3.1 data ($2.50 on 2026-10-05). If your computer has only USB-C ports, use the USB-C to USB-C option.",
+            "buy_url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 3,
+            "alternatives": [
+              {
+                "label": "Adafruit (USB-C to USB-C)",
+                "url": "https://www.adafruit.com/product/4199",
+                "note": "USB 3.1 cable with all data pins connected, 1 m, $9.95 on 2026-10-05.",
+                "est_price_usd": 10
+              }
+            ]
           },
           {
             "name": "Pick the D1S or D1Pro variant for air sensors",
@@ -166,6 +239,14 @@
             "required": false,
             "note": "The base D1 has no CO2/tVOC sensors; Muse can only read sensors the variant has.",
             "buy_url": "https://www.seeedstudio.com/SenseCAP-Indicator-D1Pro-p-5644.html"
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -195,14 +276,40 @@
           "display_in": 7.5
         },
         "note": "Status text and black-and-white images on 7.5\" e-paper.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command over its CH340 bridge."
+        },
+        "flash": {
+          "port": "This board has a CH340 USB bridge. It shows up as /dev/cu.usbserial-* or /dev/cu.wchusbserial* on macOS and /dev/ttyUSB* on Linux, not as usbmodem or ttyACM. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbserial-* /dev/cu.wchusbserial* 2>/dev/null || ls /dev/ttyUSB* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Seeed cable is USB-C to USB-A and carries USB 3.1 data ($2.50 on 2026-10-05). If your computer has only USB-C ports, use the USB-C to USB-C option.",
+            "buy_url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 3,
+            "alternatives": [
+              {
+                "label": "Adafruit (USB-C to USB-C)",
+                "url": "https://www.adafruit.com/product/4199",
+                "note": "USB 3.1 cable with all data pins connected, 1 m, $9.95 on 2026-10-05.",
+                "est_price_usd": 10
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -232,14 +339,40 @@
           "display_in": 7.3
         },
         "note": "Status text and six-colour images on 7.3\" e-paper.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command over its CH340 bridge."
+        },
+        "flash": {
+          "port": "This board has a CH340 USB bridge. It shows up as /dev/cu.usbserial-* or /dev/cu.wchusbserial* on macOS and /dev/ttyUSB* on Linux, not as usbmodem or ttyACM. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbserial-* /dev/cu.wchusbserial* 2>/dev/null || ls /dev/ttyUSB* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Seeed cable is USB-C to USB-A and carries USB 3.1 data ($2.50 on 2026-10-05). If your computer has only USB-C ports, use the USB-C to USB-C option.",
+            "buy_url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 3,
+            "alternatives": [
+              {
+                "label": "Adafruit (USB-C to USB-C)",
+                "url": "https://www.adafruit.com/product/4199",
+                "note": "USB 3.1 cable with all data pins connected, 1 m, $9.95 on 2026-10-05.",
+                "est_price_usd": 10
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -268,7 +401,21 @@
           "round_display": false,
           "display_in": null
         },
-        "note": "Status on the LED ring, push-to-talk, dial as volume.",
+        "note": "Status on the LED ring, push-to-talk, dial as volume. Replies show as text in the Muse app.",
+        "difficulty": {
+          "level": "green",
+          "why": "One flash command over its own USB. It replaces the ESP32-S3 firmware only and leaves the audio chip alone."
+        },
+        "flash": {
+          "warning": "Home Assistant Voice PE: flashing replaces the firmware on the ESP32-S3 only. Never reflash the XMOS audio chip; it keeps its own firmware.",
+          "port": "It flashes through the S3's own USB-Serial-JTAG: /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux, like a DevKitC-1. With other boards plugged in, pass the port and check it with python -m esptool -p PORT read-mac before flashing.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "never": [
+            "Never reflash the XMOS audio chip."
+          ],
+          "after": "Once voice chat is ready, the centre button is push-to-talk. Turn the mute switch on to get its setup role back (pairing confirmation and the 5 s reset hold).",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
         "parts": [
           {
             "name": "USB-C power supply (5 V / 2 A)",
@@ -282,9 +429,18 @@
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
           }
         ],
         "try_saying": [
@@ -314,14 +470,32 @@
           "display_in": 1.75
         },
         "note": "Round AMOLED avatar; best desk object.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
           },
           {
             "name": "3.7 V Li-ion cell with MX1.25 connector",
@@ -331,6 +505,14 @@
             "info_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.75c.htm",
             "search": "3.7V Li-ion cell MX1.25 connector",
             "est_price_usd": 8
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -360,14 +542,40 @@
           "display_in": null
         },
         "note": "Palm-size voice buddy with a snap-on battery and a two-button menu.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -397,14 +605,32 @@
           "display_in": 1.8
         },
         "note": "No PSRAM: voice notes go over the control session and replies come back as scrolling text.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
           },
           {
             "name": "3.7 V Li-ion cell with MX1.25 connector",
@@ -414,6 +640,14 @@
             "info_url": "https://docs.waveshare.com/ESP32-C6-Touch-AMOLED-1.8",
             "search": "3.7V Li-ion cell MX1.25 connector thin",
             "est_price_usd": 8
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -443,14 +677,65 @@
           "display_in": 1.45
         },
         "note": "camera.capture returns a JPEG (CONFIG_MUSE_WATCHER_CAMERA=y).",
+        "stand_note": "No printed stand yet for this board; it sits flat on a desk.",
+        "difficulty": {
+          "level": "blue",
+          "why": "Back up its nvsfactory partition first, flash through the CH342 port ending in 3, and wait about 3 minutes for the paced flash."
+        },
+        "flash": {
+          "warning": "SenseCAP Watcher: back up the nvsfactory partition (read-flash 0x9000 0x32000) before the first flash, use the CH342 port ending in 3, and flash only with tools/muse/board.sh flash watcher. It shows nothing for about 3 minutes; don't interrupt it.",
+          "connector_note": "Use the bottom USB-C port; its CH342 bridge carries the ESP32-S3 console.",
+          "port": "Use the bottom USB-C port. Its CH342 bridge shows up as two ports, both /dev/cu.usbmodem* on macOS. Use the port ending in 3: that is the ESP32-S3 console. The first one is the Himax camera chip.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* /dev/ttyUSB* 2>/dev/null",
+          "before": [
+            "Flash only with tools/muse/board.sh flash watcher PORT. It sends 64 bytes at a time at 115200 baud. Plain esptool and idf.py flash fail on the CH342 (0107: Checksum error, or 0105) after they have erased the bootloader, so the board can't boot until a flash succeeds. It isn't bricked: the ROM loader still answers.",
+            "A lower baud or another USB port doesn't help, and WCH's driver isn't needed on macOS.",
+            "Camera capture is off by default. To use it, turn on CONFIG_MUSE_WATCHER_CAMERA=y (menuconfig > Muse > SenseCAP Watcher camera capture and live preview) and rebuild."
+          ],
+          "backup": {
+            "what": "the Watcher's nvsfactory partition (its factory data at 0x9000, unique to each Watcher, which Muse overwrites)",
+            "commands": [
+              "tools/muse/paced_esptool.py --chip esp32s3 -p PORT read-flash 0x9000 0x32000 nvsfactory.bin"
+            ],
+            "file": "nvsfactory.bin",
+            "bytes": 204800,
+            "restore_note": "To go back to Seeed's firmware, flash it first, then write the backup back:",
+            "restore": [
+              "tools/muse/paced_esptool.py --chip esp32s3 -p PORT write-flash 0x9000 nvsfactory.bin"
+            ]
+          },
+          "duration_note": "A Watcher flash shows nothing for about 3 minutes. Don't interrupt it: that leaves the board unbootable again.",
+          "never": [
+            "Never flash the Watcher with plain esptool or idf.py flash.",
+            "Don't unplug the cable or stop the command while it flashes."
+          ],
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Seeed cable is USB-C to USB-A and carries USB 3.1 data ($2.50 on 2026-10-05). If your computer has only USB-C ports, use the USB-C to USB-C option.",
+            "buy_url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 3,
+            "alternatives": [
+              {
+                "label": "Adafruit (USB-C to USB-C)",
+                "url": "https://www.adafruit.com/product/4199",
+                "note": "USB 3.1 cable with all data pins connected, 1 m, $9.95 on 2026-10-05.",
+                "est_price_usd": 10
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -480,14 +765,65 @@
           "display_in": 1.14
         },
         "note": "Pocket stick with speaker, mic, IMU and battery; the best push-to-talk remote.",
+        "difficulty": {
+          "level": "blue",
+          "why": "The first flash needs a UiFlow2 REPL snippet to turn USB serial on, an 8 MB backup and --after no-reset."
+        },
+        "flash": {
+          "warning": "M5Stack StickS3 first flash: it ships with UiFlow2, which turns off USB serial, and it has no BOOT button. Turn USB serial on from the UiFlow2 REPL, back up the 8 MB flash, and pass --after no-reset to esptool until Muse is on.",
+          "port": "Native USB: once USB serial is on, it shows up as a USB JTAG/serial port, /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "before": [
+            "Put UiFlow2 in USB mode and open its REPL (for example with mpremote repl), then paste the snippet below. The REPL stops answering.",
+            "Unplug the USB cable and plug it back in. The battery keeps the stick running, and it shows up as a USB JTAG/serial port.",
+            "Anything that resets the stick now boots UiFlow2 again, so pass --after no-reset to esptool until Muse is on."
+          ],
+          "snippet": {
+            "language": "python",
+            "code": "import machine; m = machine.mem32\nm[0x600C001C] = m[0x600C001C] | (1 << 10)                 # USB serial clock on\nm[0x600C0024] = m[0x600C0024] & ~(1 << 10)                # and out of reset\nm[0x60038018] = 0x4200                                    # its pads on\nm[0x60008120] = (m[0x60008120] | (1 << 20)) & ~(1 << 19)  # give it the USB pins",
+            "note": "Paste this into the UiFlow2 REPL (from the Muse SDK's devices/README.md):"
+          },
+          "backup": {
+            "what": "the full 8 MB flash, so you can go back to UiFlow2",
+            "commands": [
+              "python -m esptool --chip esp32s3 -p PORT --after no-reset read-flash 0 0x800000 sticks3.bin"
+            ],
+            "file": "sticks3.bin",
+            "bytes": 8388608,
+            "restore_note": "To go back to UiFlow2, write the backup:",
+            "restore": [
+              "python -m esptool --chip esp32s3 -p PORT write-flash 0 sticks3.bin"
+            ]
+          },
+          "recovery": "There is no BOOT button: the power chip drives the boot pin. If esptool can't find the stick on the first flash, turn USB serial on with the REPL snippet above.",
+          "after": "Muse keeps the USB serial port on, so later flashes need none of this.",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -517,15 +853,57 @@
           "display_in": 1.14
         },
         "eol": true,
-        "note": "End of life at M5Stack; buzzer only, so no spoken replies.",
+        "note": "End of life at M5Stack. It has a buzzer, not a speaker, so replies are quiet; they show as text on the screen.",
+        "difficulty": {
+          "level": "blue",
+          "why": "Back up the 8 MB flash first, and flash at 230400 baud for its CH9102 bridge."
+        },
+        "flash": {
+          "warning": "M5Stack StickC Plus2: back up the 8 MB flash before the first flash. Its CH9102 USB bridge drops out above 230400 baud.",
+          "port": "Its CH9102 USB bridge shows up as /dev/cu.usbserial-* on macOS or /dev/ttyACM* on Linux.",
+          "list_ports": "ls /dev/cu.usbserial-* 2>/dev/null || ls /dev/ttyACM* /dev/ttyUSB* 2>/dev/null",
+          "before": [
+            "tools/muse/board.sh flash plus2 flashes at 230400 baud. Keep any esptool command you run by hand at -b 230400."
+          ],
+          "backup": {
+            "what": "the full 8 MB flash (M5Stack's factory firmware)",
+            "commands": [
+              "python -m esptool --chip esp32 -p PORT -b 230400 read-flash 0 0x800000 plus2.bin"
+            ],
+            "file": "plus2.bin",
+            "bytes": 8388608,
+            "restore_note": "To go back, write the backup with the same chip, port and baud:",
+            "restore": [
+              "python -m esptool --chip esp32 -p PORT -b 230400 write-flash 0 plus2.bin"
+            ]
+          },
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md"
+        },
         "parts": [
           {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,
-            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables.",
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
             "search": "USB-C data cable",
-            "est_price_usd": 8
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
           }
         ],
         "try_saying": [
@@ -542,7 +920,7 @@
       "https://gadgets.muse.ai/sdk-terms",
       "https://www.engadget.com/2276312/meta-muse-gadgets-open-source-smart-home-link/"
     ],
-    "last_verified": "2026-10-02"
+    "last_verified": "2026-10-05"
   },
   {
     "id": "muse-linux",
@@ -611,6 +989,11 @@
           "compute": "standard"
         },
         "note": "Featured on gadgets.muse.ai.",
+        "price_note": "List price after the April 2026 rise: 4GB $110, 8GB $175. Prices vary by seller.",
+        "difficulty": {
+          "level": "green",
+          "why": "Raspberry Pi Imager for the SD card, then the SDK install script."
+        },
         "parts": [
           {
             "name": "Official 27 W USB-C power supply",
@@ -654,6 +1037,10 @@
           "compute": "standard"
         },
         "note": "Listed in the Linux SDK README.",
+        "difficulty": {
+          "level": "green",
+          "why": "Raspberry Pi Imager for the SD card, then the SDK install script."
+        },
         "parts": [
           {
             "name": "USB-C power supply (5.1 V / 3 A)",
@@ -689,6 +1076,11 @@
           "compute": "light"
         },
         "note": "Listed in the Linux SDK README; slow but enough for shell and file commands.",
+        "price_note": "List price $15. Prices vary by seller.",
+        "difficulty": {
+          "level": "green",
+          "why": "Raspberry Pi Imager for the SD card, then the SDK install script."
+        },
         "parts": [
           {
             "name": "Micro-USB power supply (5 V / 2.5 A)",
@@ -724,6 +1116,10 @@
           "compute": "desktop"
         },
         "note": "Not on Meta's list. Meets the stated requirements on Debian/Ubuntu if it has Bluetooth LE; most units need a USB BLE adapter.",
+        "difficulty": {
+          "level": "blue",
+          "why": "You install Debian or Ubuntu yourself and add a USB Bluetooth LE adapter."
+        },
         "parts": [
           {
             "name": "USB Bluetooth LE adapter",
@@ -759,6 +1155,10 @@
           "compute": "desktop"
         },
         "note": "Not on Meta's list. Add a USB Bluetooth LE adapter.",
+        "difficulty": {
+          "level": "blue",
+          "why": "You install Debian or Ubuntu yourself and add a USB Bluetooth LE adapter."
+        },
         "parts": [
           {
             "name": "USB Bluetooth LE adapter",
@@ -794,6 +1194,10 @@
           "compute": "desktop"
         },
         "note": "Not on Meta's list. Many NUCs ship with Bluetooth; check yours.",
+        "difficulty": {
+          "level": "blue",
+          "why": "You install Debian or Ubuntu yourself, and add a USB Bluetooth LE adapter if it has no Bluetooth."
+        },
         "parts": [
           {
             "name": "USB Bluetooth LE adapter (only if yours has none)",
@@ -821,6 +1225,10 @@
           "compute": "desktop"
         },
         "note": "Not on Meta's list. Bluetooth depends on the Wi-Fi card fitted; add a USB BLE adapter if missing.",
+        "difficulty": {
+          "level": "blue",
+          "why": "You install Debian or Ubuntu yourself, and add a USB Bluetooth LE adapter if it has no Bluetooth."
+        },
         "parts": [
           {
             "name": "USB Bluetooth LE adapter (only if yours has none)",

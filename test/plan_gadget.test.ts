@@ -75,15 +75,15 @@ describe("plan_gadget", () => {
     }
   });
 
-  it("uses inferred size to rank desk and pocket voice boards", () => {
+  it("ranks the cheapest board that meets the needs first; size fit breaks ties", () => {
     const desk = run({ idea: "a desk gadget I can talk to", budget_usd: 60 });
-    const deskBoard = boardFor(desk.picks[0]!.device_id);
 
     expect(desk.inferred_size).toBe("desk");
     expect(desk.inferred_preferences).toEqual(["desk"]);
-    expect(desk.picks[0]?.device_id).not.toBe("m5stack-sticks3");
-    expect(deskBoard.fits).toContain("desk");
     expect(desk.picks[0]?.needs_met).toContain("voice");
+    const totals = desk.picks.map((pick) => pick.est_total_usd ?? Infinity);
+    expect(totals).toEqual([...totals].sort((a, b) => a - b));
+    expect(desk.picks.some((pick) => boardFor(pick.device_id).fits?.includes("desk"))).toBe(true);
 
     const pocket = run({ idea: "a pocket remote I can talk to", budget_usd: 60 });
 
@@ -135,15 +135,21 @@ describe("plan_gadget", () => {
     expect(out.warnings).toContain('Unknown device id "nope" (not in the catalog); ignored.');
   });
 
-  it("returns intake questions for vague ideas but not specific ones", () => {
+  it("returns intake questions until the intake is answered, even for specific ideas", () => {
     const vague = run({ idea: "a body for you" });
     const specific = run({ idea: "a desk gadget I can talk to" });
 
-    expect(vague.questions.length).toBeGreaterThan(0);
-    expect(vague.questions.length).toBeLessThanOrEqual(4);
+    expect(vague.questions.length).toBe(4);
+    expect(vague.intake).toEqual({ complete: false, missing: ["size", "interaction", "sensing", "budget"] });
     expect(vague.questions.find((question) => question.id === "size")?.options)
       .toContainEqual(expect.objectContaining({ value: "hidden", size: "hidden" }));
-    expect(specific.questions).toEqual([]);
+    expect(specific.intake.complete).toBe(false);
+    expect(specific.questions.map((question) => question.id)).toEqual([
+      "size",
+      "interaction",
+      "sensing",
+      "budget",
+    ]);
   });
 
   it("formats bad input as a tool error without raw Zod JSON", async () => {
