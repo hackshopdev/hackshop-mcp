@@ -1,4 +1,5 @@
 import { buildUrls } from "../build-plan/index.js";
+import { difficultySummary } from "./difficulty.js";
 import { getBuildPlan } from "./tools.js";
 import type { CoreContext, DeviceEntry, Platform, PlatformBoard } from "./types.js";
 
@@ -34,21 +35,21 @@ export const CORE_RESOURCES: CoreResource[] = [
     uri: "hackshop://muse/boards",
     name: "muse-boards",
     title: "Muse boards",
-    description: "Every Hackshop Muse board with features, price and build-page URL.",
+    description: "Every hackshop Muse board with features, price, difficulty and build-page URL. For one board's full build plan, read hackshop://build/{device_id} (listed under resources/templates/list), e.g. hackshop://build/seeed-sensecap-watcher.",
     mimeType: "application/json",
   },
   {
     uri: "hackshop://muse/sdk-terms",
     name: "muse-sdk-terms",
     title: "Muse SDK terms",
-    description: "Plain-English summary of the Muse SDK token terms.",
+    description: "Plain-English summary of the Muse SDK token terms. Build plans are at hackshop://build/{device_id} (see resources/templates/list).",
     mimeType: "text/plain",
   },
   {
     uri: "hackshop://catalog/tags",
     name: "catalog-tags",
     title: "Catalog tags",
-    description: "The Hackshop catalog tag list.",
+    description: "The hackshop catalog tag list.",
     mimeType: "text/plain",
   },
 ];
@@ -58,7 +59,7 @@ export const CORE_RESOURCE_TEMPLATES: CoreResourceTemplate[] = [
     uriTemplate: "hackshop://build/{device_id}",
     name: "build-plan",
     title: "Build plan",
-    description: "Build plan JSON for a Hackshop catalog device id.",
+    description: "Build plan JSON for a hackshop catalog device id: difficulty, flash warnings, parts, shopping list, steps and assembly. Example: hackshop://build/seeed-sensecap-watcher.",
     mimeType: "application/json",
   },
 ];
@@ -134,6 +135,25 @@ export function readCoreResource(
   return null;
 }
 
+export const EXAMPLE_BUILD_URI = "hackshop://build/seeed-sensecap-watcher";
+
+/** A helpful message for a resources/read that can't be resolved. */
+export function resourceNotFoundMessage(uri: string, ctx: CoreContext): string {
+  if (uri.includes("{") || uri.includes("}")) {
+    return `${uri} is a URI template, not a resource. Replace {device_id} with a catalog device id, for example ${EXAMPLE_BUILD_URI}. resources/templates/list lists the template; hackshop://muse/boards lists the board ids.`;
+  }
+  const buildMatch = uri.match(/^hackshop:\/\/build\/([^/]*)$/);
+  if (buildMatch) {
+    const id = decodeURIComponent(buildMatch[1] ?? "");
+    const known = ctx.platforms.flatMap((platform) => platform.boards.map((board) => board.device_id));
+    return `Unknown device_id "${id}" in ${uri}. Try ${EXAMPLE_BUILD_URI}, or read hackshop://muse/boards for every id${known.length > 0 ? ` (e.g. ${known.slice(0, 3).join(", ")})` : ""}.`;
+  }
+  return `Unknown resource: ${uri}. Available: ${CORE_RESOURCES.map((resource) => resource.uri).join(", ")}, plus the template hackshop://build/{device_id} (e.g. ${EXAMPLE_BUILD_URI}).`;
+}
+
+/** JSON-RPC code MCP uses for "resource not found". */
+export const RESOURCE_NOT_FOUND_CODE = -32002;
+
 export function listCorePrompts(): CorePrompt[] {
   return CORE_PROMPTS;
 }
@@ -151,7 +171,7 @@ export function getCorePrompt(
     : "";
 
   return {
-    description: "Plan and build a Muse gadget body with explicit human purchase approval.",
+    description: "Plan and build a Muse gadget body; the human approves every order.",
     messages: [
       {
         role: "user",
@@ -159,7 +179,7 @@ export function getCorePrompt(
           type: "text",
           text:
             `Help me build a physical body for my AI agent. Idea: ${idea || "<ask me for the idea>"}.${budget}\n\n` +
-            "Flow: ask at most four intake questions if the idea is vague, using `plan_gadget.questions`. Then call `plan_gadget` (or POST /api/plan) and let the human choose a board. Call `get_build_plan` for the chosen board, show the shopping list and get explicit approval before buying anything. Follow the machine-readable `assembly` steps, then flash and pair it. Tell the human to click Start a build on the build page so progress is saved.",
+            "Flow: ask the four intake questions from `intake_gadget` (skip any already answered), then call `plan_gadget` with `answers` (or POST /api/plan) and let the human choose a board; mention its difficulty. Call `get_build_plan` for the chosen board and read its `warnings` before flashing. Show the exact items, sellers and total, then ask \"Place this order for $<total> at <seller>?\" and wait for a clear yes before checking out; for sites without automated checkout (Amazon and eBay don't allow it), give the human the links. Follow the machine-readable `assembly` steps and their `verify` checks, then flash and pair it. Tell the human to click Start a build on the build page so progress is saved.",
         },
       },
     ],
@@ -185,6 +205,8 @@ function museBoards(ctx: CoreContext) {
           label: priceLabel(device),
         },
         features: board.features,
+        difficulty: difficultySummary(board.difficulty),
+        flash_warning: board.flash?.warning ?? null,
         build_command: board.build,
         build_page_url: buildUrls(device.id, ctx.siteUrl, true).build_page,
       }];

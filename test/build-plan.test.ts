@@ -1,7 +1,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { PURCHASE_POLICY, buildPlan } from "../src/build-plan/index.js";
+import {
+  PRICE_CHECKED,
+  PURCHASE_CONFIRM_PHRASE,
+  PURCHASE_POLICY,
+  buildPlan,
+} from "../src/build-plan/index.js";
 import type { BuildPlan } from "../src/build-plan/types.js";
 import { loadCatalog } from "../src/catalog/load.js";
 import type { DeviceEntry } from "../src/catalog/schema.js";
@@ -58,7 +63,9 @@ describe("buildPlan", () => {
         expect.objectContaining({
           kind: "part",
           name: "USB-C data cable",
-          search_url: expect.stringContaining("amazon.com/s?k=USB-C%20data%20cable"),
+          buy_url: "https://www.adafruit.com/product/4199",
+          search_url: null,
+          alternatives: [expect.objectContaining({ url: expect.stringContaining("seeedstudio.com") })],
         }),
         expect.objectContaining({
           kind: "printed",
@@ -92,11 +99,14 @@ describe("buildPlan", () => {
     expect(plan.agent_brief_md).not.toContain("--sdk-token");
     expect(plan.agent_brief_md).not.toContain("Linux service is paired");
     expect(plan.agent_brief_md).not.toMatch(/mgst_[A-Za-z0-9]{8,}/);
-    expect(plan.shopping_list.est_total_usd).toBe(30);
+    expect(plan.shopping_list.est_total_usd).toBe(32);
+    expect(plan.shopping_list.price_checked).toBe(PRICE_CHECKED);
     expect(plan.shopping_list.purchase_policy).toBe(PURCHASE_POLICY);
-    expect(plan.shopping_list.notes).toContain(
-      "Prices are estimates before shipping and tax. M5Stack, Waveshare and Seeed often ship from China (1 to 3 weeks); Amazon or a US reseller is usually faster.",
-    );
+    expect(plan.shopping_list.purchase_policy).toContain(PURCHASE_CONFIRM_PHRASE);
+    expect(plan.shopping_list.notes[0]).toMatch(/^Prices are estimates checked on 2026-10-05/);
+    expect(plan.difficulty).toMatchObject({ level: "blue", label: "Intermediate" });
+    expect(plan.agent_brief_md.split("\n")[1]).toMatch(/^Difficulty: Intermediate/);
+    expect(plan.warnings.join("\n")).toMatch(/UiFlow2/);
     expect(plan.shopping_list.store_url).toBe("https://www.hackshop.dev/store#sticks3");
     expect(plan.shopping_list.store_json_url).toBe("https://www.hackshop.dev/store.json");
     expect(plan.shopping_list.items[0]).toMatchObject({
@@ -119,12 +129,13 @@ describe("buildPlan", () => {
     });
     expect(plan.assembly.map((step) => step.action)).toEqual([
       "power",
+      "backup",
       "flash",
       "pair",
-      "verify",
       "print",
       "place",
       "route_cable",
+      "verify",
     ]);
     expect(plan.assembly.filter((step) => step.optional).map((step) => step.action)).toEqual([
       "print",

@@ -11,6 +11,7 @@ const FIELD_LABELS: Record<string, string> = {
   device_id: "`device_id`",
   device_name: "`device_name`",
   size: "`size`",
+  answers: "`answers`",
 };
 
 export function formatInputError(toolName: string, zodError: z.ZodError): string {
@@ -33,7 +34,9 @@ function formatIssue(issue: z.ZodIssue): string {
       return `${field} must be at least ${issue.minimum} characters.`;
     }
     if (issue.type === "number") {
-      return `${field} must be at least ${issue.minimum}.`;
+      return issue.inclusive
+        ? `${field} must be at least ${issue.minimum}.`
+        : `${field} must be greater than ${issue.minimum}.`;
     }
     if (issue.type === "array") {
       return `${field} must include at least ${issue.minimum} item${issue.minimum === 1 ? "" : "s"}.`;
@@ -45,8 +48,9 @@ function formatIssue(issue: z.ZodIssue): string {
       return `${field} must be at most ${issue.maximum} characters.`;
     }
     if (issue.type === "number") {
-      const got = typeof issue.path.at(-1) === "number" ? "" : "";
-      return `${field} must be at most ${issue.maximum}${got}.`;
+      return issue.inclusive
+        ? `${field} must be at most ${issue.maximum}.`
+        : `${field} must be less than ${issue.maximum}.`;
     }
     if (issue.type === "array") {
       return `${field} must include at most ${issue.maximum} items.`;
@@ -54,7 +58,16 @@ function formatIssue(issue: z.ZodIssue): string {
   }
 
   if (issue.code === "invalid_type") {
+    if (issue.received === "undefined") return `${field} is required.`;
     return `${field} must be ${issue.expected}.`;
+  }
+
+  if (issue.code === "unrecognized_keys") {
+    return `${field} has unknown key${issue.keys.length === 1 ? "" : "s"}: ${issue.keys.join(", ")}.`;
+  }
+
+  if (issue.code === "invalid_union") {
+    return `${field} doesn't match any allowed shape.`;
   }
 
   if (issue.code === "custom") {

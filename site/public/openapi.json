@@ -1,0 +1,650 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "hackshop planner API",
+    "version": "0.0.6",
+    "description": "Deterministic Muse gadget planner (no LLM, no key). The same planner as the plan_gadget MCP tool at https://www.hackshop.dev/mcp. Ask the human the intake questions first, then send their answers. hackshop never buys anything.",
+    "license": {
+      "name": "MIT",
+      "url": "https://github.com/hackshopdev/hackshop-mcp/blob/main/LICENSE"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://www.hackshop.dev"
+    }
+  ],
+  "externalDocs": {
+    "description": "Agent guide",
+    "url": "https://www.hackshop.dev/agents.md"
+  },
+  "paths": {
+    "/api/plan": {
+      "get": {
+        "operationId": "planGadgetGet",
+        "summary": "Plan a Muse gadget from query parameters",
+        "description": "Rate limited to 120 requests per 10 minutes per IP; don't loop.",
+        "parameters": [
+          {
+            "name": "idea",
+            "in": "query",
+            "required": false,
+            "description": "The gadget idea, 3-2000 characters. Optional when answers or needs are given.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "budget_usd",
+            "in": "query",
+            "required": false,
+            "description": "All-in hardware budget in USD, greater than 0.",
+            "schema": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          {
+            "name": "needs",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated needs.",
+            "schema": {
+              "type": "string",
+              "example": "voice,camera"
+            }
+          },
+          {
+            "name": "platform",
+            "in": "query",
+            "required": false,
+            "description": "muse-esp32, muse-linux or any.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "muse-esp32",
+                "muse-linux",
+                "any"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Number of picks, 1-5.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "description": "Intake answer: where it lives.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pocket",
+                "desk",
+                "wall",
+                "hidden"
+              ]
+            }
+          },
+          {
+            "name": "interaction",
+            "in": "query",
+            "required": false,
+            "description": "Intake answer: how you interact.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "voice",
+                "touch",
+                "light-button"
+              ]
+            }
+          },
+          {
+            "name": "sensing",
+            "in": "query",
+            "required": false,
+            "description": "Intake answer: room sensing.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "camera",
+                "air-quality",
+                "none"
+              ]
+            }
+          },
+          {
+            "name": "budget",
+            "in": "query",
+            "required": false,
+            "description": "Intake answer: budget band.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "under-25",
+                "under-50",
+                "under-100",
+                "no-limit"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Plan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, with a plain error message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "planGadget",
+        "summary": "Plan a Muse gadget",
+        "description": "Rate limited to 120 requests per 10 minutes per IP; don't loop.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanRequest"
+              },
+              "example": {
+                "idea": "a desk buddy I can talk to",
+                "answers": {
+                  "size": "desk",
+                  "interaction": "voice",
+                  "sensing": "none",
+                  "budget": "under-50"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Plan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, with a plain error message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IntakeAnswers": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "The human's intake answers. Each value maps to needs, size or budget exactly as the planner's intake questions declare.",
+        "properties": {
+          "size": {
+            "type": "string",
+            "enum": [
+              "pocket",
+              "desk",
+              "wall",
+              "hidden"
+            ],
+            "description": "Where it lives. pocket adds need battery; wall adds big-screen; hidden adds home-tunnel. Also sets the size."
+          },
+          "interaction": {
+            "type": "string",
+            "enum": [
+              "voice",
+              "touch",
+              "light-button"
+            ],
+            "description": "voice adds need voice; touch adds screen and touch; light-button adds home-tunnel."
+          },
+          "sensing": {
+            "type": "string",
+            "enum": [
+              "camera",
+              "air-quality",
+              "none"
+            ],
+            "description": "camera adds need camera; air-quality adds air-sensors."
+          },
+          "budget": {
+            "type": "string",
+            "enum": [
+              "under-25",
+              "under-50",
+              "under-100",
+              "no-limit"
+            ],
+            "description": "Sets budget_usd to 25, 50 or 100; no-limit leaves it unset."
+          }
+        }
+      },
+      "PlanRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Give an idea, intake answers or needs (at least one).",
+        "properties": {
+          "idea": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 2000,
+            "description": "The gadget idea in plain words. Optional when answers or needs are given."
+          },
+          "answers": {
+            "$ref": "#/components/schemas/IntakeAnswers"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "muse-esp32",
+              "muse-linux",
+              "any"
+            ],
+            "default": "any"
+          },
+          "budget_usd": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 100000,
+            "description": "All-in hardware budget in USD. Wins over answers.budget."
+          },
+          "owned_device_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50
+          },
+          "needs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "voice",
+                "screen",
+                "images",
+                "touch",
+                "camera",
+                "air-sensors",
+                "e-ink",
+                "battery",
+                "round",
+                "home-tunnel",
+                "big-screen",
+                "compute",
+                "linux"
+              ]
+            }
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "pocket",
+              "desk",
+              "wall",
+              "hidden",
+              "any"
+            ],
+            "default": "any",
+            "description": "Wins over answers.size."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "default": 3
+          }
+        }
+      },
+      "IntakeQuestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "size",
+              "interaction",
+              "sensing",
+              "budget"
+            ]
+          },
+          "question": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "needs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "size": {
+                  "type": "string"
+                },
+                "budget_usd": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "label",
+                "value"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "why",
+          "options"
+        ]
+      },
+      "Pick": {
+        "type": "object",
+        "properties": {
+          "device_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "platform_id": {
+            "type": "string"
+          },
+          "support": {
+            "type": "string",
+            "enum": [
+              "official",
+              "possible"
+            ]
+          },
+          "tier_label": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          },
+          "gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "needs_met": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "est_total_usd": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "All-in estimate: board plus required parts."
+          },
+          "within_budget": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "price_label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "difficulty": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Difficulty"
+              }
+            ]
+          },
+          "build_page_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "agent_brief_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Board-specific flashing warnings."
+          },
+          "caveats": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "device_id",
+          "name",
+          "why",
+          "needs_met",
+          "build_page_url"
+        ]
+      },
+      "Difficulty": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "green",
+              "blue",
+              "black"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "enum": [
+              "Beginner",
+              "Intermediate",
+              "Expert"
+            ]
+          },
+          "short": {
+            "type": "string"
+          },
+          "why": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "level",
+          "label",
+          "why"
+        ]
+      },
+      "PlanResponse": {
+        "type": "object",
+        "properties": {
+          "inferred_needs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "inferred_size": {
+            "type": "string"
+          },
+          "budget_usd": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "fit": {
+            "type": "string",
+            "enum": [
+              "all",
+              "partial",
+              "none"
+            ],
+            "description": "none when no board that meets the hard needs fits the budget."
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "difficulty_note": {
+            "type": "string",
+            "description": "Present when the idea needs movement or arms."
+          },
+          "intake": {
+            "type": "object",
+            "properties": {
+              "complete": {
+                "type": "boolean"
+              },
+              "missing": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "complete",
+              "missing"
+            ]
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IntakeQuestion"
+            },
+            "description": "The intake questions still unanswered."
+          },
+          "picks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Pick"
+            }
+          },
+          "terms": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "next_steps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "inferred_needs",
+          "fit",
+          "notes",
+          "warnings",
+          "intake",
+          "questions",
+          "picks"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    }
+  }
+}

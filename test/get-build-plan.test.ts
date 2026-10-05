@@ -28,7 +28,7 @@ describe("get_build_plan MCP tool", () => {
       "assemble",
       "try",
     ]);
-    expect(plan.shopping_list.purchase_policy).toContain("explicit approval");
+    expect(plan.shopping_list.purchase_policy).toContain("Place this order for $<total> at <seller>?");
     expect(plan.urls.build_page).toBe("https://www.hackshop.dev/build/m5stack-sticks3");
   });
 

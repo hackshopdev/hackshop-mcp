@@ -1,4 +1,37 @@
+import type { BoardDifficulty, DifficultySummary } from "../core/difficulty.js";
+
 export type FeatureValue = boolean | string | number | null;
+export type { BoardDifficulty, DifficultySummary };
+
+export interface PlatformBoardPartAlternative {
+  label: string;
+  url: string;
+  note?: string;
+  est_price_usd?: number;
+}
+
+/** Board-specific flashing hazards from the Muse SDK docs (platforms.json `flash`). */
+export interface FlashOverlay {
+  warning?: string;
+  connector_note?: string;
+  port?: string;
+  list_ports?: string;
+  before?: string[];
+  snippet?: { language: string; code: string; note: string };
+  backup?: {
+    what: string;
+    commands: string[];
+    file: string;
+    bytes: number;
+    restore_note: string;
+    restore: string[];
+  };
+  duration_note?: string;
+  recovery?: string;
+  never?: string[];
+  after?: string;
+  source: string;
+}
 
 export interface DeviceEntry {
   id: string;
@@ -20,6 +53,7 @@ export interface PlatformBoardPart {
   info_url?: string;
   search?: string;
   est_price_usd?: number;
+  alternatives?: PlatformBoardPartAlternative[];
 }
 
 export interface PlatformBoard {
@@ -31,6 +65,10 @@ export interface PlatformBoard {
   chip?: "esp32" | "esp32c5" | "esp32c6" | "esp32s3";
   eol?: boolean;
   note: string;
+  price_note?: string;
+  stand_note?: string;
+  difficulty?: BoardDifficulty;
+  flash?: FlashOverlay;
   features: Record<string, FeatureValue>;
   parts: PlatformBoardPart[];
   try_saying: string[];
@@ -97,6 +135,7 @@ export interface BuildPlanPart {
   search: string | null;
   kind: "board" | "part" | "printed";
   est_price_usd: number | null;
+  alternatives?: PlatformBoardPartAlternative[];
 }
 
 export interface BuildPlanStep {
@@ -106,6 +145,21 @@ export interface BuildPlanStep {
   body_md: string;
   commands: string[];
   links: Array<{ label: string; url: string }>;
+}
+
+export type AssemblyVerifyMethod =
+  | "serial_log"
+  | "status_light"
+  | "muse_app"
+  | "command"
+  | "file"
+  | "visual";
+
+/** A machine-checkable check: what to look at and the exact thing to expect. */
+export interface AssemblyVerify {
+  method: AssemblyVerifyMethod;
+  expect: string;
+  command?: string;
 }
 
 export interface AssemblyStep {
@@ -119,6 +173,7 @@ export interface AssemblyStep {
     | "route_cable"
     | "fasten"
     | "power"
+    | "backup"
     | "flash"
     | "pair"
     | "verify";
@@ -126,6 +181,10 @@ export interface AssemblyStep {
   tools: string[];
   instruction: string;
   check: string;
+  connector: string | null;
+  pose: string | null;
+  force_note: string | null;
+  verify: AssemblyVerify[];
   robot: {
     feasible: boolean;
     notes: string;
@@ -151,6 +210,7 @@ export interface ShoppingList {
   }>;
   est_total_usd: number | null;
   currency: "USD";
+  price_checked: string;
   purchase_policy: string;
   notes: string[];
   store_url: string;
@@ -171,6 +231,9 @@ export interface BuildPlan {
   assembly: AssemblyStep[];
   try_saying: string[];
   caveats: string[];
+  warnings: string[];
+  difficulty: DifficultySummary | null;
+  flash: FlashOverlay | null;
   terms: { summary: string; url: string } | null;
   agent_brief_md: string;
   urls: { build_page: string; build_md: string; muse_page: string | null };

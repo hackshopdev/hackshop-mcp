@@ -36,6 +36,16 @@ export const BOARD_SLUGS: Record<string, string> = {
   "raspberry-pi-5": "raspberry-pi-5",
   "raspberry-pi-4b": "raspberry-pi-4b",
   "raspberry-pi-zero-2w": "raspberry-pi-zero-2w",
+  "espressif-esp32-c6-devkitc-1": "esp32-c6-devkitc",
+  "espressif-esp32-s3-devkitc-1": "esp32-s3-devkitc",
+  "waveshare-esp32-c6-lcd-1-47": "waveshare-c6-lcd-1-47",
+  "waveshare-esp32-s3-touch-amoled-1-75": "waveshare-amoled-1-75",
+  "espressif-esp32-s3-box-3": "esp32-s3-box-3",
+  "m5stack-stopwatch": "stopwatch",
+  "m5stack-cores3": "cores3",
+  "guition-jc3248w535": "jc3248w535",
+  "m5stack-core2-v1-0": "core2-v1-0",
+  "freenove-fnk0104b": "fnk0104b",
 };
 
 const DEVICE_BY_SLUG = new Map(
@@ -87,6 +97,18 @@ export const EBAY_QUERIES: Readonly<Record<string, string>> = {
   "hp-t620-plus": "HP t620 Plus thin client",
   "intel-nuc": "Intel NUC mini PC",
   "lenovo-thinkcentre-tiny": "Lenovo ThinkCentre Tiny",
+  "espressif-esp32-c6-devkitc-1": "ESP32-C6-DevKitC-1",
+  "espressif-esp32-s3-devkitc-1": "ESP32-S3-DevKitC-1 N8R8",
+  "waveshare-esp32-c6-lcd-1-47": "Waveshare ESP32-C6-LCD-1.47",
+  "seeed-respeaker-lite-xiao-esp32s3": "reSpeaker Lite XIAO ESP32S3",
+  "waveshare-esp32-s3-touch-amoled-1-75": "Waveshare ESP32-S3 AMOLED 1.75",
+  "espressif-esp32-s3-box-3": "ESP32-S3-BOX-3",
+  "m5stack-cardputer-adv": "M5Stack Cardputer ADV",
+  "m5stack-stopwatch": "M5Stack StopWatch",
+  "m5stack-cores3": "M5Stack CoreS3",
+  "guition-jc3248w535": "JC3248W535",
+  "m5stack-core2-v1-0": "M5Stack Core2",
+  "freenove-fnk0104b": "Freenove FNK0104B",
 };
 
 const RETAILERS: Array<[RegExp, string]> = [
@@ -101,6 +123,7 @@ const RETAILERS: Array<[RegExp, string]> = [
   [/(^|\.)digikey\.com$/, "Digi-Key"],
   [/(^|\.)adafruit\.com$/, "Adafruit"],
   [/(^|\.)sparkfun\.com$/, "SparkFun"],
+  [/(^|\.)freenove\.com$/, "Freenove"],
   [/(^|\.)ebay\.com$/, "eBay"],
 ];
 

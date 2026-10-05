@@ -2,6 +2,7 @@ import catalogJson from "../catalog.json";
 import platformsJson from "../platforms.json";
 import { boardSlug } from "./board-slugs";
 import { buildPlanForDevice } from "./build-plan-data";
+import { difficultySummary, type DifficultySummary } from "./core/difficulty";
 import { hasImage } from "./image-sources";
 import { Platforms, type Platform, type PlatformBoard } from "./platform-types";
 import {
@@ -29,6 +30,9 @@ export interface StorePart {
   url_kind: "buy" | "search" | null;
   seller: string | null;
   est_price_usd: number | null;
+  /** Other concrete product pages for the same part (e.g. USB-C to USB-A). */
+  alternatives: StoreLink[];
+  /** Used-part search; only boards get one now, so this is null for accessories. */
   ebay_url: string | null;
 }
 
@@ -44,6 +48,9 @@ export interface StoreBoard {
   muse_featured: boolean;
   description: string;
   capabilities: string[];
+  difficulty: DifficultySummary | null;
+  /** Board-specific flashing warning (e.g. the Watcher's nvsfactory backup). */
+  flash_warning: string | null;
   price_label: string;
   est_board_usd: number | null;
   buy: StoreLink[];
@@ -134,17 +141,25 @@ export function commonParts(): StoreCommonPart[] {
   const parts = new Map<string, StoreCommonPart>();
   for (const board of storeBoards()) {
     for (const part of board.parts) {
-      if (part.qty === 0 || part.url_kind !== "search") continue;
+      if (part.qty === 0 || !part.url) continue;
       const baseName = part.name.replace(/\s*\((?:only|optional)[^)]*\)/gi, "").trim();
       const key = baseName.toLowerCase();
+      const links: StoreLink[] = [
+        {
+          label: part.seller ?? "Shop",
+          url: part.url,
+          kind: part.url_kind === "buy" ? "seller" : "search",
+        },
+        ...part.alternatives,
+      ];
       const existing = parts.get(key);
       if (existing) {
         if (!existing.used_by.includes(board.name)) existing.used_by.push(board.name);
+        for (const link of links) {
+          if (!existing.links.some((known) => known.url === link.url)) existing.links.push(link);
+        }
         continue;
       }
-      const links: StoreLink[] = [];
-      if (part.url) links.push({ label: part.seller ?? "Shop", url: part.url, kind: "search" });
-      if (part.ebay_url) links.push({ label: "eBay", url: part.ebay_url, kind: "search" });
       parts.set(key, {
         name: baseName,
         est_price_usd: part.est_price_usd,
@@ -165,7 +180,6 @@ function toStoreBoard(platform: Platform, board: PlatformBoard, device: DeviceEn
     .filter((part) => part.kind === "part")
     .map((part) => {
       const url = part.buy_url ?? part.search_url;
-      const searchTerm = board.parts.find((candidate) => candidate.name === part.name)?.search;
       return {
         name: part.name,
         qty: part.qty,
@@ -175,7 +189,13 @@ function toStoreBoard(platform: Platform, board: PlatformBoard, device: DeviceEn
         url_kind: part.buy_url ? "buy" : part.search_url ? "search" : null,
         seller: url ? retailerLabel(url) : null,
         est_price_usd: part.est_price_usd,
-        ebay_url: searchTerm ? ebayNewestUrl(searchTerm, AFFILIATE) : null,
+        alternatives: (part.alternatives ?? []).map((alternative) => ({
+          label: alternative.label,
+          url: alternative.url,
+          kind: "seller" as const,
+          ...(alternative.note ? { note: alternative.note } : {}),
+        })),
+        ebay_url: null,
       };
     });
 
@@ -191,6 +211,8 @@ function toStoreBoard(platform: Platform, board: PlatformBoard, device: DeviceEn
     muse_featured: featured,
     description: descriptionFor(board, device),
     capabilities: capabilitiesFor(platform, board),
+    difficulty: difficultySummary(board.difficulty),
+    flash_warning: board.flash?.warning ?? null,
     price_label: priceLabel(device),
     est_board_usd: device.est_used_price_usd_min ?? null,
     buy: buyLinksFor({

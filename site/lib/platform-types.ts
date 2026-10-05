@@ -5,6 +5,15 @@ const IsoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "date must be YYYY-MM-DD
 const FeatureValue = z.union([z.boolean(), z.string(), z.number(), z.null()]);
 const FitSize = z.enum(["pocket", "desk", "wall", "hidden"]);
 
+// Another concrete product page for the same part (e.g. a USB-C to USB-A
+// cable when the main link is USB-C to USB-C).
+export const PlatformBoardPartAlternative = z.object({
+  label: z.string().min(1),
+  url: z.string().url(),
+  note: z.string().min(1).optional(),
+  est_price_usd: z.number().nonnegative().optional(),
+}).strict();
+
 export const PlatformBoardPart = z.object({
   name: z.string().min(1),
   qty: z.number().int().min(0),
@@ -14,7 +23,43 @@ export const PlatformBoardPart = z.object({
   info_url: z.string().url().optional(),
   search: z.string().min(1).optional(),
   est_price_usd: z.number().nonnegative().optional(),
+  alternatives: z.array(PlatformBoardPartAlternative).optional(),
 });
+
+// Ski-style build difficulty: green (beginner), blue (extra steps), black
+// (needs a pro). Labels live in src/core/difficulty.ts.
+export const BoardDifficulty = z.object({
+  level: z.enum(["green", "blue", "black"]),
+  why: z.string().min(1),
+}).strict();
+
+// Board-specific flashing hazards from the Muse SDK docs. Build plans fold
+// these into the flash step, the assembly steps, the brief and warnings.
+export const FlashOverlay = z.object({
+  warning: z.string().min(1).optional(),
+  connector_note: z.string().min(1).optional(),
+  port: z.string().min(1).optional(),
+  list_ports: z.string().min(1).optional(),
+  before: z.array(z.string().min(1)).optional(),
+  snippet: z.object({
+    language: z.string().min(1),
+    code: z.string().min(1),
+    note: z.string().min(1),
+  }).strict().optional(),
+  backup: z.object({
+    what: z.string().min(1),
+    commands: z.array(z.string().min(1)).min(1),
+    file: z.string().min(1),
+    bytes: z.number().int().positive(),
+    restore_note: z.string().min(1),
+    restore: z.array(z.string().min(1)).min(1),
+  }).strict().optional(),
+  duration_note: z.string().min(1).optional(),
+  recovery: z.string().min(1).optional(),
+  never: z.array(z.string().min(1)).optional(),
+  after: z.string().min(1).optional(),
+  source: z.string().url(),
+}).strict();
 
 export const PlatformBoard = z.object({
   device_id: z.string().min(1),
@@ -26,6 +71,10 @@ export const PlatformBoard = z.object({
   fits: z.array(FitSize).optional(),
   eol: z.boolean().optional(),
   note: z.string().min(1),
+  price_note: z.string().min(1).optional(),
+  stand_note: z.string().min(1).optional(),
+  difficulty: BoardDifficulty.optional(),
+  flash: FlashOverlay.optional(),
   features: z.record(FeatureValue),
   parts: z.array(PlatformBoardPart).default([]),
   try_saying: z.array(z.string().min(1)).default([]),
@@ -74,3 +123,5 @@ export const Platforms = z.array(Platform).min(1);
 export type Platform = z.infer<typeof Platform>;
 export type PlatformBoard = z.infer<typeof PlatformBoard>;
 export type PlatformBoardPart = z.infer<typeof PlatformBoardPart>;
+export type FlashOverlay = z.infer<typeof FlashOverlay>;
+export type BoardDifficulty = z.infer<typeof BoardDifficulty>;

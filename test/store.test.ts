@@ -39,11 +39,18 @@ describe("store data", () => {
     expect(ideaspark?.buy.filter((link) => link.label === "Amazon")).toHaveLength(1);
   });
 
-  it("lists parts with prices and both a shop and an eBay link", () => {
+  it("lists parts with prices and concrete cable links, without eBay for accessories", () => {
     const sticks = storeBoard("m5stack-sticks3");
     const cable = sticks?.parts.find((part) => part.name === "USB-C data cable");
-    expect(cable?.url).toContain("amazon.com/s?k=");
-    expect(cable?.ebay_url).toContain("ebay.com/sch");
+    expect(cable?.url).toBe("https://www.adafruit.com/product/4199");
+    expect(cable?.url_kind).toBe("buy");
+    expect(cable?.alternatives.map((link) => link.url)).toContain(
+      "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+    );
+    expect(cable?.ebay_url).toBeNull();
+    // Seeed boards lead with Seeed's own cable.
+    expect(storeBoard("seeed-sensecap-watcher")?.parts.find((part) => part.name === "USB-C data cable")?.url)
+      .toContain("seeedstudio.com");
     expect(sticks?.est_total_usd).toBe(buildPlanForDevice("m5stack-sticks3")?.shopping_list.est_total_usd);
     const common = commonParts();
     expect(common[0]?.name).toBe("USB-C data cable");
@@ -111,7 +118,7 @@ describe("shopping list email", () => {
   });
 
   it("masks addresses", () => {
-    expect(maskEmail("miguel@example.com")).toBe("mi••••@example.com");
+    expect(maskEmail("builder@example.com")).toBe("bu•••••@example.com");
     expect(maskEmail("nope")).toBe("your email");
   });
 });

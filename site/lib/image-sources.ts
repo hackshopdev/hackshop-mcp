@@ -185,6 +185,26 @@ export const IMAGE_SOURCES: Record<string, string> = {
     "https://www.waveshare.com/img/devkit/ESP32-C6-Touch-AMOLED-1.8/ESP32-C6-Touch-AMOLED-1.8-1.jpg",
   "waveshare-esp32-s3-touch-amoled-1-75c":
     "https://www.waveshare.com/img/devkit/ESP32-S3-Touch-AMOLED-1.75C/ESP32-S3-Touch-AMOLED-1.75C-details-1.jpg",
+  // More Muse SDK boards, curl-verified (200 + image/*) on 2026-10-05.
+  "espressif-esp32-c6-devkitc-1": "https://cdn-shop.adafruit.com/970x728/5672-00.jpg",
+  "espressif-esp32-s3-devkitc-1": "https://cdn-shop.adafruit.com/970x728/5336-00.jpg",
+  "espressif-esp32-s3-box-3": "https://cdn-shop.adafruit.com/970x728/5835-06.jpg",
+  "waveshare-esp32-c6-lcd-1-47":
+    "https://www.waveshare.com/img/devkit/ESP32-C6-LCD-1.47/ESP32-C6-LCD-1.47-details-1.jpg",
+  "waveshare-esp32-s3-touch-amoled-1-75":
+    "https://www.waveshare.com/img/devkit/ESP32-S3-Touch-AMOLED-1.75/ESP32-S3-Touch-AMOLED-1.75-details-1.jpg",
+  "seeed-respeaker-lite-xiao-esp32s3":
+    "https://media-cdn.seeedstudio.com/media/catalog/product/cache/7f7f32ef807b8c2c2215b49801c56084/9/0/904832d1-b0d8-461a-bbbc-cbfa5a1f71a9.jpg",
+  "m5stack-stopwatch":
+    "https://cdn.shopify.com/s/files/1/0056/7689/2250/files/M5Stack_Stopwatch_Dev_Kit_ESP32-S3_2.webp?v=1786608414",
+  "m5stack-cores3":
+    "https://cdn.shopify.com/s/files/1/0056/7689/2250/products/1_c74b4a9e-bbee-416a-8c7c-c5cda0493ca7.webp?v=1682064333",
+  "m5stack-cardputer-adv":
+    "https://cdn.shopify.com/s/files/1/0056/7689/2250/files/1_9b624809-c4b1-4031-b149-54709e72bd53.webp?v=1756977500",
+  "m5stack-core2-v1-0":
+    "https://shop.m5stack.com/cdn/shop/files/1_b5359a18-c82e-484f-8879-7d560bea0e66_1200x1200.webp?v=1683770131",
+  "freenove-fnk0104b":
+    "https://cdn.shopify.com/s/files/1/0612/4450/6310/files/FNK0104B.PT03_abdfd5e8-bbaa-4721-82a7-e3d74b60aa53.jpg?v=1784173485",
   "m5stack-core2":
     "https://shop.m5stack.com/cdn/shop/files/1_b5359a18-c82e-484f-8879-7d560bea0e66_1200x1200.webp?v=1683770131",
   "m5stack-cardputer":

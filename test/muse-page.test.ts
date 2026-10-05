@@ -32,7 +32,8 @@ describe("Muse page data assembly", () => {
     const data = getMusePageData();
     const rows = data.esp32.boards;
 
-    expect(rows).toHaveLength(12);
+    // Every board in the Muse ESP32 SDK's supported table.
+    expect(rows).toHaveLength(24);
 
     const firstStatus = rows.findIndex((row) => row.tier === "status");
     expect(firstStatus).toBeGreaterThan(0);
@@ -61,7 +62,8 @@ describe("Muse page data assembly", () => {
     const data = getMusePageData();
 
     for (const row of data.esp32.boards) {
-      expect(row.priceLabel).toMatch(/^\$/);
+      // Boards without a seller price we could check say so.
+      expect(row.priceLabel).toMatch(/^\$|^Price unknown$/);
       expect(row.tierLabel).toMatch(/Full UI|Status/);
     }
 

@@ -1,26 +1,41 @@
 {
   "name": "hackshop",
-  "description": "Agent-first hardware planner for building a physical Muse body for an AI agent, including intake questions, board selection, shopping list, machine-readable assembly, flashing and pairing.",
+  "description": "Agent-first hardware planner for building a physical Muse body for an AI agent: intake questions, board selection with difficulty, shopping list, board-specific flash warnings, assembly steps with checks, flashing and pairing. Most assembly steps still need a human.",
   "url": "https://www.hackshop.dev",
   "capabilities": [
     "muse-gadget-planning",
     "agent-body-intake",
+    "build-difficulty",
     "shopping-list-with-approval-policy",
-    "machine-readable-assembly",
+    "machine-readable-assembly-steps",
     "hackability-assessment",
     "firmware-and-community-links"
   ],
-  "protocols": ["mcp", "https"],
+  "protocols": [
+    "mcp",
+    "https"
+  ],
   "mcp": {
     "url": "https://www.hackshop.dev/mcp",
     "transport": "streamable-http",
-    "tools": ["plan_gadget", "get_build_plan", "assess_hackability"],
+    "stateless": true,
+    "tools": [
+      "intake_gadget",
+      "plan_gadget",
+      "get_build_plan",
+      "assess_hackability"
+    ],
     "resources": [
       "hackshop://muse/boards",
       "hackshop://muse/sdk-terms",
       "hackshop://catalog/tags"
     ],
-    "prompts": ["plan-muse-gadget"]
+    "resource_templates": [
+      "hackshop://build/{device_id}"
+    ],
+    "prompts": [
+      "plan-muse-gadget"
+    ]
   },
   "links": {
     "homepage": "https://www.hackshop.dev",
@@ -31,6 +46,7 @@
     "llms_txt": "https://www.hackshop.dev/llms.txt",
     "agents_md": "https://www.hackshop.dev/agents.md",
     "ai_agent_manifest": "https://www.hackshop.dev/.well-known/ai-agent.json",
-    "mcp_manifest": "https://www.hackshop.dev/.well-known/mcp.json"
+    "mcp_manifest": "https://www.hackshop.dev/.well-known/mcp.json",
+    "openapi": "https://www.hackshop.dev/openapi.json"
   }
 }
