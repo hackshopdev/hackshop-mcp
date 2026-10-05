@@ -39,13 +39,13 @@
   ],
   "license": "MIT",
   "author": "hackshop (https://www.hackshop.dev)",
-  "homepage": "https://github.com/msanchezgrice/hackshop-mcp",
+  "homepage": "https://github.com/hackshopdev/hackshop-mcp",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/msanchezgrice/hackshop-mcp.git"
+    "url": "git+https://github.com/hackshopdev/hackshop-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/msanchezgrice/hackshop-mcp/issues"
+    "url": "https://github.com/hackshopdev/hackshop-mcp/issues"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.93.0",

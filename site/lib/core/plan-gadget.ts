@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { buildPlan } from "../build-plan/index.js";
+import { buildPlan, flashCommandForBuild } from "../build-plan/index.js";
 import {
   NEED_VALUES,
   type CoreContext,
@@ -244,7 +244,7 @@ export function planGadget(
       agent_brief_url: plan.urls.build_md,
       links: candidate.device.firmware_links,
       build_command: candidate.board.build,
-      setup_steps: candidate.platform.setup_steps,
+      setup_steps: boardSetupSteps(candidate.platform, candidate.board),
       caveats: plan.caveats,
       fabrication: {
         printables,
@@ -704,7 +704,7 @@ function fabricationNote(device: DeviceEntry, printables: Printable[]): string {
     physical.size_mm.t === null ||
     ["approximate", "conflicting"].includes(physical.size_confidence);
   if (needsMeasure) {
-    const note = physical.size_note ?? "the board's dimensions aren't verified";
+    const note = (physical.size_note ?? "the board's dimensions aren't verified").replace(/[.\s]+$/, "");
     return `No printable stand yet; ${note}. Measure the device before making a stand.`;
   }
 
@@ -726,7 +726,7 @@ function nextSteps(picks: PlanGadgetOutput["picks"]): string[] {
     );
   } else if (first) {
     steps.push(
-      `Build: \`${first.build_command}\`, then flash with idf.py -p PORT flash monitor.`,
+      `Build: \`${first.build_command}\`, set the token, build again, then flash with \`${flashCommandForBuild(first.build_command)}\`.`,
       "Pair it in the Muse app (Settings > Devices > Developer mode > Add Device).",
     );
   }
@@ -836,4 +836,14 @@ function longestSide(device: DeviceEntry): number | null {
   const size = device.physical?.size_mm;
   if (!size) return null;
   return Math.max(size.w, size.h, size.t ?? 0);
+}
+
+function boardSetupSteps(platform: Platform, board: PlatformBoard): string[] {
+  const museBoard = board.build.match(/^tools\/muse\/board\.sh\s+build\s+(\S+)$/)?.[1];
+  return platform.setup_steps.map((step) =>
+    step
+      .replace("<chip>", board.chip ?? "esp32s3")
+      .replace("tools/muse/board.sh flash <board> PORT", flashCommandForBuild(board.build))
+      .replace("<board>", museBoard ?? "<board>"),
+  );
 }

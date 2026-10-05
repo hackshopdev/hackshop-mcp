@@ -257,7 +257,7 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
         {visible.length === 0 && (
           <div style={{ color: "var(--muted)", padding: 16 }}>
             No matches. Want to suggest a device?{" "}
-            <a href="https://github.com/msanchezgrice/hackshop-mcp/issues">
+            <a href="https://github.com/hackshopdev/hackshop-mcp/issues">
               Open an issue
             </a>
             .

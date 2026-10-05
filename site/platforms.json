@@ -19,10 +19,10 @@
     ],
     "setup_steps": [
       "Get an SDK token at https://gadgets.muse.ai/settings/sdk-tokens (never commit it or paste it into a public repo).",
-      "Install ESP-IDF v6.0.1: git clone -b v6.0.1 --recursive https://github.com/espressif/esp-idf.git ~/esp/esp-idf-v6 && ~/esp/esp-idf-v6/install.sh esp32c5,esp32s3,esp32c6,esp32 && . ~/esp/esp-idf-v6/export.sh",
+      "Install ESP-IDF v6.0.1 for your board's chip only: git clone -b v6.0.1 --recursive https://github.com/espressif/esp-idf.git ~/esp/esp-idf-v6 && ~/esp/esp-idf-v6/install.sh <chip> && . ~/esp/esp-idf-v6/export.sh",
       "git clone https://github.com/facebookincubator/muse-gadget-sdk && cd muse-gadget-sdk/esp32",
       "Set the token: idf.py menuconfig > ESP32 Device SDK > Muse Gadgets SDK token (or CONFIG_GADGET_SDK_TOKEN in the build's sdkconfig).",
-      "Build and flash with the board's command below, then idf.py -p PORT flash monitor. If flashing can't connect: hold BOOT, tap RESET, release BOOT.",
+      "Build with the board's command below, set the token, build again, then flash with the board's flash command (tools/muse/board.sh flash <board> PORT). If flashing can't connect: hold BOOT, tap RESET, release BOOT.",
       "In the Muse app, turn on Settings > Devices > Developer mode, then Settings > Devices > Add Device (+). Pick MuseGadget-XXXXXX and press the board's button (BOOT on dev kits) when the light breathes blue. Green = connected."
     ],
     "agent_quickstart": "curl -fsSL https://dev.meta.ai/install.sh | sh && git clone https://github.com/facebookincubator/muse-gadget-sdk && cd muse-gadget-sdk/esp32 && muse --disable-sandbox   # then: \"Build this firmware for my <board> and flash it.\" Any coding agent that reads AGENTS.md can do the same.",
