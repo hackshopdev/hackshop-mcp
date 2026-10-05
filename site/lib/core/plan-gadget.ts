@@ -159,6 +159,8 @@ export interface PlanGadgetOutput {
     needs_met: Need[];
     est_total_usd: number | null;
     within_budget: boolean | null;
+    /** True when the board suits the requested size (pocket, desk, wall, hidden); null when no size was asked. */
+    fits_size: boolean | null;
     price_label: string | null;
     difficulty: PlanGadgetPickDifficulty | null;
     build_page_url: string;
@@ -369,6 +371,7 @@ export function planGadget(
       needs_met: candidate.satisfied,
       est_total_usd: candidate.estTotalUsd,
       within_budget: candidate.withinBudget,
+      fits_size: candidate.sizeFit,
       price_label: priceLabel(candidate.device),
       difficulty,
       build_page_url: plan.urls.build_page,
@@ -716,8 +719,8 @@ function featureString(board: PlatformBoard, key: string): string | null {
 /**
  * Ranking: boards that meet the hard needs (or as many as any board can)
  * first; then owned boards; then boards within budget; then official
- * support; then more of the other needs; then the cheaper all-in total;
- * then size fit; then score.
+ * support; then more of the other needs; then size fit and the cheaper
+ * all-in total (price first when every option is over budget); then score.
  */
 function candidateSort(budgetUsd?: number) {
   return (a: ScoredBoard, b: ScoredBoard): number => {
@@ -732,10 +735,19 @@ function candidateSort(budgetUsd?: number) {
     if (b.satisfied.length !== a.satisfied.length) return b.satisfied.length - a.satisfied.length;
     const priceA = priceFor(a);
     const priceB = priceFor(b);
-    if (priceA !== priceB) return priceA - priceB;
     const fitA = sizeFitRank(a.sizeFit);
     const fitB = sizeFitRank(b.sizeFit);
-    if (fitA !== fitB) return fitA - fitB;
+    // Both over budget: the cheaper board wins, then size fit.
+    // Otherwise (both within budget, or no budget): the board that fits where
+    // it will live wins, then the cheaper one.
+    const bothOver = budgetUsd !== undefined && a.withinBudget !== true && b.withinBudget !== true;
+    if (bothOver) {
+      if (priceA !== priceB) return priceA - priceB;
+      if (fitA !== fitB) return fitA - fitB;
+    } else {
+      if (fitA !== fitB) return fitA - fitB;
+      if (priceA !== priceB) return priceA - priceB;
+    }
     if (b.score !== a.score) return b.score - a.score;
     return a.device.id.localeCompare(b.device.id);
   };

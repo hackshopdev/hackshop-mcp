@@ -48,12 +48,17 @@ describe("HS-RANK-001/002: the 32-cell ranking matrix", () => {
       });
       expect(out.picks.length).toBeGreaterThan(0);
 
-      // No pick outranks a cheaper board that meets the same needs.
+      // No pick outranks a cheaper board that meets the same needs and fits as well.
       for (let i = 0; i < out.picks.length; i += 1) {
         for (let j = i + 1; j < out.picks.length; j += 1) {
           const higher = out.picks[i]!;
           const lower = out.picks[j]!;
           if (!sameNeeds(higher.needs_met, lower.needs_met)) continue;
+          // A board that fits where it will live may outrank a cheaper one
+          // that doesn't, unless both are over budget (then price wins).
+          const bothOver = higher.within_budget === false && lower.within_budget === false;
+          const fitRank = (fit: boolean | null) => (fit === true ? 0 : fit === null ? 1 : 2);
+          if (!bothOver && fitRank(higher.fits_size) < fitRank(lower.fits_size)) continue;
           expect(
             (higher.est_total_usd ?? Infinity) <= (lower.est_total_usd ?? Infinity),
             `${higher.device_id} ($${higher.est_total_usd}) outranks cheaper ${lower.device_id} ($${lower.est_total_usd})`,
