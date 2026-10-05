@@ -1,4 +1,4 @@
-// Ready-made prompts people paste into their own agent ("Tell my agent").
+// Ready-made prompts people paste into their own agent ("Ask my agent").
 // Kept in one place so the homepage, board pages, build pages and projects
 // all hand off the same way.
 
