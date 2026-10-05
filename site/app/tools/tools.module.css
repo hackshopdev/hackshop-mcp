@@ -1,0 +1,483 @@
+/* Shared layout for /tools pages. Tokens come from ui.module.css (.page). */
+
+.crumbs {
+  padding: 22px 0 0;
+  font-size: 14px;
+}
+
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+}
+
+.crumbs li + li::before {
+  content: "/";
+  margin-right: 6px;
+  color: #55554f;
+}
+
+.crumbs a {
+  color: #c9c9c4;
+}
+
+.hero {
+  max-width: 780px;
+  padding: 28px 0 8px;
+}
+
+.hero h1 {
+  margin: 0 0 16px;
+  color: var(--text);
+  font-size: clamp(32px, 5vw, 52px);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+
+.intro p {
+  margin: 0 0 12px;
+  color: #c4c4be;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.intro strong {
+  color: var(--text);
+}
+
+.checked {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.toolArea {
+  margin: 28px 0 0;
+  min-width: 0;
+}
+
+.block {
+  padding: 64px 0 0;
+}
+
+.block h2,
+.cta h2,
+.sources h2 {
+  margin: 0 0 16px;
+  color: var(--text);
+  font-size: clamp(24px, 3.4vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.prose {
+  max-width: 760px;
+  color: #c4c4be;
+}
+
+.prose p {
+  margin: 0 0 14px;
+}
+
+.prose ol,
+.prose ul {
+  margin: 0 0 14px;
+  padding-left: 22px;
+}
+
+.prose li {
+  margin: 0 0 8px;
+}
+
+.prose strong {
+  color: var(--text);
+}
+
+.faq {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.faqItem {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+.faqItem h3 {
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.faqItem p {
+  margin: 0;
+  color: #b9b9b3;
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.related {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.relatedCard {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.relatedCard:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.relatedCard strong {
+  color: var(--text);
+}
+
+.relatedCard span {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 64px 0 0;
+  padding: 28px;
+  border: 1px solid rgba(255, 122, 0, 0.32);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #1a130c 0%, var(--panel) 140px);
+}
+
+.cta > div:first-child {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.cta p {
+  margin: 0;
+  color: #c4c4be;
+}
+
+.sources {
+  margin: 48px 0 0;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14.5px;
+}
+
+.sources h2 {
+  font-size: 20px;
+}
+
+.sources p {
+  margin: 0 0 10px;
+}
+
+.sources ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 6px 24px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.sources a {
+  overflow-wrap: anywhere;
+}
+
+/* ---- Shared tool widgets ---- */
+
+.panel {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid rgba(255, 122, 0, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #171310 0%, var(--panel) 120px);
+}
+
+.panelTitle {
+  margin: 0 0 6px;
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.fieldLabel {
+  display: block;
+  margin: 0 0 8px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.hint {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.select,
+.textInput {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #101010;
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+
+.select:focus,
+.textInput:focus {
+  border-color: var(--accent);
+  outline: 2px solid rgba(255, 122, 0, 0.25);
+  outline-offset: 1px;
+}
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.segmented legend {
+  margin: 0 0 8px;
+  padding: 0;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.segmentButton {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel2);
+  color: #d6d6d2;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segmentButton:hover {
+  border-color: #4a4a45;
+}
+
+.segmentButton[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accentSoft);
+  color: #ffb066;
+}
+
+.codeRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.codeRow pre {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #0d0d0d;
+  color: #f0f0ea;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.codeRow pre code {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.copyButton {
+  flex: 0 0 auto;
+  min-width: 72px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel2);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.copyButton:hover {
+  border-color: var(--accent);
+}
+
+.notice {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(245, 196, 81, 0.35);
+  border-radius: 10px;
+  background: rgba(245, 196, 81, 0.07);
+  color: #ecd9a5;
+  font-size: 15px;
+}
+
+.toolCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.toolCard {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.toolCard:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.toolCard h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.toolCard p {
+  margin: 0;
+  color: #b9b9b3;
+}
+
+.toolCard span {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.dataTable {
+  width: 100%;
+  margin: 8px 0 14px;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.dataTable th,
+.dataTable td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.dataTable th {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dataTable td:first-child {
+  color: var(--text);
+}
+
+.dataTable small {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.dataTable code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.prose h3 {
+  margin: 28px 0 10px;
+  color: var(--text);
+  font-size: 20px;
+}
+
+@media (max-width: 640px) {
+  .dataTable thead {
+    display: none;
+  }
+
+  .dataTable tr {
+    display: grid;
+    gap: 2px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .dataTable td {
+    padding: 0;
+    border: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .faq,
+  .toolCards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .block {
+    padding-top: 48px;
+  }
+
+  .panel,
+  .cta {
+    padding: 18px;
+  }
+
+  .intro p {
+    font-size: 17px;
+  }
+}

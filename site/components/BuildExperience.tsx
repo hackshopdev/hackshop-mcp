@@ -7,14 +7,30 @@ import { track } from "@/lib/analytics";
 import { shoppingListText } from "@/lib/projects/build";
 import { AgentHandoff } from "./AgentHandoff";
 import { CopyButton } from "./CopyButton";
-import { boardAgentPrompt } from "@/lib/agent-prompts";
+import { ASK_AGENT_TITLE, buildWithAgentPrompt } from "@/lib/agent-prompts";
+import type { Difficulty } from "@/lib/ui/difficulty";
+import { plainTierLabel } from "@/lib/ui/labels";
+import { boardAndTotalLabel } from "@/lib/ui/price";
+import { DifficultyBadge } from "./DifficultyBadge";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
 import { TellMyAgent } from "./TellMyAgent";
 import { StartBuildButton } from "./StartBuildButton";
 import styles from "./build.module.css";
 
-export function BuildExperience({ plan }: { plan: BuildPlan }) {
+export function BuildExperience({
+  plan,
+  difficulty,
+  seeInside,
+}: {
+  plan: BuildPlan;
+  difficulty?: Difficulty;
+  /** Server-rendered "See inside" section (exploded 3D model). */
+  seeInside?: React.ReactNode;
+}) {
+  const isEsp32 = plan.platform_id === "muse-esp32";
+  const tier = plainTierLabel(plan.tier_label);
+  const price = boardAndTotalLabel(plan.est_cost_label, estimatedTotal(plan));
   return (
     <main className={styles.page}>
       <SiteHeader cta={null} />
@@ -26,11 +42,12 @@ export function BuildExperience({ plan }: { plan: BuildPlan }) {
               <Link href="/muse">Muse boards</Link> / Build
             </p>
             <h1>Build: {plan.name}</h1>
+            <EffortLine plan={plan} isEsp32={isEsp32} difficulty={difficulty} />
             <p className={styles.summary}>{plan.summary}</p>
             <div className={styles.pillRow}>
-              {plan.tier_label ? <span className={styles.pill}>{plan.tier_label}</span> : null}
-              {plan.est_cost_label ? <span className={styles.pill}>{plan.est_cost_label}</span> : null}
-              {plan.est_time_label ? <span className={styles.pill}>{plan.est_time_label}</span> : null}
+              {tier ? <span className={styles.pill}>{tier}</span> : null}
+              {price ? <span className={styles.pill}>{price}</span> : null}
+              {!isEsp32 && plan.est_time_label ? <span className={styles.pill}>{plan.est_time_label}</span> : null}
             </div>
             <div className={styles.actions} style={{ marginTop: 18 }}>
               <StartBuildButton
@@ -39,8 +56,9 @@ export function BuildExperience({ plan }: { plan: BuildPlan }) {
                 source="build_page"
               />
               <TellMyAgent
-                prompt={boardAgentPrompt({ name: plan.name, deviceId: plan.device_id })}
+                prompt={buildWithAgentPrompt({ name: plan.name, deviceId: plan.device_id })}
                 surface="build_page"
+                label={ASK_AGENT_TITLE}
               />
               <a className={styles.secondaryButton} href={plan.urls.build_md}>
                 Download build.md
@@ -49,6 +67,8 @@ export function BuildExperience({ plan }: { plan: BuildPlan }) {
           </div>
           <PartsPreview plan={plan} />
         </header>
+
+        {seeInside}
 
         <div className={styles.contentGrid}>
           <ProgressRail plan={plan} />
@@ -64,6 +84,46 @@ export function BuildExperience({ plan }: { plan: BuildPlan }) {
       <SiteFooter />
     </main>
   );
+}
+
+// UX-008: how long it takes and what you need, up top, with the agent as
+// the recommended path.
+function EffortLine({
+  plan,
+  isEsp32,
+  difficulty,
+}: {
+  plan: BuildPlan;
+  isEsp32: boolean;
+  difficulty?: Difficulty;
+}) {
+  const time = isEsp32 ? "About 30-45 minutes" : plan.est_time_label ? capitalize(plan.est_time_label) : null;
+  const needs = isEsp32
+    ? "needs a Mac or PC and a USB-C data cable"
+    : plan.platform_id === "muse-linux"
+      ? "needs a Mac or PC to set it up"
+      : null;
+  return (
+    <div className={styles.effort} data-effort-line>
+      <p className={styles.effortText}>
+        {[time, needs, "some Terminal, or let your agent do it"].filter(Boolean).join(" · ")}
+      </p>
+      <div className={styles.effortActions}>
+        <a className={styles.recommended} href="#agent-handoff">
+          Let your agent do it
+          <span className={styles.recommendedTag}>Recommended</span>
+        </a>
+        <a className={styles.effortLink} href={`#step-${plan.steps[0]?.id ?? "parts"}`}>
+          Or follow the steps yourself
+        </a>
+      </div>
+      {difficulty ? <DifficultyBadge difficulty={difficulty} showWhy /> : null}
+    </div>
+  );
+}
+
+function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 function PartsPreview({ plan }: { plan: BuildPlan }) {
@@ -92,7 +152,7 @@ function PartsPreview({ plan }: { plan: BuildPlan }) {
           onCopied={() => track("parts_list_copied", { device_id: plan.device_id })}
         />
         {estimatedTotal(plan) !== null ? (
-          <span className={styles.muted}>Estimated total ~${estimatedTotal(plan)}</span>
+          <span className={styles.muted}>About ${estimatedTotal(plan)} in total with cable/parts</span>
         ) : null}
       </div>
       <p className={styles.muted} style={{ margin: "12px 0 0" }}>

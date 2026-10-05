@@ -18,7 +18,7 @@
       "https://hackaday.com/tag/electric-objects/"
     ],
     "community_size_bucket": "small",
-    "notes": "23-inch wall-mount picture frame, abandoned by manufacturer. Linux-based, SSH access via stock firmware bug. Founder revived one in ~6h with Claude assistance.",
+    "notes": "23-inch wall-mount picture frame, abandoned by manufacturer. Linux-based, SSH access via stock firmware bug. One was revived in about 6 hours with an AI coding agent.",
     "est_used_price_usd_min": 80,
     "est_used_price_usd_max": 200,
     "est_setup_hours_min": 4,
@@ -66,14 +66,14 @@
     "hack_difficulty": 1,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-05-04",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/"
     ],
     "community_size_bucket": "thriving",
     "notes": "Smaller than Pi 4B, lower power. Good for projects that need to be embedded/hidden. Reasonable Wi-Fi. Slightly slow CPU but usually enough.",
     "est_used_price_usd_min": 15,
-    "est_used_price_usd_max": 25,
+    "est_used_price_usd_max": 15,
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 2,
     "buy_url": "https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/"
@@ -1815,7 +1815,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://wiki.seeedstudio.com/getting_started_with_reterminal_e1001/",
@@ -1869,7 +1869,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-04",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://www.seeedstudio.com/reTerminal-E1002-p-6533.html",
@@ -1878,7 +1878,7 @@
     "community_size_bucket": "small",
     "notes": "7.3\" E Ink Spectra 6 full-color ePaper with ESP32-S3 and up to 3-month battery life. Muse shows status text and six-color images. Official SDK build command is reterminal-e1002.",
     "est_used_price_usd_min": 99,
-    "est_used_price_usd_max": 99,
+    "est_used_price_usd_max": 109,
     "image_url": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-104991003-reterminal-e1002-epaper-display.jpg",
     "est_setup_hours_min": 1,
     "est_setup_hours_max": 3,
@@ -1898,14 +1898,14 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://github.com/esphome/home-assistant-voice-pe",
       "https://www.home-assistant.io/voice-pe/"
     ],
     "community_size_bucket": "thriving",
-    "notes": "ESP32-S3 + XMOS voice puck: dual mics, speaker, 3.5mm out, LED ring, rotary dial, hardware mute. Under Muse it is push-to-talk with status on the LED ring and the dial as volume. Flashing Muse replaces the ESPHome firmware; reflash ESPHome to go back to Home Assistant.",
+    "notes": "ESP32-S3 + XMOS voice puck: dual mics, speaker, 3.5mm out, LED ring, rotary dial, hardware mute. Under Muse it is push-to-talk with status on the LED ring and the dial as volume; replies show as text in the Muse app. Flashing Muse replaces the ESPHome firmware; reflash ESPHome to go back to Home Assistant.",
     "est_used_price_usd_min": 69,
     "est_used_price_usd_max": 69,
     "image_url": "https://www.home-assistant.io/images/voice-pe/vpe-top.webp",
@@ -1952,7 +1952,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://docs.waveshare.com/ESP32-S3-Touch-AMOLED-1.75C",
@@ -2007,7 +2007,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://aipi.com/pages/manual",
@@ -2113,7 +2113,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://wiki.seeedstudio.com/watcher_hardware_overview/",
@@ -2121,7 +2121,7 @@
     ],
     "community_size_bucket": "small",
     "notes": "ESP32-S3 + Himax vision chip, 5MP camera, 1.45\" round touch LCD, mic, speaker, scroll wheel. Full Muse UI plus camera.capture, so Muse can look at a room or a 3D printer. Camera and on-device vision mean high privacy exposure; place it deliberately.",
-    "est_used_price_usd_min": 55,
+    "est_used_price_usd_min": 61,
     "est_used_price_usd_max": 61,
     "image_url": "https://media-cdn.seeedstudio.com/media/catalog/product/cache/48035b5512857d0ab907b31a092da78f/1/-/1-113991315-sensecap-watcher-w1-a_1.jpg",
     "est_setup_hours_min": 1,
@@ -2168,7 +2168,7 @@
     "hack_difficulty": 2,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
       "https://docs.m5stack.com/en/core/StickS3",
@@ -2231,7 +2231,7 @@
       "https://github.com/m5stack/M5StickCPlus2"
     ],
     "community_size_bucket": "active",
-    "notes": "ESP32 stick (2MB PSRAM) with 1.14\" LCD, mic, buzzer, IMU, IR, 200mAh battery. Full Muse UI with push-to-talk, but buzzer only, so replies can't be spoken on-device. M5Stack lists it as end-of-life; buy the StickS3 unless you already own one.",
+    "notes": "ESP32 stick (2MB PSRAM) with 1.14\" LCD, mic, buzzer, IMU, IR, 200mAh battery. Full Muse UI with push-to-talk, but it has a buzzer, not a speaker, so replies are quiet; they show as text on the screen. M5Stack lists it as end-of-life; buy the StickS3 unless you already own one.",
     "est_used_price_usd_min": 15,
     "est_used_price_usd_max": 20,
     "image_url": "https://m5stack-doc.oss-cn-shenzhen.aliyuncs.com/512/K016-P2.webp",
@@ -2279,17 +2279,303 @@
     "hack_difficulty": 1,
     "brick_risk": 1,
     "brick_provenance": "vendor-docs",
-    "last_verified": "2026-10-02",
+    "last_verified": "2026-10-05",
     "firmware_links": [
       "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/linux",
       "https://www.raspberrypi.com/documentation/"
     ],
     "community_size_bucket": "thriving",
-    "notes": "The board gadgets.muse.ai features for the Muse Linux SDK: install script, systemd service, and Muse gets shell, file and health commands as your user. Good host for Home Assistant plus a Muse bridge. Anything Muse runs here runs with your account's permissions.",
-    "est_used_price_usd_min": 50,
-    "est_used_price_usd_max": 120,
+    "notes": "The board gadgets.muse.ai features for the Muse Linux SDK: install script, systemd service, and Muse gets shell, file and health commands as your user. Good host for Home Assistant plus a Muse bridge. Anything Muse runs here runs with your account's permissions. List price after the April 2026 rise: 4GB $110, 8GB $175; prices vary by seller.",
+    "est_used_price_usd_min": 110,
+    "est_used_price_usd_max": 175,
     "est_setup_hours_min": 0.5,
     "est_setup_hours_max": 2,
     "buy_url": "https://www.raspberrypi.com/products/raspberry-pi-5/"
+  },
+  {
+    "id": "espressif-esp32-c6-devkitc-1",
+    "name": "Espressif ESP32-C6-DevKitC-1 (no PSRAM)",
+    "category": "sbc",
+    "idea_fit_tags": [
+      "sbc",
+      "iot",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/esp32-c6-devkitc-1/user_guide.html"
+    ],
+    "community_size_bucket": "active",
+    "notes": "ESP32-C6 dev board without PSRAM (8 MB flash). Muse shows status on its RGB light and uses the BOOT button. No PSRAM, so no home-network tunnel; Muse can still reach and control it. Adafruit listed the N8 at $9.95 (out of stock) on 2026-10-05.",
+    "est_used_price_usd_min": 10,
+    "est_used_price_usd_max": 10,
+    "buy_url": "https://www.adafruit.com/product/5672"
+  },
+  {
+    "id": "espressif-esp32-s3-devkitc-1",
+    "name": "Espressif ESP32-S3-DevKitC-1 (N8R8)",
+    "category": "sbc",
+    "idea_fit_tags": [
+      "sbc",
+      "iot",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32s3/esp32-s3-devkitc-1/user_guide_v1.1.html"
+    ],
+    "community_size_bucket": "active",
+    "notes": "ESP32-S3 dev board with 8 MB flash and 8 MB PSRAM. Muse shows status on its RGB light, uses the BOOT button and gets the home-network tunnel. No screen or audio. Micro-USB ports. Adafruit listed it at $19.95 (out of stock) on 2026-10-05.",
+    "est_used_price_usd_min": 20,
+    "est_used_price_usd_max": 20,
+    "buy_url": "https://www.adafruit.com/product/5336"
+  },
+  {
+    "id": "waveshare-esp32-c6-lcd-1-47",
+    "name": "Waveshare ESP32-C6-LCD-1.47",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "iot",
+      "low-power",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://www.waveshare.com/wiki/ESP32-C6-LCD-1.47"
+    ],
+    "community_size_bucket": "small",
+    "notes": "ESP32-C6 board with a 1.47\" 172x320 ST7789 LCD and 4 MB flash, no PSRAM. Muse shows status on the screen and draws images; no PSRAM, so no home-network tunnel. Uses the BOOT button.",
+    "est_used_price_usd_min": 12,
+    "est_used_price_usd_max": 13,
+    "buy_url": "https://www.waveshare.com/esp32-c6-lcd-1.47.htm"
+  },
+  {
+    "id": "seeed-respeaker-lite-xiao-esp32s3",
+    "name": "Seeed reSpeaker Lite with XIAO ESP32-S3",
+    "category": "speaker",
+    "idea_fit_tags": [
+      "voice",
+      "audio-out",
+      "iot"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/seeed-respeaker-lite.md",
+      "https://wiki.seeedstudio.com/xiao_respeaker/"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Experimental in the Muse SDK. reSpeaker Lite 2-mic array with a XIAO ESP32-S3 (8 MB flash, 8 MB PSRAM). RGB status LED and push-to-talk on the XIAO BOOT button; replies show as text in the Muse app. The XMOS must run Seeed's 16 kHz I2S firmware v1.0.9. Seeed's kit with the XIAO soldered on was $30.99 on 2026-10-05.",
+    "est_used_price_usd_min": 31,
+    "est_used_price_usd_max": 31,
+    "buy_url": "https://www.seeedstudio.com/ReSpeaker-Lite-Voice-Assistant-Kit-p-5929.html"
+  },
+  {
+    "id": "waveshare-esp32-s3-touch-amoled-1-75",
+    "name": "Waveshare ESP32-S3-Touch-AMOLED-1.75 (round)",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "voice",
+      "audio-out",
+      "ambient",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/tree/main/esp32",
+      "https://docs.waveshare.com/ESP32-S3-Touch-AMOLED-1.75",
+      "https://github.com/waveshareteam/ESP32-S3-Touch-AMOLED-1.75"
+    ],
+    "community_size_bucket": "small",
+    "notes": "Round 1.75\" 466x466 touch AMOLED with ESP32-S3, 16 MB flash and 8 MB PSRAM. Full Muse UI: animated avatar, push-to-talk on BOOT, settings and images. The 1.75C sibling has 32 MB flash. Waveshare listed it at $29.99-39.99 on 2026-10-05.",
+    "est_used_price_usd_min": 30,
+    "est_used_price_usd_max": 40,
+    "buy_url": "https://www.waveshare.com/esp32-s3-touch-amoled-1.75.htm"
+  },
+  {
+    "id": "espressif-esp32-s3-box-3",
+    "name": "Espressif ESP32-S3-BOX-3",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "voice",
+      "audio-out",
+      "iot",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/esp32-s3-box-3.md",
+      "https://github.com/espressif/esp-bsp/tree/master/bsp/esp-box-3",
+      "https://github.com/espressif/esp-box"
+    ],
+    "community_size_bucket": "active",
+    "notes": "ESP32-S3 kit with a 2.4\" 320x240 touch LCD, 16 MB flash, 16 MB PSRAM, speaker and mics. Full Muse UI: BOOT/CONFIG push-to-talk, touch settings and images. Dock sensors, SD card, IR and battery telemetry aren't used. Adafruit listed it at $49.95 (out of stock) on 2026-10-05.",
+    "est_used_price_usd_min": 50,
+    "est_used_price_usd_max": 50,
+    "buy_url": "https://www.adafruit.com/product/5835"
+  },
+  {
+    "id": "m5stack-cardputer-adv",
+    "name": "M5Stack Cardputer ADV",
+    "category": "input",
+    "idea_fit_tags": [
+      "input",
+      "display",
+      "low-power"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md",
+      "https://docs.m5stack.com/en/core/Cardputer-Adv"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Experimental in the Muse SDK. ESP32-S3 keyboard computer (8 MB flash, no PSRAM) with a 1.14\" LCD. Hold Space/GO to send a voice note; replies show as scrolling text. No images, home-network tunnel or battery telemetry. M5Stack listed it at $29.90 on 2026-10-05.",
+    "est_used_price_usd_min": 30,
+    "est_used_price_usd_max": 30,
+    "buy_url": "https://shop.m5stack.com/products/m5stack-cardputer-adv-version-esp32-s3"
+  },
+  {
+    "id": "m5stack-stopwatch",
+    "name": "M5Stack StopWatch",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "voice",
+      "wearable",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md",
+      "https://docs.m5stack.com/en/core/StopWatch",
+      "https://github.com/m5stack/M5StopWatch-UserDemo"
+    ],
+    "community_size_bucket": "small",
+    "notes": "ESP32-S3 with a round 1.75\" 466x466 touch AMOLED, 16 MB flash, 8 MB PSRAM and the StickS3's ES8311 audio. Full Muse UI: yellow button for push-to-talk, blue for sleep, settings on the touch screen, battery status. M5Stack listed it at $45 on 2026-10-05.",
+    "est_used_price_usd_min": 45,
+    "est_used_price_usd_max": 45,
+    "buy_url": "https://shop.m5stack.com/products/m5stack-stopwatch-dev-kit-esp32-s3"
+  },
+  {
+    "id": "m5stack-cores3",
+    "name": "M5Stack CoreS3",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "voice",
+      "audio-out",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md",
+      "https://docs.m5stack.com/en/core/CoreS3",
+      "https://github.com/espressif/esp-bsp/tree/master/bsp/m5stack_core_s3"
+    ],
+    "community_size_bucket": "active",
+    "notes": "ESP32-S3 core with a 2\" 320x240 touch LCD, 16 MB flash, 8 MB PSRAM, 1 W speaker and mics. Full Muse UI: PWR is push-to-talk and pairing, settings on the touch screen. The camera, IMU and SD card aren't used yet. M5Stack listed it at $59.90 on 2026-10-05.",
+    "est_used_price_usd_min": 60,
+    "est_used_price_usd_max": 60,
+    "buy_url": "https://shop.m5stack.com/products/m5stack-cores3-esp32s3-iotdevelopment-kit"
+  },
+  {
+    "id": "guition-jc3248w535",
+    "name": "Guition JC3248W535 (3.5\" touch)",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "kiosk",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md",
+      "https://github.com/sirisakG2/JC3248W535C",
+      "https://github.com/me-processware/JC3248W535-Driver"
+    ],
+    "community_size_bucket": "small",
+    "notes": "ESP32-S3 with a 3.5\" 320x480 IPS touch panel, 16 MB flash, 8 MB PSRAM and a speaker amp. Full Muse UI and images. It has no microphone: push-to-talk needs an I2S MEMS mic such as an INMP441 wired in. Sold as JC3248W535C_I_Y and JC3248W535EN. No seller price verified."
+  },
+  {
+    "id": "m5stack-core2-v1-0",
+    "name": "M5Stack Core2 (v1.0)",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "voice",
+      "audio-out",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md",
+      "https://docs.m5stack.com/en/core/Core2",
+      "https://github.com/m5stack/M5Unified"
+    ],
+    "community_size_bucket": "active",
+    "notes": "Core2 v1.0 (AXP192 power chip): classic ESP32, 2\" 320x240 touch LCD, 16 MB flash, 8 MB PSRAM. Full Muse UI: hold the middle touch zone to talk; settings, battery, images and the home-network tunnel work. Core2 v1.1 (AXP2101) isn't supported; check the back sticker or PCB. No seller price verified."
+  },
+  {
+    "id": "freenove-fnk0104b",
+    "name": "Freenove FNK0104B (ESP32-S3 2.8\" touch)",
+    "category": "display",
+    "idea_fit_tags": [
+      "display",
+      "voice",
+      "agent-gadget"
+    ],
+    "hack_difficulty": 2,
+    "brick_risk": 1,
+    "brick_provenance": "vendor-docs",
+    "last_verified": "2026-10-05",
+    "firmware_links": [
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md",
+      "https://github.com/Freenove/Freenove_ESP32_S3_Display"
+    ],
+    "community_size_bucket": "small",
+    "notes": "ESP32-S3 board with a 2.8\" 240x320 touch LCD, 16 MB flash, 8 MB PSRAM and ES8311 audio. Full Muse UI: BOOT is push-to-talk, settings on the touch screen, images. Battery shows voltage only. Freenove listed the touch version (FNK0104B) at $23.99 on 2026-10-05.",
+    "est_used_price_usd_min": 24,
+    "est_used_price_usd_max": 24,
+    "buy_url": "https://store.freenove.com/products/fnk0104"
   }
 ]

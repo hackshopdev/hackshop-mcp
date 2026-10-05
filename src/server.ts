@@ -10,6 +10,7 @@ import {
   ListPromptsRequestSchema,
   ListResourcesRequestSchema,
   ListToolsRequestSchema,
+  McpError,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { loadCatalog } from "./catalog/load.js";
@@ -29,23 +30,29 @@ import {
 import { siteUrlFromEnv } from "./site-url.js";
 import { createTelemetry, errorKind } from "./telemetry.js";
 import {
+  CORE_TOOLS,
   coreToolDefinitions,
   executeCoreTool,
   type CoreToolResult,
 } from "./core/tools.js";
+import { formatInputError } from "./core/errors.js";
 import {
+  RESOURCE_NOT_FOUND_CODE,
   getCorePrompt,
   listCoreResourceTemplates,
   listCorePrompts,
   listCoreResources,
   readCoreResource,
+  resourceNotFoundMessage,
 } from "./core/resources.js";
 import type { CoreContext } from "./core/types.js";
 
 const NAME = "hackshop-mcp";
 const VERSION = "0.0.6";
 const STDIO_INSTRUCTIONS =
-  "Hackshop maps a natural-language project idea to hackable, repurposable, or protocol-native hardware. Use plan_gadget for Muse agent-body gadgets because it is deterministic, instant and key-free. Use propose_hardware for broader repurposing ideas and existing hardware, especially when the host can sample or ANTHROPIC_API_KEY is set. Hackshop never buys anything; show shopping lists and ask the human before any purchase. Anonymous usage telemetry (tool names and timings only) is on by default; set HACKSHOP_TELEMETRY=0 to turn it off.";
+  "hackshop maps a natural-language project idea to hackable, repurposable, or protocol-native hardware. For Muse agent-body gadgets, ask the intake questions from intake_gadget, then call plan_gadget with the answers; it is deterministic, instant and key-free. get_build_plan returns the parts, flash warnings and assembly checks. Use propose_hardware for broader repurposing ideas and existing hardware, especially when the host can sample or ANTHROPIC_API_KEY is set. hackshop never buys anything: show the exact items, sellers and total, ask \"Place this order for $<total> at <seller>?\" and wait for a clear yes. Anonymous usage telemetry (tool names and timings only) is on by default; set HACKSHOP_TELEMETRY=0 to turn it off.";
+
+const CORE_TOOL_NAMES = new Set<string>(CORE_TOOLS.map((tool) => tool.name));
 
 export function createToolRunner(context: {
   devices: DeviceEntry[];
@@ -60,19 +67,16 @@ export function createToolRunner(context: {
 }> {
   return async (name: string, args: unknown) => {
     if (name === "propose_hardware") {
+      const parsed = proposeHardwareInput.safeParse(args);
+      if (!parsed.success) return inputError(formatInputError(name, parsed.error));
       if (!context.server) {
         throw new Error("propose_hardware requires an MCP server context");
       }
-      const input = proposeHardwareInput.parse(args);
-      const out = await proposeHardware(input, context.devices, context.server);
+      const out = await proposeHardware(parsed.data, context.devices, context.server);
       return { out, degraded: out.degraded };
     }
 
-    if (
-      name === "assess_hackability" ||
-      name === "plan_gadget" ||
-      name === "get_build_plan"
-    ) {
+    if (CORE_TOOL_NAMES.has(name)) {
       const result = executeCoreTool(
         name,
         args,
@@ -82,8 +86,9 @@ export function createToolRunner(context: {
     }
 
     if (name === "simulate_assembly") {
-      const input = simulateAssemblyInput.parse(args);
-      return { out: await simulateAssembly(input) };
+      const parsed = simulateAssemblyInput.safeParse(args);
+      if (!parsed.success) return inputError(formatInputError(name, parsed.error));
+      return { out: await simulateAssembly(parsed.data) };
     }
 
     throw new Error(`Unknown tool: ${name}`);
@@ -103,6 +108,10 @@ function coreContext(
     siteUrl,
     tags,
   };
+}
+
+function inputError(text: string): { out: unknown; isError: true; text: string } {
+  return { out: { error: text }, isError: true, text };
 }
 
 function runnerResult(result: CoreToolResult): {
@@ -155,7 +164,7 @@ async function main(): Promise<void> {
       {
         name: "propose_hardware",
         description:
-          "Given a project idea (vague is fine), return 3-5 hardware proposals with 'why this fits', hack difficulty, brick risk (with safety rule applied), firmware links, community size, and a suggested eBay search query string. Compose with ebay-mcp at the host level for live listings.",
+          "Given a project idea (vague is fine), return 3-5 hardware proposals with 'why this fits', hack difficulty, brick risk (with safety rule applied), firmware links, community size, and a search query for used parts (search eBay yourself).",
         inputSchema: {
           type: "object",
           properties: {
@@ -166,7 +175,8 @@ async function main(): Promise<void> {
             },
             budget_usd: {
               type: "number",
-              description: "Optional budget in USD. Affects eBay query suggestions.",
+              exclusiveMinimum: 0,
+              description: "Optional budget in USD, greater than 0. Affects the used-parts search suggestions.",
             },
             constraints: {
               type: "string",
@@ -212,12 +222,10 @@ async function main(): Promise<void> {
   }));
 
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    const resource = readCoreResource(
-      request.params.uri,
-      coreContext(devices, platforms, sortedTags),
-    );
+    const ctx = coreContext(devices, platforms, sortedTags);
+    const resource = readCoreResource(request.params.uri, ctx);
     if (!resource) {
-      throw new Error(`Unknown resource: ${request.params.uri}`);
+      throw new McpError(RESOURCE_NOT_FOUND_CODE, resourceNotFoundMessage(request.params.uri, ctx));
     }
     return { contents: [resource] };
   });

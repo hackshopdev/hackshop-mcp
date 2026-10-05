@@ -13,7 +13,7 @@ Show HN: Hackshop-MCP – an AI agent that knows what hardware is hackable
 ## URL field
 
 ```
-https://github.com/msanchezgrice/hackshop-mcp
+https://github.com/hackshopdev/hackshop-mcp
 ```
 
 (HN prefers a GitHub link over an npm link for Show HN posts.)
@@ -48,7 +48,7 @@ V0.0.2 ships 27 devices, two tools, and an Anthropic API fallback for hosts that
 
 Built it for myself first; sharing because I can't be the only person who'd use this. Catalog PRs and "what device should I add" issues both very welcome.
 
-GitHub: https://github.com/msanchezgrice/hackshop-mcp
+GitHub: https://github.com/hackshopdev/hackshop-mcp
 npm:    https://www.npmjs.com/package/hackshop-mcp
 ```
 

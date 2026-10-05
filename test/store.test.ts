@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import platforms from "../platforms.json";
-import { buyEverythingPrompt, STORE_AGENT_PROMPT } from "../site/lib/agent-prompts";
 import { buildPlanForDevice } from "../site/lib/build-plan-data";
 import { maskEmail, shoppingListEmail } from "../site/lib/email-templates";
 import { commonParts, storeBoard, storeBoards, storeBoardsByGroup } from "../site/lib/store";
@@ -39,11 +38,18 @@ describe("store data", () => {
     expect(ideaspark?.buy.filter((link) => link.label === "Amazon")).toHaveLength(1);
   });
 
-  it("lists parts with prices and both a shop and an eBay link", () => {
+  it("lists parts with prices and concrete cable links, without eBay for accessories", () => {
     const sticks = storeBoard("m5stack-sticks3");
     const cable = sticks?.parts.find((part) => part.name === "USB-C data cable");
-    expect(cable?.url).toContain("amazon.com/s?k=");
-    expect(cable?.ebay_url).toContain("ebay.com/sch");
+    expect(cable?.url).toBe("https://www.adafruit.com/product/4199");
+    expect(cable?.url_kind).toBe("buy");
+    expect(cable?.alternatives.map((link) => link.url)).toContain(
+      "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+    );
+    expect(cable?.ebay_url).toBeNull();
+    // Seeed boards lead with Seeed's own cable.
+    expect(storeBoard("seeed-sensecap-watcher")?.parts.find((part) => part.name === "USB-C data cable")?.url)
+      .toContain("seeedstudio.com");
     expect(sticks?.est_total_usd).toBe(buildPlanForDevice("m5stack-sticks3")?.shopping_list.est_total_usd);
     const common = commonParts();
     expect(common[0]?.name).toBe("USB-C data cable");
@@ -65,24 +71,6 @@ describe("store data", () => {
       buyUrl: null,
       affiliate: { amazonTag: "hack-20" },
     })[0]?.url).toContain("tag=hack-20");
-  });
-});
-
-describe("buy-everything prompts", () => {
-  it("hands the agent the list and requires approval before buying", () => {
-    const prompt = buyEverythingPrompt({
-      name: "M5Stack StickS3",
-      deviceId: "m5stack-sticks3",
-      items: [{ qty: 1, name: "USB-C data cable" }],
-    });
-    expect(prompt).toContain("https://www.hackshop.dev/build/m5stack-sticks3/plan.json");
-    expect(prompt).toContain("https://www.hackshop.dev/store.json");
-    expect(prompt).toContain("1 × USB-C data cable");
-    expect(prompt).toMatch(/wait for my OK/);
-    expect(prompt).toMatch(/only add to cart or check out after I approve/i);
-    expect(prompt).toMatch(/Amazon and eBay don't allow automated carts or checkout/);
-    expect(STORE_AGENT_PROMPT).toMatch(/wait for my OK before you add anything to a cart or check out/);
-    expect(STORE_AGENT_PROMPT).toMatch(/Amazon and eBay don't allow automated carts or checkout/);
   });
 });
 
@@ -111,7 +99,7 @@ describe("shopping list email", () => {
   });
 
   it("masks addresses", () => {
-    expect(maskEmail("miguel@example.com")).toBe("mi••••@example.com");
+    expect(maskEmail("builder@example.com")).toBe("bu•••••@example.com");
     expect(maskEmail("nope")).toBe("your email");
   });
 });

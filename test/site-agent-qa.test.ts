@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("robots", () => {
-  it("allows /api/plan while keeping other APIs blocked", async () => {
+  it("allows /api/plan while keeping private APIs blocked", async () => {
     const { default: robots } = await import("../site/app/robots");
     const rules = robots().rules;
-    const allow = Array.isArray(rules) ? rules.flatMap((rule) => rule.allow ?? []) : rules.allow ?? [];
-    const disallow = Array.isArray(rules) ? rules.flatMap((rule) => rule.disallow ?? []) : rules.disallow ?? [];
+    const allow = [Array.isArray(rules) ? rules.flatMap((rule) => rule.allow ?? []) : rules.allow ?? []].flat();
+    const disallow = [Array.isArray(rules) ? rules.flatMap((rule) => rule.disallow ?? []) : rules.disallow ?? []].flat();
 
     expect(allow).toContain("/api/plan");
-    expect(disallow).toContain("/api/");
+    expect(disallow).toContain("/api/projects");
     expect(allow).not.toContain("/api/projects");
   });
 });

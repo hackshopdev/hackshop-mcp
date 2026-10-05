@@ -1,3 +1,11 @@
+import type {
+  BoardDifficulty,
+  FlashOverlay,
+  PlatformBoardPartAlternative,
+} from "../build-plan/types.js";
+
+export type { BoardDifficulty, FlashOverlay, PlatformBoardPartAlternative };
+
 export const NEED_VALUES = [
   "voice",
   "screen",
@@ -73,6 +81,7 @@ export interface PlatformBoardPart {
   info_url?: string;
   search?: string;
   est_price_usd?: number;
+  alternatives?: PlatformBoardPartAlternative[];
 }
 
 export interface PlatformBoard {
@@ -85,6 +94,10 @@ export interface PlatformBoard {
   fits?: FitSize[];
   eol?: boolean;
   note: string;
+  price_note?: string;
+  stand_note?: string;
+  difficulty?: BoardDifficulty;
+  flash?: FlashOverlay;
   features: Record<string, FeatureValue>;
   parts: PlatformBoardPart[];
   try_saying: string[];

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DifficultyBadge, DifficultyLegend } from "@/components/DifficultyBadge";
 import { GadgetPlanner } from "@/components/GadgetPlanner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -6,10 +7,14 @@ import { StartBuildButton } from "@/components/StartBuildButton";
 import { TellMyAgent } from "@/components/TellMyAgent";
 import { GENERAL_AGENT_PROMPT } from "@/lib/agent-prompts";
 import { boardPath } from "@/lib/board-slugs";
+import { buildPlanForDevice } from "@/lib/build-plan-data";
 import { hasImage } from "@/lib/image-sources";
 import { getMusePageData, type MuseBoardRow } from "@/lib/muse-page";
 import { pageMetadata } from "@/lib/page-metadata";
 import { TEMPLATES } from "@/lib/templates";
+import { difficultyFor, difficultyMap } from "@/lib/ui/difficulty";
+import { humanNote, plainTierLabel } from "@/lib/ui/labels";
+import { boardAndTotalLabel } from "@/lib/ui/price";
 import styles from "./muse.module.css";
 
 const DESCRIPTION =
@@ -31,6 +36,12 @@ export default function MusePage() {
   const statusRows = data.esp32.boards.filter((row) => row.tier === "status");
   const museTemplates = TEMPLATES.filter((template) => template.category === "agents");
   const services = fabricationServices(data.esp32.boards);
+  const totals = new Map(
+    data.esp32.boards.map((row) => {
+      const total = buildPlanForDevice(row.device.id)?.shopping_list.est_total_usd;
+      return [row.device.id, typeof total === "number" ? Math.round(total) : null] as const;
+    }),
+  );
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -99,8 +110,8 @@ export default function MusePage() {
           </div>
           <div className={styles.startGrid}>
             {[
-              ["1", "Describe it or pick a board", "Tell the planner below what you want, or compare the boards further down. Not sure? The M5Stack StickS3 is the cheapest Full UI board."],
-              ["2", "Start a build", "It saves the parts list with store links, print files and a step checklist to My builds. You can also save just the idea and pick a board later."],
+              ["1", "Answer a few questions or pick a board", "Tell the planner below what you want, or compare the boards further down. Not sure? The M5Stack StickS3 is a cheap pocket board with a screen and a mic."],
+              ["2", "Start this build", "It saves the parts list with store links, print files and a step checklist to My builds. You can also save just the idea and pick a board later."],
               ["3", "Tell your agent", "Copy the prompt or open the build in Claude, ChatGPT, Codex, Cursor or Muse Code. It walks you through ordering, assembly, flashing and pairing."],
             ].map(([number, title, body]) => (
               <article className={styles.faqItem} key={number}>
@@ -114,7 +125,8 @@ export default function MusePage() {
             <GadgetPlanner
               source="muse"
               readQuery
-              subhead="Describe the Muse gadget you want. We'll pick boards that can do it, then save it to My builds."
+              subhead="Answer a few quick questions, describe the Muse gadget you want, or both. We'll pick boards that can do it, then save it to My builds."
+              difficulties={difficultyMap()}
             />
           </div>
         </section>
@@ -133,14 +145,15 @@ export default function MusePage() {
                 <thead>
                   <tr>
                     <th scope="col">Board</th>
-                    <th scope="col">Tier</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Camera</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">How hard</th>
                     <th scope="col">Voice</th>
                     <th scope="col">Images</th>
                     <th scope="col">Touch</th>
-                    <th scope="col">Camera</th>
                     <th scope="col">Air sensors</th>
                     <th scope="col">Home tunnel</th>
-                    <th scope="col">Price</th>
                     <th scope="col">Printable</th>
                   </tr>
                 </thead>
@@ -161,16 +174,30 @@ export default function MusePage() {
                           />
                         </div>
                       </th>
+                      <td className={styles.priceCell}>
+                        <span>{row.priceLabel}</span>
+                        {totals.get(row.device.id) ? (
+                          <span className={styles.priceTotal}>
+                            about ${totals.get(row.device.id)} with cable/parts
+                          </span>
+                        ) : null}
+                      </td>
+                      <BooleanCell value={row.board.features.camera === true} />
                       <td>
                         <TierPill row={row} />
+                      </td>
+                      <td>
+                        {difficultyFor(row.device.id) ? (
+                          <DifficultyBadge difficulty={difficultyFor(row.device.id)} compact />
+                        ) : (
+                          <NoValue />
+                        )}
                       </td>
                       <td>{row.voiceLabel ?? <NoValue />}</td>
                       <td>{row.imageLabel ?? <NoValue />}</td>
                       <BooleanCell value={row.board.features.touch === true} />
-                      <BooleanCell value={row.board.features.camera === true} />
                       <BooleanCell value={row.board.features.air_sensors === true} />
                       <BooleanCell value={row.board.features.home_tunnel === true} />
-                      <td className={styles.priceCell}>{row.priceLabel}</td>
                       <td>
                         {row.printables[0] ? (
                           <a href={`#${row.device.id}`}>Stand</a>
@@ -184,6 +211,12 @@ export default function MusePage() {
               </table>
             </div>
           </div>
+          <ul className={styles.compareCards} aria-label="Muse Gadgets ESP32 boards">
+            {data.esp32.boards.map((row) => (
+              <CompareCard row={row} total={totals.get(row.device.id) ?? null} key={row.device.id} />
+            ))}
+          </ul>
+          <DifficultyLegend />
         </section>
 
         <section className={styles.section} aria-labelledby="board-cards">
@@ -191,8 +224,8 @@ export default function MusePage() {
             <p className={styles.eyebrow}>ESP32 boards</p>
             <h2 id="board-cards">Every board in detail</h2>
           </div>
-          <BoardGroup title="Full UI" rows={fullUiRows} />
-          <BoardGroup title="Status" rows={statusRows} />
+          <BoardGroup title={plainTierLabel("full-ui") ?? "Full UI"} rows={fullUiRows} />
+          <BoardGroup title={plainTierLabel("status") ?? "Status"} rows={statusRows} />
         </section>
 
         <section className={styles.section} aria-labelledby="build">
@@ -228,7 +261,7 @@ export default function MusePage() {
                 {data.linux.officialBoards.map((row) => (
                   <li key={row.device.id}>
                     <strong>{row.device.name}</strong> · {row.priceLabel} ·{" "}
-                    {row.board.note}
+                    {humanNote(row.board.note) || row.board.note}
                   </li>
                 ))}
               </ul>
@@ -396,7 +429,14 @@ function BoardCard({ row }: { row: MuseBoardRow }) {
     <article className={styles.boardCard} id={row.device.id}>
       <div className={styles.imageBox}>
         {hasImage(row.device.id) ? (
-          <img src={`/api/img?slug=${row.device.id}`} alt={row.device.name} />
+          <img
+            src={`/api/img?slug=${row.device.id}`}
+            alt={row.device.name}
+            loading="lazy"
+            decoding="async"
+            width={640}
+            height={480}
+          />
         ) : (
           <span>No image</span>
         )}
@@ -406,17 +446,22 @@ function BoardCard({ row }: { row: MuseBoardRow }) {
           <h3>{row.device.name}</h3>
           <TierPill row={row} />
         </div>
-        <p>{row.device.notes}</p>
+        <DifficultyBadge difficulty={difficultyFor(row.device.id)} />
+        <p>{humanNote(row.device.notes)}</p>
         <h4>What works</h4>
         <ul className={styles.workList}>
           {row.whatWorks.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
-        <h4>Build command</h4>
-        <pre className={styles.cardCode}>
-          <code>{row.board.build}</code>
-        </pre>
+        <details className={styles.devDetails}>
+          <summary>Developer details</summary>
+          <p>{row.board.note}</p>
+          <h4>Build command</h4>
+          <pre className={styles.cardCode}>
+            <code>{row.board.build}</code>
+          </pre>
+        </details>
         <div className={styles.linkRow}>
           <StartBuildButton
             className={styles.button}
@@ -440,7 +485,12 @@ function BoardCard({ row }: { row: MuseBoardRow }) {
             <div className={styles.printPanel} key={part.urls.fab}>
               <h4>Printable stand</h4>
               <div className={styles.svgBox}>
-                <img src={part.urls.svg} alt={`${row.device.name} printable stand preview`} />
+                <img
+                  src={part.urls.svg}
+                  alt={`${row.device.name} printable stand preview`}
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <dl className={styles.partStats}>
                 {part.bboxLabel ? (
@@ -493,10 +543,45 @@ function TierPill({ row }: { row: MuseBoardRow }) {
   return (
     <span className={styles.tierWrap}>
       <span className={row.tier === "full-ui" ? styles.fullPill : styles.statusPill}>
-        {row.tierLabel}
+        {plainTierLabel(row.tier) ?? row.tierLabel}
       </span>
       {row.board.eol ? <span className={styles.eolPill}>EOL</span> : null}
     </span>
+  );
+}
+
+// Phones get stacked cards instead of the wide table (UX-002).
+function CompareCard({ row, total }: { row: MuseBoardRow; total: number | null }) {
+  const f = row.board.features;
+  const hasScreen = f.images !== "none" || (typeof f.display_in === "number" && f.display_in > 0) || row.tier === "full-ui";
+  const checks: Array<{ label: string; value: boolean; note?: string }> = [
+    { label: "Voice", value: row.voiceLabel !== null },
+    { label: "Screen", value: hasScreen },
+    { label: "Camera", value: f.camera === true },
+    { label: "Battery", value: f.battery === "yes" || f.battery === "optional", note: f.battery === "optional" ? "optional" : undefined },
+  ];
+  const price = boardAndTotalLabel(row.priceLabel, total);
+  return (
+    <li className={styles.compareCard}>
+      <div className={styles.compareCardTop}>
+        <Link href={boardPath(row.device.id) ?? `/build/${row.device.id}`} className={styles.compareCardName}>
+          {row.device.name}
+        </Link>
+        <TierPill row={row} />
+      </div>
+      {price ? <p className={styles.compareCardPrice}>{price}</p> : null}
+      <ul className={styles.compareChecks}>
+        {checks.map((check) => (
+          <li key={check.label} className={check.value ? styles.checkYes : styles.checkNo}>
+            <span aria-hidden="true">{check.value ? "✓" : "—"}</span> {check.label}
+            {check.note ? <em> ({check.note})</em> : null}
+            <span className={styles.srOnly}>{check.value ? ": yes" : ": no"}</span>
+          </li>
+        ))}
+      </ul>
+      <DifficultyBadge difficulty={difficultyFor(row.device.id)} />
+      <StartBuildButton className={styles.button} deviceId={row.device.id} source="muse_card_mobile" />
+    </li>
   );
 }
 

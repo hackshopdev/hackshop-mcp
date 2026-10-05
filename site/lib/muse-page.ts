@@ -62,7 +62,9 @@ export interface MuseBoardRow {
   printables: MusePrintablePart[];
   fabricationNote: string;
   whatWorks: string[];
-  voiceLabel: "Spoken" | "Voice in, no speaker" | "Text replies" | null;
+  // Muse replies are text (captions on screen boards); spoken replies need
+  // your own text-to-speech service.
+  voiceLabel: "Voice in, text replies" | "Voice in, no speaker" | "Text replies" | null;
   imageLabel: "Color" | "B&W" | null;
 }
 
@@ -254,7 +256,7 @@ function formatNumber(value: number): string {
 
 function voiceLabel(board: PlatformBoard): MuseBoardRow["voiceLabel"] {
   if (board.features.audio === "speaker-mic" && board.features.push_to_talk === "voice") {
-    return "Spoken";
+    return "Voice in, text replies";
   }
   if (board.features.audio === "buzzer-mic" && board.features.push_to_talk === "voice") {
     return "Voice in, no speaker";
@@ -279,8 +281,8 @@ function whatWorks(board: PlatformBoard): string[] {
 
   if (voice) {
     works.push(
-      voice === "Spoken"
-        ? "Push-to-talk with spoken replies"
+      voice === "Voice in, text replies"
+        ? "Push-to-talk with text replies; add text-to-speech for spoken replies"
         : voice === "Text replies"
           ? "Push-to-talk with text replies"
           : "Push-to-talk (buzzer, no speaker)",

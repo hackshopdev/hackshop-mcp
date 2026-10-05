@@ -1,15 +1,17 @@
 # hackshop (hackshop-mcp)
 
-Hackshop helps an agent plan and build a physical body for itself. Muse gadgets are the first supported agent platform.
+hackshop helps an agent plan and build a physical body for itself. Muse gadgets are the first supported agent platform.
 
 ## Use First
 
-- Hosted MCP: `https://www.hackshop.dev/mcp`
-- Planner API: `POST https://www.hackshop.dev/api/plan`
+- Hosted MCP: `https://www.hackshop.dev/mcp` (stateless, POST only)
+- Planner API: `POST https://www.hackshop.dev/api/plan` (OpenAPI: `https://www.hackshop.dev/openapi.json`)
 - Build JSON: `https://www.hackshop.dev/build/<device_id>/plan.json`
 - Build brief: `https://www.hackshop.dev/build/<device_id>/build.md`
 - Muse boards: `https://www.hackshop.dev/muse`
-- Store JSON (every board and part, seller links, newest eBay listings): `https://www.hackshop.dev/store.json`
+- Store JSON (every board and part, seller links, difficulty, prices checked date): `https://www.hackshop.dev/store.json`
+- Agent guide: `https://www.hackshop.dev/agents.md`
+- Source: `https://github.com/hackshopdev/hackshop-mcp`
 
 ## MCP Install
 
@@ -21,6 +23,8 @@ Hosted connector:
   "transport": "streamable-http"
 }
 ```
+
+The hosted MCP is stateless: send JSON-RPC with POST. It never sends an `mcp-session-id`; GET and DELETE return 405. Browser clients are allowed (CORS `*`).
 
 Local npm server:
 
@@ -39,15 +43,22 @@ Local npm server:
 
 ## Tools
 
-- `plan_gadget`: deterministic Muse board planner with questions, fit, warnings, notes and build links.
-- `get_build_plan`: deterministic parts, shopping list, assembly, flashing, pairing and agent brief.
+- `intake_gadget`: the 4 intake questions (where it lives, how you interact, room sensing, budget), why they matter and how answers map to `plan_gadget`.
+- `plan_gadget`: deterministic Muse board planner. Pass the human's `answers`; it returns fit, warnings, notes, intake status, remaining questions, and picks with difficulty and build links.
+- `get_build_plan`: deterministic difficulty, flash warnings, parts, shopping list, assembly with verify checks, flashing, pairing and agent brief.
 - `assess_hackability`: catalog lookup with brick risk, firmware links and build-page URL.
-- Local npm only: `propose_hardware`, `simulate_assembly`.
+- Local npm only: `propose_hardware`, `simulate_assembly`. The hosted MCP answers these with a `try_instead` hint.
+
+Resources: `hackshop://muse/boards`, `hackshop://muse/sdk-terms`, `hackshop://catalog/tags`, and the template `hackshop://build/{device_id}` (listed under `resources/templates/list`; e.g. `hackshop://build/seeed-sensecap-watcher`).
+
+## Difficulty
+
+Every board has a ski-style level: green = Beginner (no tools), blue = Intermediate (extra steps such as a flash backup or a special port), black = Expert (needs a pro, or better to buy). Ideas that need the body to move or use arms get a warning: Muse boards can't move.
 
 ## Agent Rule
 
-Ask intake questions, call `plan_gadget`, let the human choose, then tell the human to click Start a build so progress is saved. Fetch `get_build_plan` or `/build/<id>/plan.json`, show the shopping list (best prices from `/store.json`), and get approval for the exact items, sellers and total before buying. Amazon and eBay don't allow automated carts or checkout, so give the human those links and let them check out. Follow `assembly`, then flash and pair.
+Ask the intake questions (skip any already answered), call `plan_gadget` with `answers`, let the human choose, then tell the human to click Start a build so progress is saved. Fetch `get_build_plan` or `/build/<id>/plan.json` and read its `warnings` before flashing (the SenseCAP Watcher needs an nvsfactory backup and the port ending in 3). Show the shopping list, follow the purchase policy, follow `assembly` and its `verify` checks, then flash and pair. Muse replies are text; add a text-to-speech service for spoken replies.
 
 ## Purchase Policy
 
-Show the human one list with links and the total, and get explicit approval for the exact items, sellers and total before buying anything. Amazon and eBay don't allow automated carts or checkout, so for those items give the human the links and let them check out. On other stores, once they approve and ask you to, you may add exactly those items to a cart and check out with a payment method they have already set up. Never buy anything they have not approved, and never type card numbers or passwords yourself.
+hackshop never buys anything. Your agent can help you buy the parts: it shows you the exact items, sellers and total, then asks "Place this order for $<total> at <seller>?" and waits for a clear yes before it checks out. If it can't check out on a site, or the site doesn't allow automated checkout (Amazon and eBay don't), it gives you the link to buy yourself.

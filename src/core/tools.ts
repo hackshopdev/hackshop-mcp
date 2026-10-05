@@ -8,11 +8,14 @@ import {
 } from "./assess.js";
 import { formatInputError } from "./errors.js";
 import {
+  INTAKE_QUESTIONS,
   NEED_VALUES,
   planGadget,
   planGadgetInput,
   type PlanGadgetOutput,
+  type PlanGadgetQuestion,
 } from "./plan-gadget.js";
+import { DIFFICULTY_LEVELS } from "./difficulty.js";
 import type { CoreContext, DeviceEntry, Platform, PlatformBoard } from "./types.js";
 
 export const getBuildPlanInput = z.object({
@@ -20,6 +23,25 @@ export const getBuildPlanInput = z.object({
 });
 
 export type GetBuildPlanInput = z.infer<typeof getBuildPlanInput>;
+
+export const intakeGadgetInput = z.object({});
+
+export type IntakeGadgetInput = z.infer<typeof intakeGadgetInput>;
+
+export interface IntakeGadgetOutput {
+  instruction: string;
+  questions: PlanGadgetQuestion[];
+  answers_shape: Record<string, string[]>;
+  mapping: string;
+  example: { tool: "plan_gadget"; arguments: Record<string, unknown> };
+  difficulty_levels: typeof DIFFICULTY_LEVELS;
+}
+
+/** Tools that only the npm server has; the hosted MCP points callers there. */
+export const NPM_ONLY_TOOLS: Readonly<Record<string, string>> = {
+  propose_hardware: "broad hardware ideas and repurposing",
+  simulate_assembly: "physics simulation of a wheeled robot",
+};
 
 type JsonSchema = Record<string, unknown>;
 
@@ -29,7 +51,7 @@ const OBJECT_OUTPUT_SCHEMA = {
 };
 
 export interface CoreTool<Input, Output> {
-  name: "plan_gadget" | "get_build_plan" | "assess_hackability";
+  name: "intake_gadget" | "plan_gadget" | "get_build_plan" | "assess_hackability";
   title: string;
   description: string;
   inputSchema: JsonSchema;
@@ -41,6 +63,7 @@ export interface CoreTool<Input, Output> {
 export interface CoreToolError {
   isError: true;
   text: string;
+  try_instead?: string;
 }
 
 export interface CoreToolSuccess {
@@ -50,14 +73,38 @@ export interface CoreToolSuccess {
 
 export type CoreToolResult = CoreToolSuccess | CoreToolError;
 
+const ANSWER_PROPERTIES = Object.fromEntries(
+  INTAKE_QUESTIONS.map((question) => [
+    question.id,
+    {
+      type: "string",
+      enum: question.options.map((option) => option.value),
+      description: `${question.question} ${question.options.map((option) => `${option.value} = ${option.label}`).join("; ")}.`,
+    },
+  ]),
+);
+
 export const CORE_TOOLS = [
+  {
+    name: "intake_gadget",
+    title: "Get the intake questions",
+    description:
+      "Return the 4 intake questions (where it lives, how you interact, room sensing, budget), why each matters and how each answer maps to plan_gadget. Ask the human these, then call plan_gadget with `answers`. No input.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
+    zodSchema: intakeGadgetInput,
+    run: intakeGadget,
+  } satisfies CoreTool<IntakeGadgetInput, IntakeGadgetOutput>,
   {
     name: "plan_gadget",
     title: "Plan a Muse gadget",
     description:
-      "Deterministically plan a physical body for an AI agent using Meta Muse boards. Inputs: `idea` 3-2000 chars; `platform` one of muse-esp32, muse-linux, any (default any); `budget_usd` positive number up to 100000; `owned_device_ids` up to 50 catalog ids; `needs` values: " +
+      "Deterministically plan a physical body for an AI agent using Meta Muse boards. Ask the intake questions first (intake_gadget, or the `questions` this returns until `intake.complete` is true), then pass the human's choices as `answers`. Inputs: `idea` 3-2000 chars (optional when `answers` or `needs` are given); `answers` {size, interaction, sensing, budget} using the intake option values; `platform` one of muse-esp32, muse-linux, any (default any); `budget_usd` number greater than 0, up to 100000; `owned_device_ids` up to 50 catalog ids; `needs` values: " +
       `${NEED_VALUES.join(", ")}; ` +
-      "`size` one of pocket, desk, wall, hidden, any (default any); `limit` 1-5 (default 3). Returns fit, notes, warnings, intake questions, picks, terms and next steps.",
+      "`size` one of pocket, desk, wall, hidden, any (default any); `limit` 1-5 (default 3). Boards that meet the hard needs and the budget rank first, cheapest first. Returns fit, notes, warnings, intake status, questions, picks with difficulty, terms and next steps.",
     inputSchema: {
       type: "object",
       properties: {
@@ -65,7 +112,13 @@ export const CORE_TOOLS = [
           type: "string",
           minLength: 3,
           maxLength: 2000,
-          description: "Gadget idea or use case, 3-2000 characters.",
+          description: "Gadget idea or use case, 3-2000 characters. Optional when `answers` or `needs` are given.",
+        },
+        answers: {
+          type: "object",
+          properties: ANSWER_PROPERTIES,
+          additionalProperties: false,
+          description: "The human's intake answers, by question id, using the option values from intake_gadget.",
         },
         platform: {
           type: "string",
@@ -104,7 +157,6 @@ export const CORE_TOOLS = [
           description: "Number of picks to return: 1-5, default 3.",
         },
       },
-      required: ["idea"],
     },
     outputSchema: OBJECT_OUTPUT_SCHEMA,
     zodSchema: planGadgetInput,
@@ -114,7 +166,7 @@ export const CORE_TOOLS = [
     name: "get_build_plan",
     title: "Get a build plan",
     description:
-      "Return the complete deterministic build plan for a catalog device id: parts, shopping list with buy_options and store URLs, steps, machine-readable assembly, commands, links, caveats and an agent-ready brief. Input: `device_id` 1-200 chars.",
+      "Return the complete deterministic build plan for a catalog device id: difficulty, board-specific flash warnings, parts, shopping list with buy_options, prices checked date and purchase policy, steps, machine-readable assembly with verify checks, commands, links, caveats and an agent-ready brief. Input: `device_id` 1-200 chars.",
     inputSchema: {
       type: "object",
       properties: {
@@ -173,7 +225,19 @@ export function executeCoreTool(
 ): CoreToolResult {
   const tool = CORE_TOOLS.find((candidate) => candidate.name === toolName);
   if (!tool) {
-    return { isError: true, text: `Unknown tool: ${toolName}` };
+    const npmOnly = NPM_ONLY_TOOLS[toolName];
+    if (npmOnly) {
+      const tryInstead = "available in the npm server: npx -y hackshop-mcp";
+      return {
+        isError: true,
+        text: `${toolName} (${npmOnly}) isn't on the hosted MCP. It is ${tryInstead}. For Muse boards, use plan_gadget here.`,
+        try_instead: tryInstead,
+      };
+    }
+    return {
+      isError: true,
+      text: `Unknown tool: ${toolName}. Available: ${CORE_TOOLS.map((candidate) => candidate.name).join(", ")}.`,
+    };
   }
 
   const parsed = tool.zodSchema.safeParse(args);
@@ -187,6 +251,30 @@ export function executeCoreTool(
   const result = tool.run(parsed.data as never, ctx);
   if (isCoreToolError(result)) return result;
   return { output: result };
+}
+
+export function intakeGadget(): IntakeGadgetOutput {
+  return {
+    instruction:
+      "Ask the human these questions, one short message is fine, and skip any they already answered. Then call plan_gadget with `answers` set to the option values they chose, plus their idea in their own words if they gave one.",
+    questions: INTAKE_QUESTIONS.map((question) => ({
+      ...question,
+      options: question.options.map((option) => ({ ...option })),
+    })),
+    answers_shape: Object.fromEntries(
+      INTAKE_QUESTIONS.map((question) => [question.id, question.options.map((option) => option.value)]),
+    ),
+    mapping:
+      "Each option lists what plan_gadget applies for it: `needs` are added to the needs from the idea, `size` sets the placement and `budget_usd` sets the budget. An explicit `size` or `budget_usd` in the plan_gadget call wins over an answer.",
+    example: {
+      tool: "plan_gadget",
+      arguments: {
+        idea: "a desk buddy I can talk to",
+        answers: { size: "desk", interaction: "voice", sensing: "none", budget: "under-50" },
+      },
+    },
+    difficulty_levels: DIFFICULTY_LEVELS,
+  };
 }
 
 export function getBuildPlan(

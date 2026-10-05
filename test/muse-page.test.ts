@@ -32,7 +32,8 @@ describe("Muse page data assembly", () => {
     const data = getMusePageData();
     const rows = data.esp32.boards;
 
-    expect(rows).toHaveLength(12);
+    // Every board in the Muse ESP32 SDK's supported table.
+    expect(rows).toHaveLength(24);
 
     const firstStatus = rows.findIndex((row) => row.tier === "status");
     expect(firstStatus).toBeGreaterThan(0);
@@ -61,7 +62,8 @@ describe("Muse page data assembly", () => {
     const data = getMusePageData();
 
     for (const row of data.esp32.boards) {
-      expect(row.priceLabel).toMatch(/^\$/);
+      // Boards without a seller price we could check say so.
+      expect(row.priceLabel).toMatch(/^\$|^Price unknown$/);
       expect(row.tierLabel).toMatch(/Full UI|Status/);
     }
 
@@ -73,8 +75,10 @@ describe("Muse page data assembly", () => {
     const data = getMusePageData();
     const rows = new Map(data.esp32.boards.map((row) => [row.device.id, row]));
 
-    expect(rows.get("m5stack-sticks3")?.voiceLabel).toBe("Spoken");
-    expect(rows.get("m5stack-sticks3")?.whatWorks).toContain("Push-to-talk with spoken replies");
+    expect(rows.get("m5stack-sticks3")?.voiceLabel).toBe("Voice in, text replies");
+    expect(rows.get("m5stack-sticks3")?.whatWorks).toContain(
+      "Push-to-talk with text replies; add text-to-speech for spoken replies",
+    );
     expect(rows.get("m5stack-stickc-plus2")?.voiceLabel).toBe("Voice in, no speaker");
     expect(rows.get("m5stack-stickc-plus2")?.whatWorks).toContain("Push-to-talk (buzzer, no speaker)");
     expect(rows.get("waveshare-esp32-c6-touch-amoled-1-8")?.voiceLabel).toBe(

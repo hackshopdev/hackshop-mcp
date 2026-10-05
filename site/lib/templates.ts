@@ -43,9 +43,9 @@ export const TEMPLATES: Template[] = [
     slug: "muse-desk-orb",
     title: "A desk orb that shows what Muse is doing",
     blurb:
-      "Round AMOLED avatar on your desk: push-to-talk, spoken replies and images from Muse, in a printed stand.",
+      "Round AMOLED avatar on your desk: push-to-talk, Muse's replies as text and images from Muse, in a printed stand.",
     prompt:
-      "Give my Muse AI agent a body on my desk: a round screen that shows its avatar and status, push-to-talk with spoken replies, and shows images Muse sends me. USB powered, sits on a desk stand.",
+      "Give my Muse AI agent a body on my desk: a round screen that shows its avatar, status and replies, push-to-talk, and shows images Muse sends me. USB powered, sits on a desk stand.",
     difficulty: 2,
     est_cost_usd: { min: 40, max: 45 },
     est_setup_hours_min: 1,
@@ -59,7 +59,7 @@ export const TEMPLATES: Template[] = [
   {
     slug: "muse-pocket-remote",
     title: "Pocket push-to-talk remote for Muse",
-    blurb: "M5Stack StickS3 on a keychain or desk dock: press, talk, hear Muse answer.",
+    blurb: "M5Stack StickS3 on a keychain or desk dock: press, talk, read Muse's answer on the screen.",
     prompt:
       "A pocket-sized push-to-talk remote for my Muse AI agent with a small screen and a speaker, battery powered, plus a desk dock to charge it.",
     difficulty: 2,
@@ -68,7 +68,7 @@ export const TEMPLATES: Template[] = [
     est_setup_hours_max: 2,
     viability: "official",
     viability_note:
-      "StickS3 is on the full-UI list with speaker and mic. The older StickC Plus2 also works but only has a buzzer, so replies can't be spoken.",
+      "StickS3 is on the full-UI list with speaker and mic. Replies show as text; add your own text-to-speech service for spoken replies. The older StickC Plus2 also works but only has a buzzer, so it can't play audio.",
     device_id: "m5stack-sticks3",
     category: "agents",
   },
@@ -84,7 +84,7 @@ export const TEMPLATES: Template[] = [
     est_setup_hours_max: 3,
     viability: "official",
     viability_note:
-      "Status tier: no voice, black-and-white images only. The color E1002 is shown on gadgets.muse.ai but only the E1001 is in the SDK's board list.",
+      "Status tier: no voice, black-and-white images only. The SDK's board list has both the E1001 and the color E1002 (six-color e-paper), so pick the E1002 if you want color.",
     device_id: "seeed-reterminal-e1001",
     category: "agents",
   },
@@ -182,7 +182,7 @@ export const TEMPLATES: Template[] = [
     est_setup_hours_max: 8,
     viability: "verified",
     viability_note:
-      "Electric Objects EO1 has a public revival project (dasl-/electric-objects-revival). Founder did this hack personally — ~6 hours with Claude assistance.",
+      "Electric Objects EO1 has a public revival project (dasl-/electric-objects-revival). The hackshop team did this hack in about 6 hours with help from Claude.",
     category: "display",
   },
   {

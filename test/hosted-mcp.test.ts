@@ -28,6 +28,7 @@ describe("hosted MCP route", () => {
 
     const tools = await rpc("tools/list");
     expect(tools.result.tools.map((tool: { name: string }) => tool.name)).toEqual([
+      "intake_gadget",
       "plan_gadget",
       "get_build_plan",
       "assess_hackability",

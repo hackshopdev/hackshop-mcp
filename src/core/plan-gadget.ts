@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { buildPlan, flashCommandForBuild } from "../build-plan/index.js";
+import { buildPlan, flashCommandForBuild, formatUsd, roundMoney } from "../build-plan/index.js";
+import {
+  MOVEMENT_DIFFICULTY_NOTE,
+  difficultySummary,
+  type DifficultyLevel,
+} from "./difficulty.js";
 import {
   NEED_VALUES,
   type CoreContext,
@@ -17,38 +22,128 @@ export { NEED_VALUES, type Need, type Size };
 const NeedSchema = z.enum(NEED_VALUES);
 const SizeSchema = z.enum(["pocket", "desk", "wall", "hidden", "any"]);
 
+export interface PlanGadgetQuestionOption {
+  label: string;
+  value: string;
+  needs?: Need[];
+  budget_usd?: number;
+  size?: Size;
+}
+
+export interface PlanGadgetQuestion {
+  id: IntakeQuestionId;
+  question: string;
+  why: string;
+  options: PlanGadgetQuestionOption[];
+}
+
+export const INTAKE_QUESTION_IDS = ["size", "interaction", "sensing", "budget"] as const;
+export type IntakeQuestionId = (typeof INTAKE_QUESTION_IDS)[number];
+
+/**
+ * The four intake questions shared by plan_gadget, intake_gadget, /api/plan
+ * and the site planner. Each option declares exactly what it maps to.
+ */
+export const INTAKE_QUESTIONS: readonly PlanGadgetQuestion[] = [
+  {
+    id: "size",
+    question: "Where should this body live?",
+    why: "Size and placement decide whether a pocket remote, desk object, wall display, or hidden no-screen board fits.",
+    options: [
+      { label: "Pocket", value: "pocket", needs: ["battery"], size: "pocket" },
+      { label: "Desk", value: "desk", size: "desk" },
+      { label: "Wall or fridge", value: "wall", needs: ["big-screen"], size: "wall" },
+      { label: "Hidden, no screen", value: "hidden", needs: ["home-tunnel"], size: "hidden" },
+    ],
+  },
+  {
+    id: "interaction",
+    question: "How should you interact with it?",
+    why: "Some boards have push-to-talk with a mic and speaker; replies show as text on the screen or in the Muse app (add a text-to-speech service for spoken replies). Others have a touch screen, or just a light and a button.",
+    options: [
+      { label: "Talk to it", value: "voice", needs: ["voice"] },
+      { label: "Touch screen", value: "touch", needs: ["screen", "touch"] },
+      { label: "Light and button", value: "light-button", needs: ["home-tunnel"] },
+    ],
+  },
+  {
+    id: "sensing",
+    question: "Should it sense the room?",
+    why: "Camera and air-quality boards are specialized, so choosing this early prevents a mismatched build.",
+    options: [
+      { label: "Camera", value: "camera", needs: ["camera"] },
+      { label: "Air quality", value: "air-quality", needs: ["air-sensors"] },
+      { label: "None", value: "none" },
+    ],
+  },
+  {
+    id: "budget",
+    question: "What budget should I plan around?",
+    why: "Boards that do what you need and fit the budget come first, cheapest first. If none fits, the planner says so and names the cheapest board that does what you asked.",
+    options: [
+      { label: "Under $25", value: "under-25", budget_usd: 25 },
+      { label: "Under $50", value: "under-50", budget_usd: 50 },
+      { label: "Under $100", value: "under-100", budget_usd: 100 },
+      { label: "No limit", value: "no-limit" },
+    ],
+  },
+];
+
+const AnswersSchema = z.object({
+  size: z.enum(["pocket", "desk", "wall", "hidden"]).optional(),
+  interaction: z.enum(["voice", "touch", "light-button"]).optional(),
+  sensing: z.enum(["camera", "air-quality", "none"]).optional(),
+  budget: z.enum(["under-25", "under-50", "under-100", "no-limit"]).optional(),
+}).strict();
+
+export type IntakeAnswers = z.infer<typeof AnswersSchema>;
+
+// A blank idea is the same as no idea: the planner can run on answers alone.
+const IdeaSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.string().min(3).max(2000).optional(),
+);
+
 export const planGadgetInput = z.object({
-  idea: z.string().min(3).max(2000),
+  idea: IdeaSchema,
   platform: z.enum(["muse-esp32", "muse-linux", "any"]).default("any"),
   budget_usd: z.number().positive().max(100000).optional(),
   owned_device_ids: z.array(z.string().min(1)).max(50).optional(),
   needs: z.array(NeedSchema).optional(),
   size: SizeSchema.default("any"),
   limit: z.number().int().min(1).max(5).default(3),
+  answers: AnswersSchema.optional(),
+}).superRefine((input, ctx) => {
+  const answered = input.answers !== undefined &&
+    Object.values(input.answers).some((value) => value !== undefined);
+  if (input.idea === undefined && !answered && (input.needs?.length ?? 0) === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["idea"],
+      message: "is required (3-2000 characters) unless `answers` or `needs` are given",
+    });
+  }
 });
 
 export type PlanGadgetInput = z.infer<typeof planGadgetInput>;
 
-export interface PlanGadgetQuestion {
-  id: string;
-  question: string;
+export interface PlanGadgetPickDifficulty {
+  level: DifficultyLevel;
+  label: string;
+  short: string;
   why: string;
-  options: Array<{
-    label: string;
-    value: string;
-    needs?: Need[];
-    budget_usd?: number;
-    size?: Size;
-  }>;
 }
 
 export interface PlanGadgetOutput {
   inferred_needs: Need[];
   inferred_preferences: InferredPreference[];
   inferred_size: Size;
+  budget_usd: number | null;
   fit: "all" | "partial" | "none";
   notes: string[];
   warnings: string[];
+  difficulty_note?: string;
+  intake: { complete: boolean; missing: IntakeQuestionId[] };
   questions: PlanGadgetQuestion[];
   picks: Array<{
     device_id: string;
@@ -64,12 +159,16 @@ export interface PlanGadgetOutput {
     needs_met: Need[];
     est_total_usd: number | null;
     within_budget: boolean | null;
+    /** True when the board suits the requested size (pocket, desk, wall, hidden); null when no size was asked. */
+    fits_size: boolean | null;
     price_label: string | null;
+    difficulty: PlanGadgetPickDifficulty | null;
     build_page_url: string;
     agent_brief_url: string;
     links: string[];
     build_command: string;
     setup_steps: string[];
+    warnings: string[];
     caveats: string[];
     fabrication: {
       printables: Printable[];
@@ -140,7 +239,6 @@ const SIZE_KEYWORDS: Record<FitSize, string[]> = {
   wall: ["wall", "fridge", "kitchen", "frame", "poster"],
   hidden: ["hidden", "closet", "no screen", "headless"],
 };
-const SIZE_WORDS = Object.values(SIZE_KEYWORDS).flat();
 
 const NON_MUSE_ASSISTANTS: Array<[RegExp, string]> = [
   [/\b(alexa|echo)\b/i, "Alexa"],
@@ -150,6 +248,29 @@ const NON_MUSE_ASSISTANTS: Array<[RegExp, string]> = [
   [/\bbixby\b/i, "Bixby"],
 ];
 
+// Ideas that need the body to move or use arms. Muse boards are screens,
+// speakers, mics and sensors; none of them can do this.
+const MOVEMENT_KEYWORDS = [
+  "move",
+  "moves",
+  "drive",
+  "wheels",
+  "walk",
+  "roll",
+  "arm",
+  "arms",
+  "wave",
+  "grab",
+  "gripper",
+  "servo",
+  "motor",
+  "robot that moves",
+];
+const NOT_MOVEMENT = /\b(hard|flash|usb|thumb|google|external|network|disk|ssd|nas|shared)\s+drive\b/gi;
+
+export const MOVEMENT_WARNING =
+  "These Muse boards can't move or use arms; they're screens, speakers, mics and sensors. Movement needs a robot kit, which hackshop doesn't plan yet.";
+
 interface ScoredBoard {
   device: DeviceEntry;
   platform: Platform;
@@ -157,10 +278,20 @@ interface ScoredBoard {
   tierLabel: string;
   score: number;
   satisfied: Need[];
+  hardMet: number;
   gaps: string[];
   estTotalUsd: number | null;
   withinBudget: boolean | null;
   sizeFit: boolean | null;
+  owned: boolean;
+}
+
+interface ResolvedRequest {
+  idea: string;
+  needs: Need[];
+  hardNeeds: Need[];
+  size: Size;
+  budgetUsd: number | undefined;
 }
 
 export function planGadget(
@@ -168,12 +299,16 @@ export function planGadget(
   ctx: CoreContext,
 ): PlanGadgetOutput {
   const catalogById = new Map(ctx.catalog.map((device) => [device.id, device]));
-  const needs = input.needs ? orderNeeds(input.needs) : inferNeeds(input.idea);
-  const inferredSize = input.size === "any" ? inferSize(input.idea) : input.size;
-  const inferredPreferences = inferPreferences(input.idea, inferredSize);
+  const request = resolveRequest(input);
+  const { idea, needs, hardNeeds } = request;
+  const inferredSize = request.size;
+  const budgetUsd = request.budgetUsd;
+  const inferredPreferences = inferPreferences(idea, inferredSize);
+  const movement = impliesMovement(idea);
   const warnings = [
     ...unknownOwnedDeviceWarnings(input.owned_device_ids ?? [], catalogById),
-    ...nonMuseAssistantWarnings(input.idea),
+    ...nonMuseAssistantWarnings(idea),
+    ...(movement ? [MOVEMENT_WARNING] : []),
   ];
   const owned = new Set(
     (input.owned_device_ids ?? []).filter((id) => catalogById.has(id)),
@@ -192,7 +327,7 @@ export function planGadget(
         board,
         tierLabel: tierLabels.get(board.tier) ?? board.tier,
         needs,
-        budgetUsd: input.budget_usd,
+        budgetUsd,
         owned: owned.has(device.id),
         cheapPreference: inferredPreferences.includes("cheap"),
         size: inferredSize,
@@ -200,20 +335,16 @@ export function planGadget(
     }
   }
 
-  candidates.sort(candidateSort(input.budget_usd));
+  const sort = candidateSort(budgetUsd);
+  candidates.sort(sort);
 
-  const budgeted = input.budget_usd !== undefined;
-  const anyWithinBudget = !budgeted || candidates.some((candidate) => candidate.withinBudget);
-  const ranked = budgeted && !anyWithinBudget
-    ? [...candidates].sort((a, b) => {
-      if (b.satisfied.length !== a.satisfied.length) return b.satisfied.length - a.satisfied.length;
-      const priceA = priceFor(a);
-      const priceB = priceFor(b);
-      if (priceA !== priceB) return priceA - priceB;
-      return a.device.id.localeCompare(b.device.id);
-    })
-    : candidates;
-  const selected = ensureNeedCoverage(ranked, input.limit, needs, input.budget_usd);
+  // "Workable" boards meet every hard need, or as many as any board can.
+  const bestHard = Math.max(0, ...candidates.map((candidate) => candidate.hardMet));
+  const workable = candidates.filter((candidate) => candidate.hardMet === bestHard);
+  const budgeted = budgetUsd !== undefined;
+  const anyWorkableWithinBudget = !budgeted ||
+    workable.some((candidate) => candidate.withinBudget === true);
+  const selected = ensureNeedCoverage(candidates, input.limit, needs, sort);
 
   const picks = selected.map((candidate) => {
     const printables = ctx.printablesFor(candidate.device, ctx.siteUrl);
@@ -224,6 +355,7 @@ export function planGadget(
       printables,
       siteUrl: ctx.siteUrl,
     });
+    const difficulty = difficultySummary(candidate.board.difficulty);
 
     return {
       device_id: candidate.device.id,
@@ -239,16 +371,19 @@ export function planGadget(
       needs_met: candidate.satisfied,
       est_total_usd: candidate.estTotalUsd,
       within_budget: candidate.withinBudget,
+      fits_size: candidate.sizeFit,
       price_label: priceLabel(candidate.device),
+      difficulty,
       build_page_url: plan.urls.build_page,
       agent_brief_url: plan.urls.build_md,
       links: candidate.device.firmware_links,
       build_command: candidate.board.build,
       setup_steps: boardSetupSteps(candidate.platform, candidate.board),
+      warnings: plan.warnings,
       caveats: plan.caveats,
       fabrication: {
         printables,
-        note: fabricationNote(candidate.device, printables),
+        note: fabricationNote(candidate.device, printables, candidate.board),
       },
     };
   });
@@ -256,25 +391,42 @@ export function planGadget(
   const notes = buildNotes({
     needs,
     candidates,
-    picks: selected,
-    budgetUsd: input.budget_usd,
-    anyWithinBudget,
+    workable,
+    budgetUsd,
+    anyWorkableWithinBudget,
   });
-  const fit = computeFit(needs, selected[0], input.budget_usd, anyWithinBudget);
+  warnings.push(...hardNeedWarnings({
+    hardNeeds,
+    candidates,
+    top: selected[0],
+    size: inferredSize,
+  }));
+  const fit = computeFit({
+    needs,
+    first: selected[0],
+    budgetUsd,
+    anyWorkableWithinBudget,
+    movement,
+  });
   const pickedPlatforms = new Map<string, Platform>();
   for (const pick of picks) {
     const platform = ctx.platforms.find((candidate) => candidate.id === pick.platform_id);
     if (platform) pickedPlatforms.set(platform.id, platform);
   }
+  const intake = intakeStatus(input);
 
   return {
     inferred_needs: needs,
     inferred_preferences: inferredPreferences,
     inferred_size: inferredSize,
+    budget_usd: budgetUsd ?? null,
     fit,
     notes,
     warnings,
-    questions: intakeQuestions(input, needs, inferredSize, inferredPreferences),
+    ...(movement ? { difficulty_note: MOVEMENT_DIFFICULTY_NOTE } : {}),
+    intake,
+    questions: INTAKE_QUESTIONS.filter((question) => intake.missing.includes(question.id))
+      .map(cloneQuestion),
     picks,
     terms: [...pickedPlatforms.values()].map((platform) => ({
       platform_id: platform.id,
@@ -285,6 +437,84 @@ export function planGadget(
     })),
     next_steps: nextSteps(picks),
   };
+}
+
+/** Explicit inputs first, then intake answers, then what the idea text implies. */
+function resolveRequest(input: PlanGadgetInput): ResolvedRequest {
+  const idea = input.idea ?? "";
+  const mapped = mapAnswers(input.answers);
+  const baseNeeds = input.needs ?? inferNeeds(idea);
+  const needs = orderNeeds([...baseNeeds, ...mapped.needs]);
+  const size = input.size !== "any"
+    ? input.size
+    : mapped.size ?? inferSize(idea);
+  const budgetUsd = input.budget_usd ?? mapped.budgetUsd;
+  return {
+    idea,
+    needs,
+    hardNeeds: needs.filter((need) => HARD_NEEDS.has(need)),
+    size,
+    budgetUsd,
+  };
+}
+
+/** Map intake answers to needs, size and budget exactly as the options declare. */
+export function mapAnswers(answers: IntakeAnswers | undefined): {
+  needs: Need[];
+  size: Size | undefined;
+  budgetUsd: number | undefined;
+} {
+  const needs: Need[] = [];
+  let size: Size | undefined;
+  let budgetUsd: number | undefined;
+  if (!answers) return { needs, size, budgetUsd };
+  for (const question of INTAKE_QUESTIONS) {
+    const value = answers[question.id];
+    if (value === undefined) continue;
+    const option = question.options.find((candidate) => candidate.value === value);
+    if (!option) continue;
+    needs.push(...(option.needs ?? []));
+    if (option.size) size = option.size;
+    if (option.budget_usd !== undefined) budgetUsd = option.budget_usd;
+  }
+  return { needs, size, budgetUsd };
+}
+
+/**
+ * Intake is complete once every question is answered, either in `answers` or
+ * by an explicit `size`, `needs` or `budget_usd`. What the idea text implies
+ * does not count: the human should still be asked.
+ */
+export function intakeStatus(input: Pick<PlanGadgetInput, "answers" | "size" | "needs" | "budget_usd">): {
+  complete: boolean;
+  missing: IntakeQuestionId[];
+} {
+  const answers = input.answers ?? {};
+  const explicitNeeds = input.needs;
+  const answered: Record<IntakeQuestionId, boolean> = {
+    size: answers.size !== undefined || input.size !== "any",
+    interaction: answers.interaction !== undefined ||
+      (explicitNeeds ?? []).some((need) => ["voice", "touch", "screen", "home-tunnel"].includes(need)),
+    sensing: answers.sensing !== undefined || explicitNeeds !== undefined,
+    budget: answers.budget !== undefined || input.budget_usd !== undefined,
+  };
+  const missing = INTAKE_QUESTION_IDS.filter((id) => !answered[id]);
+  return { complete: missing.length === 0, missing };
+}
+
+function cloneQuestion(question: PlanGadgetQuestion): PlanGadgetQuestion {
+  return {
+    ...question,
+    options: question.options.map((option) => ({
+      ...option,
+      ...(option.needs ? { needs: [...option.needs] } : {}),
+    })),
+  };
+}
+
+export function impliesMovement(idea: string): boolean {
+  const text = idea.replace(NOT_MOVEMENT, " ");
+  return MOVEMENT_KEYWORDS.some((keyword) => wordBoundaryMatch(text, keyword));
 }
 
 export function inferNeeds(idea: string): Need[] {
@@ -398,10 +628,12 @@ function scoreBoard(args: {
     tierLabel: args.tierLabel,
     score,
     satisfied,
+    hardMet: satisfied.filter((need) => HARD_NEEDS.has(need)).length,
     gaps,
     estTotalUsd,
     withinBudget,
     sizeFit,
+    owned: args.owned,
   };
 }
 
@@ -415,11 +647,13 @@ function satisfiesNeed(
       const pushToTalk = board.features.push_to_talk;
       const audio = board.features.audio;
       if (pushToTalk === "voice" && audio === "speaker-mic") return { satisfied: true };
-      if (pushToTalk === "text") return { satisfied: false, gap: "voice: text replies only" };
-      if (audio === "buzzer-mic") {
-        return { satisfied: false, gap: "voice: no speaker (buzzer only)" };
+      if (pushToTalk === "text") {
+        return { satisfied: false, gap: "voice: voice notes only, no PSRAM for its own voice session or spoken replies" };
       }
-      return { satisfied: false, gap: "voice: no push-to-talk with spoken replies" };
+      if (audio === "buzzer-mic") {
+        return { satisfied: false, gap: "voice: buzzer only, so no spoken replies" };
+      }
+      return { satisfied: false, gap: "voice: no push-to-talk mic and speaker" };
     }
     case "screen":
       return board.tier === "full-ui" || ["status-screen", "e-paper"].includes(board.kind)
@@ -482,30 +716,54 @@ function featureString(board: PlatformBoard, key: string): string | null {
   return typeof value === "string" ? value : null;
 }
 
+/**
+ * Ranking: boards that meet the hard needs (or as many as any board can)
+ * first; then owned boards; then boards within budget; then official
+ * support; then more of the other needs; then size fit and the cheaper
+ * all-in total (price first when every option is over budget); then score.
+ */
 function candidateSort(budgetUsd?: number) {
   return (a: ScoredBoard, b: ScoredBoard): number => {
+    if (b.hardMet !== a.hardMet) return b.hardMet - a.hardMet;
+    if (a.owned !== b.owned) return a.owned ? -1 : 1;
+    if (budgetUsd !== undefined) {
+      const aWithin = a.withinBudget === true;
+      const bWithin = b.withinBudget === true;
+      if (aWithin !== bWithin) return aWithin ? -1 : 1;
+    }
+    if (a.board.support !== b.board.support) return a.board.support === "official" ? -1 : 1;
     if (b.satisfied.length !== a.satisfied.length) return b.satisfied.length - a.satisfied.length;
-    if (budgetUsd !== undefined && a.withinBudget !== b.withinBudget) {
-      if (a.withinBudget === true) return -1;
-      if (b.withinBudget === true) return 1;
-    }
-    if (b.score !== a.score) return b.score - a.score;
-    if (a.sizeFit !== b.sizeFit) {
-      if (a.sizeFit === true) return -1;
-      if (b.sizeFit === true) return 1;
-    }
     const priceA = priceFor(a);
     const priceB = priceFor(b);
-    if (priceA !== priceB) return priceA - priceB;
+    const fitA = sizeFitRank(a.sizeFit);
+    const fitB = sizeFitRank(b.sizeFit);
+    // Both over budget: the cheaper board wins, then size fit.
+    // Otherwise (both within budget, or no budget): the board that fits where
+    // it will live wins, then the cheaper one.
+    const bothOver = budgetUsd !== undefined && a.withinBudget !== true && b.withinBudget !== true;
+    if (bothOver) {
+      if (priceA !== priceB) return priceA - priceB;
+      if (fitA !== fitB) return fitA - fitB;
+    } else {
+      if (fitA !== fitB) return fitA - fitB;
+      if (priceA !== priceB) return priceA - priceB;
+    }
+    if (b.score !== a.score) return b.score - a.score;
     return a.device.id.localeCompare(b.device.id);
   };
+}
+
+function sizeFitRank(fit: boolean | null): number {
+  if (fit === true) return 0;
+  if (fit === null) return 1;
+  return 2;
 }
 
 function ensureNeedCoverage(
   candidates: ScoredBoard[],
   limit: number,
   needs: Need[],
-  budgetUsd: number | undefined,
+  sort: (a: ScoredBoard, b: ScoredBoard) => number,
 ): ScoredBoard[] {
   const picks = candidates.slice(0, limit);
   for (const need of needs) {
@@ -516,7 +774,7 @@ function ensureNeedCoverage(
     const replaceIndex = replacementIndexFor(picks, needs);
     if (replaceIndex >= 0) picks[replaceIndex] = replacement;
   }
-  return picks.sort(candidateSort(budgetUsd));
+  return picks.sort(sort);
 }
 
 function replacementIndexFor(picks: ScoredBoard[], needs: Need[]): number {
@@ -538,37 +796,42 @@ function replacementIndexFor(picks: ScoredBoard[], needs: Need[]): number {
   return chosen === -1 ? picks.length - 1 : chosen;
 }
 
-function computeFit(
-  needs: Need[],
-  first: ScoredBoard | undefined,
-  budgetUsd: number | undefined,
-  anyWithinBudget: boolean,
-): "all" | "partial" | "none" {
-  if (!first) return "none";
-  if (budgetUsd !== undefined && !anyWithinBudget) return "none";
-  const meetsAllNeeds = needs.every((need) => first.satisfied.includes(need));
-  const meetsBudget = budgetUsd === undefined || first.withinBudget === true;
-  if (meetsAllNeeds && meetsBudget) return "all";
+function computeFit(args: {
+  needs: Need[];
+  first: ScoredBoard | undefined;
+  budgetUsd: number | undefined;
+  anyWorkableWithinBudget: boolean;
+  movement: boolean;
+}): "all" | "partial" | "none" {
+  if (!args.first) return "none";
+  if (args.budgetUsd !== undefined && !args.anyWorkableWithinBudget) return "none";
+  const meetsAllNeeds = args.needs.every((need) => args.first!.satisfied.includes(need));
+  const meetsBudget = args.budgetUsd === undefined || args.first.withinBudget === true;
+  // Nothing on the list can move or use arms, so a movement idea is at best partial.
+  if (meetsAllNeeds && meetsBudget && !args.movement) return "all";
   return "partial";
 }
 
 function buildNotes(args: {
   needs: Need[];
   candidates: ScoredBoard[];
-  picks: ScoredBoard[];
+  workable: ScoredBoard[];
   budgetUsd?: number;
-  anyWithinBudget: boolean;
+  anyWorkableWithinBudget: boolean;
 }): string[] {
   const notes: string[] = [];
-  if (args.budgetUsd !== undefined && !args.anyWithinBudget) {
-    // "Does what you asked" means the board meets the most stated needs any
-    // board can meet; among those, name the cheapest.
-    const bestCoverage = Math.max(0, ...args.candidates.map((candidate) => candidate.satisfied.length));
-    const cheapest = [...args.candidates]
+  if (args.budgetUsd !== undefined && !args.anyWorkableWithinBudget) {
+    // Name the cheapest workable board that covers the most stated needs.
+    const bestCoverage = Math.max(0, ...args.workable.map((candidate) => candidate.satisfied.length));
+    const cheapest = [...args.workable]
       .filter((candidate) => candidate.satisfied.length === bestCoverage)
-      .sort((a, b) => priceFor(a) - priceFor(b))[0];
+      .sort((a, b) => priceFor(a) - priceFor(b) || a.device.id.localeCompare(b.device.id))[0];
     if (cheapest) {
-      const what = args.needs.length > 0 ? "does what you asked" : "runs Muse";
+      const what = args.needs.length === 0
+        ? "runs Muse"
+        : args.needs.every((need) => cheapest.satisfied.includes(need))
+          ? "does what you asked"
+          : "comes closest to what you asked";
       notes.push(
         `Nothing on the Muse list fits a $${args.budgetUsd} budget. The cheapest board that ${what} is ${cheapest.device.name} at ${totalLabel(cheapest) ?? "an unknown price"} all-in.`,
       );
@@ -594,6 +857,82 @@ function buildNotes(args: {
   return notes;
 }
 
+const CAN_PHRASE: Partial<Record<Need, string>> = {
+  voice: "can talk",
+  camera: "has a camera",
+  "air-sensors": "has air sensors",
+  "e-ink": "has an e-paper screen",
+  linux: "runs Linux commands",
+};
+const CANT_PHRASE: Partial<Record<Need, string>> = {
+  voice: "can't talk",
+  camera: "has no camera",
+  "air-sensors": "has no air sensors",
+  "e-ink": "has no e-paper screen",
+  linux: "doesn't run Linux commands",
+};
+const SIZE_PLACE: Record<FitSize, string> = {
+  pocket: "a pocket",
+  desk: "a desk",
+  wall: "a wall",
+  hidden: "out of sight",
+};
+
+/**
+ * Warnings when a hard need can't be met: by the top pick at all, or by any
+ * board that fits the requested size.
+ */
+function hardNeedWarnings(args: {
+  hardNeeds: Need[];
+  candidates: ScoredBoard[];
+  top: ScoredBoard | undefined;
+  size: Size;
+}): string[] {
+  const warnings: string[] = [];
+  const { hardNeeds, candidates, top } = args;
+  if (!top || hardNeeds.length === 0) return warnings;
+
+  const missing = hardNeeds.filter((need) => !top.satisfied.includes(need));
+  if (missing.length > 0) {
+    const helper = candidates.find((candidate) =>
+      missing.every((need) => candidate.satisfied.includes(need))
+    ) ?? candidates.find((candidate) => missing.some((need) => candidate.satisfied.includes(need)));
+    const fix = helper
+      ? `pair it with ${helper.device.name} for ${needWords(missing)}, or drop ${needWords(missing)}.`
+      : `drop ${needWords(missing)}, or try another platform.`;
+    warnings.push(
+      `${top.device.name} ${phraseList(missing, CANT_PHRASE)}. No single board here ${phraseList(hardNeeds, CAN_PHRASE)}; ${fix}`,
+    );
+    return warnings;
+  }
+
+  if (args.size !== "any") {
+    const size = args.size;
+    const fitsAndWorks = candidates.some((candidate) =>
+      candidate.sizeFit === true && candidate.hardMet === hardNeeds.length
+    );
+    if (!fitsAndWorks) {
+      const local = candidates
+        .filter((candidate) => candidate.sizeFit === true)
+        .sort((a, b) => b.hardMet - a.hardMet || b.satisfied.length - a.satisfied.length || priceFor(a) - priceFor(b))[0];
+      const localMissing = local ? hardNeeds.filter((need) => !local.satisfied.includes(need)) : [];
+      const detail = local
+        ? ` ${local.device.name} fits ${SIZE_PLACE[size]} but ${phraseList(localMissing, CANT_PHRASE)}; pair it with ${top.device.name}, or drop ${needWords(localMissing)}.`
+        : ` The picks below ${phraseList(hardNeeds, CAN_PHRASE)} but aren't made for ${SIZE_PLACE[size]}.`;
+      warnings.push(`No ${size} board ${phraseList(hardNeeds, CAN_PHRASE)}.${detail}`);
+    }
+  }
+  return warnings;
+}
+
+function phraseList(needs: Need[], phrases: Partial<Record<Need, string>>): string {
+  return sentenceList(needs.map((need) => phrases[need] ?? needLabel(need)));
+}
+
+function needWords(needs: Need[]): string {
+  return sentenceList(needs.map(needLabel));
+}
+
 function buildWhy(candidate: ScoredBoard): string {
   const fragments = candidate.satisfied.map((need) => satisfiedPhrase(need, candidate.board));
   const prefix = fragments.length > 0
@@ -605,7 +944,7 @@ function buildWhy(candidate: ScoredBoard): string {
 function satisfiedPhrase(need: Need, board: PlatformBoard): string {
   switch (need) {
     case "voice":
-      return "push-to-talk with spoken replies";
+      return "push-to-talk with a mic and speaker (replies show as text; add a text-to-speech service for spoken replies)";
     case "screen":
       return board.tier === "full-ui" ? "full UI display" : "status display";
     case "images":
@@ -667,7 +1006,7 @@ function priceLabel(device: DeviceEntry): string | null {
 }
 
 function totalLabel(candidate: ScoredBoard): string | null {
-  return candidate.estTotalUsd === null ? priceLabel(candidate.device) : `~$${candidate.estTotalUsd}`;
+  return candidate.estTotalUsd === null ? priceLabel(candidate.device) : `~${formatUsd(candidate.estTotalUsd)}`;
 }
 
 function priceFor(candidate: ScoredBoard): number {
@@ -677,9 +1016,9 @@ function priceFor(candidate: ScoredBoard): number {
 function totalFor(device: DeviceEntry, board: PlatformBoard): number | null {
   const boardPrice = device.est_used_price_usd_min;
   if (boardPrice === undefined) return null;
-  return board.parts
+  return roundMoney(board.parts
     .filter((part) => part.required)
-    .reduce((sum, part) => sum + (part.est_price_usd ?? 0) * part.qty, boardPrice);
+    .reduce((sum, part) => sum + (part.est_price_usd ?? 0) * part.qty, boardPrice));
 }
 
 function fitsSize(board: PlatformBoard, device: DeviceEntry, size: FitSize): boolean {
@@ -693,11 +1032,12 @@ function fitsSize(board: PlatformBoard, device: DeviceEntry, size: FitSize): boo
   );
 }
 
-function fabricationNote(device: DeviceEntry, printables: Printable[]): string {
+function fabricationNote(device: DeviceEntry, printables: Printable[], board: PlatformBoard): string {
   const physical = device.physical;
   if (printables.length > 0 && physical) {
     return `Print the stand: STL/STEP links above. Dimensions are from a ${physical.size_confidence} source; print once and check the fit.`;
   }
+  if (board.stand_note) return board.stand_note;
   if (!physical) return "Use the vendor case.";
 
   const needsMeasure =
@@ -719,6 +1059,7 @@ function nextSteps(picks: PlanGadgetOutput["picks"]): string[] {
     : ["Pick a supported board, then start a build to save the parts list, checklist and agent brief to My builds."];
 
   steps.push("Get a Muse SDK token from gadgets.muse.ai (keep it private).");
+  for (const warning of first?.warnings ?? []) steps.push(`Before flashing: ${warning}`);
   if (first?.platform_id === "muse-linux") {
     steps.push(
       "On the machine: download install.sh, read it, then run `bash install.sh --sdk-token mgst_...` (use --run-as with a dedicated low-privilege user).",
@@ -758,78 +1099,6 @@ function nonMuseAssistantWarnings(idea: string): string[] {
     }
   }
   return warnings;
-}
-
-function intakeQuestions(
-  input: PlanGadgetInput,
-  needs: Need[],
-  inferredSize: Size,
-  inferredPreferences: InferredPreference[],
-): PlanGadgetQuestion[] {
-  const words = input.idea.trim().split(/\s+/).filter(Boolean);
-  const hasSizeWord = inferredSize !== "any" ||
-    SIZE_WORDS.some((word) => wordBoundaryMatch(input.idea, word));
-  const vague = needs.length === 0 || words.length < 5 || !hasSizeWord;
-  if (!vague) return [];
-
-  const questions: PlanGadgetQuestion[] = [
-    {
-      id: "size",
-      question: "Where should this body live?",
-      why: "Size and placement decide whether a pocket remote, desk object, wall display, or hidden no-screen board fits.",
-      options: [
-        { label: "Pocket", value: "pocket", needs: ["battery"], size: "pocket" },
-        { label: "Desk", value: "desk", size: "desk" },
-        { label: "Wall or fridge", value: "wall", needs: ["big-screen"], size: "wall" },
-        { label: "Hidden, no screen", value: "hidden", needs: ["home-tunnel"], size: "hidden" },
-      ],
-    },
-    {
-      id: "interaction",
-      question: "How should you interact with it?",
-      why: "Muse boards split between spoken replies, touch screens, and simple light/button status.",
-      options: [
-        { label: "Talk to it", value: "voice", needs: ["voice"] },
-        { label: "Touch screen", value: "touch", needs: ["screen", "touch"] },
-        { label: "Light and button", value: "light-button", needs: ["home-tunnel"] },
-      ],
-    },
-    {
-      id: "sensing",
-      question: "Should it sense the room?",
-      why: "Camera and air-quality boards are specialized, so choosing this early prevents a mismatched build.",
-      options: [
-        { label: "Camera", value: "camera", needs: ["camera"] },
-        { label: "Air quality", value: "air-quality", needs: ["air-sensors"] },
-        { label: "None", value: "none" },
-      ],
-    },
-    {
-      id: "budget",
-      question: "What budget should I plan around?",
-      why: "The planner can keep over-budget boards from outranking cheaper workable choices.",
-      options: [
-        { label: "Under $25", value: "under-25", budget_usd: 25 },
-        { label: "Under $50", value: "under-50", budget_usd: 50 },
-        { label: "Under $100", value: "under-100", budget_usd: 100 },
-        { label: "No limit", value: "no-limit" },
-      ],
-    },
-  ];
-
-  return questions.filter((question) => {
-    if (question.id === "size") return inferredSize === "any";
-    if (question.id === "interaction") {
-      return !needs.some((need) => ["voice", "touch", "screen", "home-tunnel"].includes(need));
-    }
-    if (question.id === "sensing") {
-      return input.needs === undefined && !needs.some((need) => ["camera", "air-sensors"].includes(need));
-    }
-    if (question.id === "budget") {
-      return input.budget_usd === undefined && !inferredPreferences.includes("cheap");
-    }
-    return true;
-  });
 }
 
 function longestSide(device: DeviceEntry): number | null {
