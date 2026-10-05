@@ -14,11 +14,11 @@ hackshop knows Meta's Muse Gadgets SDK: ESP32 boards and Linux machines that can
 
 ## Status
 
-v0.0.6 - published on npm and hosted at `https://www.hackshop.dev/mcp`. The hosted MCP exposes the deterministic tools (`intake_gadget`, `plan_gadget`, `get_build_plan`, `assess_hackability`); the npm server also includes `propose_hardware` and `simulate_assembly`. The simulation layer is live at [hackshop.dev](https://hackshop.dev). Source: [github.com/hackshopdev/hackshop-mcp](https://github.com/hackshopdev/hackshop-mcp).
+v0.0.7 - published on npm and hosted at `https://www.hackshop.dev/mcp`. The hosted MCP exposes the deterministic tools (`intake_gadget`, `plan_gadget`, `get_build_plan`, `assess_hackability`); the npm server also includes `propose_hardware` and `simulate_assembly`. The simulation layer is live at [hackshop.dev](https://hackshop.dev). Source: [github.com/hackshopdev/hackshop-mcp](https://github.com/hackshopdev/hackshop-mcp).
 
 ### Changelog
 
-- **0.0.6**
+- **0.0.7**
   - Shared intake: `intake_gadget` returns the 4 questions; `plan_gadget` and `/api/plan` take `answers`, report `intake.complete` and keep asking until it is.
   - Budget-honest ranking: boards that meet the hard needs and fit the budget rank first, cheapest first. `fit` is `none` when nothing that works fits the budget, with a note naming the cheapest board that does.
   - Warnings when the top pick or the requested size misses a hard need, and for ideas that need movement or arms.
@@ -29,6 +29,7 @@ v0.0.6 - published on npm and hosted at `https://www.hackshop.dev/mcp`. The host
   - All 24 boards in the Muse ESP32 SDK's supported table; the experimental ones are marked `possible`.
   - New purchase policy: the agent asks "Place this order for $<total> at <seller>?" and waits for a clear yes.
   - Hosted MCP: CORS for browser agents, stateless POST-only `Allow` header, build resource template listed, friendlier input errors, `try_instead` for npm-only tools. OpenAPI for `/api/plan` at `/openapi.json`.
+- **0.0.6**: buy options and store links in build plans, size-aware board picks, reTerminal E1002, listed in the official MCP registry.
 - **0.0.5**: hosted MCP at `/mcp`, `get_build_plan`, resources and prompts.
 
 ## Install in 30 seconds

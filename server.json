@@ -3,7 +3,7 @@
   "name": "dev.hackshop/hackshop-mcp",
   "title": "hackshop",
   "description": "Plan and build a physical body for your AI agent: boards, parts list, assembly and pairing.",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "websiteUrl": "https://www.hackshop.dev",
   "remotes": [
     {
@@ -15,7 +15,7 @@
     {
       "registryType": "npm",
       "identifier": "hackshop-mcp",
-      "version": "0.0.6",
+      "version": "0.0.7",
       "transport": {
         "type": "stdio"
       },
