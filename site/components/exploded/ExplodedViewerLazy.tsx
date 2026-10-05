@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { BoardModel, ModelStep } from "@/lib/models/types";
 import styles from "./exploded.module.css";
 import { ModelFallback } from "./ModelFallback";
@@ -38,13 +38,36 @@ function hasWebGL(): boolean {
 export function ExplodedViewerLazy({ model, steps }: { model: BoardModel; steps?: ModelStep[] }) {
   const [support, setSupport] = useState<"checking" | "yes" | "no">("checking");
   const [reason, setReason] = useState<string | undefined>();
+  const holder = useRef<HTMLDivElement | null>(null);
 
+  // Load three.js only when the viewer scrolls near the screen.
   useEffect(() => {
-    setSupport(hasWebGL() ? "yes" : "no");
+    const node = holder.current;
+    if (!node || typeof IntersectionObserver === "undefined") {
+      setSupport(hasWebGL() ? "yes" : "no");
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          observer.disconnect();
+          setSupport(hasWebGL() ? "yes" : "no");
+        }
+      },
+      { rootMargin: "400px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
   }, []);
 
   if (support === "no") return <ModelFallback model={model} reason={reason} />;
-  if (support === "checking") return <ViewerSkeleton />;
+  if (support === "checking") {
+    return (
+      <div ref={holder}>
+        <ViewerSkeleton />
+      </div>
+    );
+  }
   return (
     <ExplodedViewer
       model={model}

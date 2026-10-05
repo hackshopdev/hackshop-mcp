@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { BuildExperience } from "@/components/BuildExperience";
+import { SeeInside } from "@/components/exploded/SeeInside";
 import {
   allBuildDeviceIds,
   buildPlanForDevice,
@@ -32,5 +33,11 @@ export default async function BuildPage({
   const { deviceId } = await params;
   const plan = buildPlanForDevice(deviceId);
   if (!plan) notFound();
-  return <BuildExperience plan={plan} difficulty={difficultyFor(deviceId)} />;
+  return (
+    <BuildExperience
+      plan={plan}
+      difficulty={difficultyFor(deviceId)}
+      seeInside={<SeeInside deviceId={plan.device_id} name={plan.name} />}
+    />
+  );
 }

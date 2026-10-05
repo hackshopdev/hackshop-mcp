@@ -370,21 +370,30 @@ describe("report and hide", () => {
       error: null,
     }));
     mockSupabase({ rpc });
-    const { GET } = await import("../site/app/api/ideas/[id]/hide/route");
+    const { GET, POST } = await import("../site/app/api/ideas/[id]/hide/route");
+    const url = `https://www.hackshop.dev/api/ideas/${IDEA_ID}/hide?token=${TOKEN}`;
 
-    const ok = await GET(new Request(`https://www.hackshop.dev/api/ideas/${IDEA_ID}/hide?token=${TOKEN}`), params(IDEA_ID));
+    // Opening the email link only shows a confirm button (link scanners can't hide).
+    const confirm = await GET(new Request(url), params(IDEA_ID));
+    expect(confirm.status).toBe(200);
+    expect(confirm.headers.get("content-type")).toContain("text/html");
+    const confirmHtml = await confirm.text();
+    expect(confirmHtml).toContain("Hide this idea?");
+    expect(confirmHtml).toContain('method="post"');
+    expect(rpc).not.toHaveBeenCalled();
+
+    const ok = await POST(new Request(url, { method: "POST" }), params(IDEA_ID));
     expect(ok.status).toBe(200);
-    expect(ok.headers.get("content-type")).toContain("text/html");
     expect(await ok.text()).toContain("Idea hidden");
     expect(rpc).toHaveBeenCalledWith("hide_idea", { p_id: IDEA_ID, p_token: TOKEN });
 
-    const wrong = await GET(
-      new Request(`https://www.hackshop.dev/api/ideas/${IDEA_ID}/hide?token=33333333-3333-4333-8333-333333333333`),
+    const wrong = await POST(
+      new Request(`https://www.hackshop.dev/api/ideas/${IDEA_ID}/hide?token=33333333-3333-4333-8333-333333333333`, { method: "POST" }),
       params(IDEA_ID),
     );
     expect(wrong.status).toBe(404);
 
-    const missing = await GET(new Request(`https://www.hackshop.dev/api/ideas/${IDEA_ID}/hide`), params(IDEA_ID));
+    const missing = await POST(new Request(`https://www.hackshop.dev/api/ideas/${IDEA_ID}/hide`, { method: "POST" }), params(IDEA_ID));
     expect(missing.status).toBe(400);
     expect(rpc).toHaveBeenCalledTimes(2);
   });

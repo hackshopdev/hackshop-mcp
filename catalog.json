@@ -18,7 +18,7 @@
       "https://hackaday.com/tag/electric-objects/"
     ],
     "community_size_bucket": "small",
-    "notes": "23-inch wall-mount picture frame, abandoned by manufacturer. Linux-based, SSH access via stock firmware bug. Founder revived one in ~6h with Claude assistance.",
+    "notes": "23-inch wall-mount picture frame, abandoned by manufacturer. Linux-based, SSH access via stock firmware bug. One was revived in about 6 hours with an AI coding agent.",
     "est_used_price_usd_min": 80,
     "est_used_price_usd_max": 200,
     "est_setup_hours_min": 4,

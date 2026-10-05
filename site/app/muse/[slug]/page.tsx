@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/CopyButton";
 import { DifficultyBadge } from "@/components/DifficultyBadge";
+import { SeeInside } from "@/components/exploded/SeeInside";
 import { ProductTile } from "@/components/ProductTile";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -211,6 +212,8 @@ export default async function BoardPage({ params }: Props) {
             ))}
           </section>
         ) : null}
+
+        <SeeInside deviceId={row.device.id} name={row.device.name} />
 
         <section className={ui.section} aria-labelledby="dev-details">
           <details className={styles.devDetails}>

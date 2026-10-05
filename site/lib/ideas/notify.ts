@@ -45,7 +45,7 @@ export function newIdeaEmail(idea: PublicIdea, token: string, boardName: string 
     `<dt>Suggested board</dt><dd>${escapeHtml(boardName ?? idea.suggested_device_id ?? "none")}</dd>`,
     "</dl>",
     `<p><a href="${escapeHtml(link)}">View the idea</a></p>`,
-    `<p><a href="${escapeHtml(hide)}">Hide this idea</a> (one click, no sign-in)</p>`,
+    `<p><a href="${escapeHtml(hide)}">Hide this idea</a> (opens a confirm page, no sign-in)</p>`,
   ].join("");
 
   return { subject, text, html };

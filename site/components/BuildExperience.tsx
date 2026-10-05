@@ -21,9 +21,12 @@ import styles from "./build.module.css";
 export function BuildExperience({
   plan,
   difficulty,
+  seeInside,
 }: {
   plan: BuildPlan;
   difficulty?: Difficulty;
+  /** Server-rendered "See inside" section (exploded 3D model). */
+  seeInside?: React.ReactNode;
 }) {
   const isEsp32 = plan.platform_id === "muse-esp32";
   const tier = plainTierLabel(plan.tier_label);
@@ -64,6 +67,8 @@ export function BuildExperience({
           </div>
           <PartsPreview plan={plan} />
         </header>
+
+        {seeInside}
 
         <div className={styles.contentGrid}>
           <ProgressRail plan={plan} />

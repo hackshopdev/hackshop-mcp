@@ -4,6 +4,7 @@ import { DemoForm } from "@/components/DemoForm";
 import { GadgetPlanner } from "@/components/GadgetPlanner";
 import { ProductTile } from "@/components/ProductTile";
 import { SiteFooter } from "@/components/SiteFooter";
+import { TopIdeas } from "@/components/ideas/TopIdeas";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StartBuildButton } from "@/components/StartBuildButton";
 import { TellMyAgent } from "@/components/TellMyAgent";
@@ -18,6 +19,8 @@ import { plainTierLabel } from "@/lib/ui/labels";
 import styles from "./home.module.css";
 
 export const dynamic = "force-static";
+// Refresh the top ideas strip every five minutes.
+export const revalidate = 300;
 
 const HERO_BOARDS: Array<{ id: string; caption: string }> = [
   { id: "m5stack-sticks3", caption: "Pocket voice remote" },
@@ -258,6 +261,10 @@ export default function Home() {
         </section>
 
         {/* FAQ */}
+        <section className={ui.section} aria-label="Top ideas">
+          <TopIdeas />
+        </section>
+
         <section className={ui.section} aria-labelledby="faq">
           <div className={ui.sectionHead}>
             <p className={ui.eyebrow}>Questions</p>
