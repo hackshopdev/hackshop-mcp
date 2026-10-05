@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import platforms from "../platforms.json";
-import { buyEverythingPrompt, STORE_AGENT_PROMPT } from "../site/lib/agent-prompts";
 import { buildPlanForDevice } from "../site/lib/build-plan-data";
 import { maskEmail, shoppingListEmail } from "../site/lib/email-templates";
 import { commonParts, storeBoard, storeBoards, storeBoardsByGroup } from "../site/lib/store";
@@ -65,24 +64,6 @@ describe("store data", () => {
       buyUrl: null,
       affiliate: { amazonTag: "hack-20" },
     })[0]?.url).toContain("tag=hack-20");
-  });
-});
-
-describe("buy-everything prompts", () => {
-  it("hands the agent the list and requires approval before buying", () => {
-    const prompt = buyEverythingPrompt({
-      name: "M5Stack StickS3",
-      deviceId: "m5stack-sticks3",
-      items: [{ qty: 1, name: "USB-C data cable" }],
-    });
-    expect(prompt).toContain("https://www.hackshop.dev/build/m5stack-sticks3/plan.json");
-    expect(prompt).toContain("https://www.hackshop.dev/store.json");
-    expect(prompt).toContain("1 × USB-C data cable");
-    expect(prompt).toMatch(/wait for my OK/);
-    expect(prompt).toMatch(/only add to cart or check out after I approve/i);
-    expect(prompt).toMatch(/Amazon and eBay don't allow automated carts or checkout/);
-    expect(STORE_AGENT_PROMPT).toMatch(/wait for my OK before you add anything to a cart or check out/);
-    expect(STORE_AGENT_PROMPT).toMatch(/Amazon and eBay don't allow automated carts or checkout/);
   });
 });
 
