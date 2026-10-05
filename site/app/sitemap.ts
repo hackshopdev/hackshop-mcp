@@ -33,6 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     { url: `${site}/store`, lastModified: STORE_UPDATED, changeFrequency: "daily", priority: 0.85 },
     { url: `${site}/templates`, lastModified: TEMPLATES_UPDATED, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${site}/ideas`, lastModified: new Date("2026-10-05T00:00:00Z"), changeFrequency: "daily", priority: 0.75 },
     { url: `${site}/resources`, lastModified: RESOURCES_INDEX_UPDATED, changeFrequency: "weekly", priority: 0.8 },
     ...editorialPosts.map((post) => ({
       url: `${site}/resources/${post.slug}`,
