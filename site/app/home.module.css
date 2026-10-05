@@ -117,10 +117,25 @@
 .path ol {
   display: grid;
   gap: 8px;
-  margin: 0;
+  margin: 0 0 14px;
   padding-left: 20px;
   color: #c4c4be;
   font-size: 16px;
+}
+
+.pathLink {
+  color: #f4f4f2;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 122, 0, 0.6);
+  text-underline-offset: 4px;
+}
+
+.pathLink:hover {
+  color: #ffb066;
+}
+
+.plannerSection {
+  scroll-margin-top: 72px;
 }
 
 .pathBadge,

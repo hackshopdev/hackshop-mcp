@@ -9,12 +9,15 @@ export function ProductTile({
   priority = false,
   hasPhoto = true,
   className,
+  alt,
 }: {
   deviceId: string;
   name: string;
   priority?: boolean;
   hasPhoto?: boolean;
   className?: string;
+  /** Defaults to "<name> board". */
+  alt?: string;
 }) {
   const [failed, setFailed] = useState(!hasPhoto);
   return (
@@ -24,7 +27,7 @@ export function ProductTile({
       ) : (
         <img
           src={`/api/img?slug=${encodeURIComponent(deviceId)}`}
-          alt={`${name} board`}
+          alt={alt ?? `${name} board`}
           width={640}
           height={480}
           loading={priority ? "eager" : "lazy"}
