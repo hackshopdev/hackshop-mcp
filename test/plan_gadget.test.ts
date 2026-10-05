@@ -178,9 +178,10 @@ describe("plan_gadget", () => {
     expect(out.picks[0]?.device_id).toBe("seeed-sensecap-watcher");
   });
 
-  it("prefers the round Waveshare AMOLED for a talking desk orb", () => {
+  it("prefers a round Waveshare AMOLED for a talking desk orb", () => {
     const out = run({ idea: "round orb on my desk that I can talk to" });
-    expect(out.picks[0]?.device_id).toBe("waveshare-esp32-s3-touch-amoled-1-75c");
+    expect(out.picks[0]?.device_id).toMatch(/^waveshare-esp32-s3-touch-amoled-1-75c?$/);
+    expect(out.picks[0]?.needs_met).toEqual(expect.arrayContaining(["voice", "round"]));
   });
 
   it("boosts owned Linux thin clients and includes the BLE caveat", () => {
@@ -279,7 +280,7 @@ describe("plan_gadget", () => {
   });
 
   it("uses fabrication notes for printable and non-printable devices", () => {
-    const printable = run({ idea: "round orb on my desk that I can talk to", limit: 1 });
+    const printable = run({ idea: "a keychain I can talk to Muse with", limit: 1 });
     expect(printable.picks[0]?.fabrication.printables.length).toBeGreaterThan(0);
     expect(printable.picks[0]?.fabrication.note).toContain("Print the stand");
 
@@ -297,11 +298,16 @@ describe("plan_gadget", () => {
     expect(["raspberry-pi-4b", "raspberry-pi-5"]).toContain(out.picks[0]?.device_id);
   });
 
-  it("applies a cheap preference to favor inexpensive boards", () => {
-    const out = run({ idea: "something cheap so Muse can turn my lights on" });
+  it("picks the cheapest board with a home-network tunnel for a cheap lights idea", () => {
+    const out = run({ idea: "something cheap so Muse can turn my lights on", limit: 5 });
 
     expect(out.inferred_preferences).toEqual(["cheap"]);
-    expect(out.picks[0]?.device_id).toBe("espressif-esp32-c5-devkitc-1");
+    expect(out.picks[0]?.needs_met).toContain("home-tunnel");
+    expect(["espressif-esp32-c5-devkitc-1", "espressif-esp32-s3-devkitc-1"]).toContain(out.picks[0]?.device_id);
+    const tunnelTotals = out.picks
+      .filter((pick) => pick.needs_met.includes("home-tunnel"))
+      .map((pick) => pick.est_total_usd ?? Infinity);
+    expect(out.picks[0]?.est_total_usd).toBe(Math.min(...tunnelTotals));
   });
 
   it("uses large displays for fridge calendar ideas", () => {

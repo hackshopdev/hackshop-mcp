@@ -632,11 +632,16 @@ function museProfileFor(board: PlatformBoard): string | null {
       return "m5stack-core2";
     case "box3":
       return "espressif-box-3";
+    case "jc3248w535":
+      return "guition-jc3248w535";
+    case "fnk0104b":
+      return "fnk0104b";
     default:
       return null;
   }
 }
 
+// Buttons per the Muse SDK's devices/README.md feature table.
 function boardButtonName(board: PlatformBoard): string {
   switch (board.device_id) {
     case "m5stack-sticks3":
@@ -650,9 +655,27 @@ function boardButtonName(board: PlatformBoard): string {
       return "the wheel";
     case "home-assistant-voice-pe":
       return "the center button";
+    case "espressif-esp32-s3-box-3":
+      return "BOOT/CONFIG";
+    case "m5stack-stopwatch":
+      return "the yellow button";
+    case "m5stack-cores3":
+      return "PWR";
+    case "m5stack-core2-v1-0":
+      return "the middle touch zone";
+    case "m5stack-cardputer-adv":
+      return "Enter";
+    case "seeed-respeaker-lite-xiao-esp32s3":
+      return "the XIAO BOOT button";
     default:
       return "the BOOT button";
   }
+}
+
+/** The push-to-talk control, when it differs from the pairing button. */
+function talkButtonName(board: PlatformBoard): string {
+  if (board.device_id === "m5stack-cardputer-adv") return "Space/GO";
+  return boardButtonName(board);
 }
 
 function statusIndicator(board: PlatformBoard): string {
@@ -688,7 +711,7 @@ function assembleStep(
     ? `Put the board in the printed ${printable.part.replace("-", " ")}. `
     : "Put the board in its stand, case or a stable spot on the desk. ";
   const cable = board
-    ? "Route the USB-C cable through the slot or open edge, power it, and check that the buttons and display are reachable."
+    ? "Route the cable through the slot or open edge, power it, and check that the buttons and display are reachable."
     : "Route the cable neatly, power it, and check the fit.";
 
   return {
@@ -800,12 +823,32 @@ function buildAssembly(args: {
   return esp32Assembly(args.board, args.printables, args.trySaying);
 }
 
+/** The cable a board's build uses and the plug it ends in, from its parts. */
+function dataCableFor(board: PlatformBoard): { name: string; connector: string; pose: string } {
+  const cable = board.parts.find((part) => /data cable/i.test(part.name));
+  const name = cable?.name ?? "USB-C data cable";
+  if (/^micro-usb/i.test(name)) {
+    return {
+      name,
+      connector: "micro-USB",
+      pose: "Rest the board on a flat surface and line the plug up with its micro-USB port. Micro-USB goes in one way up: match the plug's wide side to the port.",
+    };
+  }
+  if (/^usb-c/i.test(name)) return { name, connector: "USB-C", pose: USB_C_POSE };
+  return {
+    name,
+    connector: "USB",
+    pose: "Rest the board on a flat surface and line the plug up with its USB port. Check which way up the plug goes before you push.",
+  };
+}
+
 function esp32Assembly(
   board: PlatformBoard,
   printables: Printable[],
   trySaying: string[],
 ): AssemblyStep[] {
   const overlay = board.flash;
+  const cable = dataCableFor(board);
   const listPorts = overlay?.list_ports ?? DEFAULT_LIST_PORTS;
   const flashCommand = flashCommandFor(board);
   const status = statusIndicator(board);
@@ -820,11 +863,11 @@ function esp32Assembly(
   steps.push(assemblyStep({
     action: "power",
     part_ids: ["board"],
-    tools: ["USB-C data cable", "computer"],
-    instruction: "Connect the board to the computer with the USB-C data cable.",
+    tools: [cable.name, "computer"],
+    instruction: `Connect the board to the computer with the ${cable.name}.`,
     check: "Board powers on and a new serial port appears.",
-    connector: "USB-C",
-    pose: overlay?.connector_note ? `${USB_C_POSE} ${overlay.connector_note}` : USB_C_POSE,
+    connector: cable.connector,
+    pose: overlay?.connector_note ? `${cable.pose} ${overlay.connector_note}` : cable.pose,
     force_note: USB_C_FORCE,
     verify: [
       { method: "command", command: listPorts, expect: "A new serial port is listed after the board is plugged in." },
@@ -838,10 +881,10 @@ function esp32Assembly(
     steps.push(assemblyStep({
       action: "backup",
       part_ids: ["board"],
-      tools: ["computer", "USB-C data cable"],
+      tools: ["computer", cable.name],
       instruction: `Before the first flash, back up ${overlay.backup.what}: \`${overlay.backup.commands.join("`, then `")}\`.`,
       check: `${overlay.backup.file} exists and is ${overlay.backup.bytes} bytes.`,
-      connector: "USB-C",
+      connector: cable.connector,
       verify: [{
         method: "file",
         command: `wc -c < ${overlay.backup.file}`,
@@ -856,10 +899,10 @@ function esp32Assembly(
   steps.push(assemblyStep({
     action: "flash",
     part_ids: ["board"],
-    tools: ["computer", "USB-C data cable"],
+    tools: ["computer", cable.name],
     instruction: `Build and flash the Muse firmware with \`${flashCommand}\`.${duration}`,
     check: "Flash completes and the serial monitor shows startup logs.",
-    connector: "USB-C",
+    connector: cable.connector,
     force_note: overlay?.duration_note ? "Don't touch or unplug the cable while it flashes." : null,
     verify: [
       bootLog,
@@ -914,9 +957,9 @@ function esp32Assembly(
     steps.push(assemblyStep({
       action: "route_cable",
       part_ids: ["board", `printed-${printable.part}`],
-      instruction: "Route the USB-C cable through the cable slot or open edge.",
+      instruction: "Route the cable through the cable slot or open edge.",
       check: "Cable exits without lifting the board or blocking buttons.",
-      connector: "USB-C",
+      connector: cable.connector,
       force_note: USB_C_FORCE,
       verify: [{ method: "visual", expect: "Cable exits flat and the board doesn't lift." }],
       feasible: true,
@@ -953,7 +996,7 @@ function finalPromptCheck(board: PlatformBoard, trySaying: string[]): AssemblyVe
       : "shows in the Muse app";
     return {
       method: "muse_app",
-      expect: `Hold ${boardButtonName(board)} and ask a question${prompt}. The reply ${where}.`,
+      expect: `Hold ${talkButtonName(board)} and ask a question${prompt}. The reply ${where}.`,
     };
   }
   return {

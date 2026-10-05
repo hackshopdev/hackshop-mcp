@@ -87,9 +87,13 @@ describe("HS-RANK-001/002: the 32-cell ranking matrix", () => {
       limit: 5,
     });
     const ids = out.picks.map((pick) => pick.device_id);
-    expect(ids.indexOf("m5stack-sticks3")).toBeGreaterThanOrEqual(0);
-    expect(ids.indexOf("m5stack-sticks3")).toBeLessThan(ids.indexOf("home-assistant-voice-pe"));
-    expect(out.picks[0]?.device_id).toBe("m5stack-sticks3");
+    const sticks = ids.indexOf("m5stack-sticks3");
+    const ha = ids.indexOf("home-assistant-voice-pe");
+    expect(sticks).toBe(0);
+    // HA Voice PE ($89 all-in) is either below StickS3 or pushed out by cheaper voice boards.
+    expect(ha === -1 || ha > sticks).toBe(true);
+    const all = run({ idea: "hidden voice assistant", size: "hidden", needs: ["voice"], budget_usd: 25, limit: 5 });
+    expect(all.picks.every((pick) => pick.within_budget === false)).toBe(true);
     expect(out.fit).toBe("none");
     expect(out.notes.join("\n")).toMatch(/cheapest board that does what you asked is M5Stack StickS3/);
   });

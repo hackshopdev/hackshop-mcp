@@ -205,7 +205,8 @@ describe("HS-DATA-002: parts and prices", () => {
     for (const { platform, board } of allBoards) {
       if (platform.sdk_path !== "esp32") continue;
       const plan = planFor(board.device_id);
-      const cable = plan.shopping_list.items.find((item) => item.name === "USB-C data cable")!;
+      const cable = plan.shopping_list.items.find((item) => item.name === "USB-C data cable");
+      if (!cable) continue;
       expect(cable.url_kind, board.device_id).toBe("buy");
       const sellers = cable.buy_options.filter((option) => option.kind === "seller").map((option) => option.url);
       expect(sellers).toEqual(expect.arrayContaining([
@@ -221,7 +222,7 @@ describe("HS-DATA-002: parts and prices", () => {
   it("adds an optional USB-C power adapter to USB-powered boards", () => {
     for (const { platform, board } of allBoards) {
       if (platform.sdk_path !== "esp32") continue;
-      const adapter = board.parts.find((part) => /^USB-C power (adapter|supply)/.test(part.name));
+      const adapter = board.parts.find((part) => /^USB(-C)? power (adapter|supply)/.test(part.name));
       expect(adapter, board.device_id).toBeDefined();
     }
     const optional = planFor("aipi-lite").parts.find((part) => part.name === "USB-C power adapter (5 V / 2 A or more)");
@@ -232,6 +233,73 @@ describe("HS-DATA-002: parts and prices", () => {
     for (const { board } of allBoards) {
       const total = planFor(board.device_id).shopping_list.est_total_usd;
       if (total !== null) expect(Math.round(total * 100) / 100).toBe(total);
+    }
+  });
+});
+
+describe("item 17: every board in the SDK's supported table", () => {
+  const SDK_BOARDS: Record<string, string> = {
+    "ESP32-C5 DevKitC-1": "espressif-esp32-c5-devkitc-1",
+    "ESP32-C6 devkit (no PSRAM)": "espressif-esp32-c6-devkitc-1",
+    "ESP32-S3-DevKitC-1": "espressif-esp32-s3-devkitc-1",
+    "ideaspark ESP32 1.9\"": "ideaspark-esp32-1-9-lcd",
+    "Waveshare ESP32-C6-LCD-1.47": "waveshare-esp32-c6-lcd-1-47",
+    "Seeed SenseCAP Indicator": "seeed-sensecap-indicator",
+    "Seeed reTerminal E1001": "seeed-reterminal-e1001",
+    "Seeed reTerminal E1002": "seeed-reterminal-e1002",
+    "Home Assistant Voice PE": "home-assistant-voice-pe",
+    "Seeed reSpeaker Lite with XIAO ESP32-S3 (experimental)": "seeed-respeaker-lite-xiao-esp32s3",
+    "Waveshare ESP32-S3-Touch-AMOLED-1.75C": "waveshare-esp32-s3-touch-amoled-1-75c",
+    "Waveshare ESP32-S3-Touch-AMOLED-1.75": "waveshare-esp32-s3-touch-amoled-1-75",
+    "Espressif ESP32-S3-BOX-3": "espressif-esp32-s3-box-3",
+    "AIPI Lite": "aipi-lite",
+    "Waveshare ESP32-C6-Touch-AMOLED-1.8": "waveshare-esp32-c6-touch-amoled-1-8",
+    "Seeed SenseCAP Watcher": "seeed-sensecap-watcher",
+    "M5Stack Cardputer ADV (experimental)": "m5stack-cardputer-adv",
+    "M5Stack StickS3": "m5stack-sticks3",
+    "M5Stack StopWatch": "m5stack-stopwatch",
+    "M5Stack CoreS3": "m5stack-cores3",
+    "Guition JC3248W535": "guition-jc3248w535",
+    "M5Stack StickC Plus2": "m5stack-stickc-plus2",
+    "M5Stack Core2 (v1.0)": "m5stack-core2-v1-0",
+    "Freenove FNK0104B": "freenove-fnk0104b",
+  };
+  const esp32 = platforms.find((platform) => platform.id === "muse-esp32")!;
+
+  it("lists all 24 boards", () => {
+    expect(Object.keys(SDK_BOARDS)).toHaveLength(24);
+    expect(esp32.boards.map((board) => board.device_id).sort()).toEqual(Object.values(SDK_BOARDS).sort());
+  });
+
+  it("marks the experimental boards as possible, with a note", () => {
+    for (const [label, id] of Object.entries(SDK_BOARDS)) {
+      const board = esp32.boards.find((candidate) => candidate.device_id === id)!;
+      if (label.includes("(experimental)")) {
+        expect(board.support, id).toBe("possible");
+        expect(board.note, id).toMatch(/^Experimental in the Muse SDK/);
+      } else {
+        expect(board.support, id).toBe("official");
+      }
+    }
+  });
+
+  it("builds a plan and slug for every official board, and a photo when a seller lists it", async () => {
+    const { boardSlug } = await import("../src/build-plan/buy-links.js");
+    const { hasImage } = await import("../site/lib/image-sources");
+    for (const board of esp32.boards) {
+      expect(board.difficulty, board.device_id).toBeDefined();
+      expect(planFor(board.device_id).steps.map((step) => step.id)).toContain("flash");
+      const device = devices.find((candidate) => candidate.id === board.device_id)!;
+      if (device.buy_url) expect(hasImage(board.device_id), board.device_id).toBe(true);
+      if (board.support === "official") expect(boardSlug(board.device_id), board.device_id).not.toBeNull();
+    }
+  });
+
+  it("only lists prices that were checked on a seller page", () => {
+    for (const id of ["guition-jc3248w535", "m5stack-core2-v1-0"]) {
+      const device = devices.find((candidate) => candidate.id === id)!;
+      expect(device.est_used_price_usd_min, id).toBeUndefined();
+      expect(device.buy_url, id).toBeUndefined();
     }
   });
 });

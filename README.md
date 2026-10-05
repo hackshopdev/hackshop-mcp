@@ -26,6 +26,7 @@ v0.0.6 - published on npm and hosted at `https://www.hackshop.dev/mcp`. The host
   - Ski-style difficulty (green, blue, black) on every board, pick, build plan and `build.md`.
   - Assembly steps carry connector, pose, force and machine-checkable `verify` checks, ending in a final verify step.
   - Prices refreshed and labeled with `price_checked`; concrete USB-C data cable links; optional USB-C power adapter.
+  - All 24 boards in the Muse ESP32 SDK's supported table; the experimental ones are marked `possible`.
   - New purchase policy: the agent asks "Place this order for $<total> at <seller>?" and waits for a clear yes.
   - Hosted MCP: CORS for browser agents, stateless POST-only `Allow` header, build resource template listed, friendlier input errors, `try_instead` for npm-only tools. OpenAPI for `/api/plan` at `/openapi.json`.
 - **0.0.5**: hosted MCP at `/mcp`, `get_build_plan`, resources and prompts.

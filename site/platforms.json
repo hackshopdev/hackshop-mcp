@@ -910,6 +910,822 @@
           "(Hold to talk) Add milk to the grocery list.",
           "Show me the picture you made."
         ]
+      },
+      {
+        "device_id": "espressif-esp32-c6-devkitc-1",
+        "support": "official",
+        "tier": "status",
+        "kind": "light",
+        "build": "tools/board.sh c6-nopsram build",
+        "chip": "esp32c6",
+        "fits": ["hidden"],
+        "note": "Status light and BOOT button. No PSRAM, so no home-network tunnel; Muse can still reach and control it.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command. No backup or workaround."
+        },
+        "flash": {
+          "port": "Native USB on the C6: /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
+        "features": {
+          "home_tunnel": false,
+          "images": "none",
+          "push_to_talk": "none",
+          "audio": "none",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": "no",
+          "round_display": false,
+          "display_in": null
+        },
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
+            "search": "USB-C data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "Blink the gadget's light when my build finishes.",
+          "Is the gadget online right now?"
+        ]
+      },
+      {
+        "device_id": "espressif-esp32-s3-devkitc-1",
+        "support": "official",
+        "tier": "status",
+        "kind": "light",
+        "build": "tools/board.sh espressif-s3-devkitc-1 build",
+        "chip": "esp32s3",
+        "fits": ["hidden"],
+        "note": "Status light and BOOT button, with PSRAM for the home-network tunnel. No screen or audio.",
+        "difficulty": {
+          "level": "green",
+          "why": "A micro-USB data cable and one flash command. No backup or workaround."
+        },
+        "flash": {
+          "port": "Native USB on the S3: /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
+        "features": {
+          "home_tunnel": true,
+          "images": "none",
+          "push_to_talk": "none",
+          "audio": "none",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": "no",
+          "round_display": false,
+          "display_in": null
+        },
+        "parts": [
+          {
+            "name": "Micro-USB data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. The ESP32-S3-DevKitC-1 has micro-USB ports. This Adafruit USB-A to Micro-B cable carries USB 2.0 data ($2.95 on 2026-10-05).",
+            "buy_url": "https://www.adafruit.com/product/592",
+            "search": "micro USB data cable",
+            "est_price_usd": 3
+          },
+          {
+            "name": "USB power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer, with the same data cable. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "What devices on my home network can you reach?",
+          "Blink the gadget's light when my build finishes."
+        ]
+      },
+      {
+        "device_id": "waveshare-esp32-c6-lcd-1-47",
+        "support": "official",
+        "tier": "status",
+        "kind": "status-screen",
+        "build": "tools/board.sh waveshare-c6-lcd-147 build",
+        "chip": "esp32c6",
+        "fits": ["desk"],
+        "note": "Status and images on a 1.47\" screen. No PSRAM, so no home-network tunnel.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command. No backup or workaround."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
+        "features": {
+          "home_tunnel": false,
+          "images": "color",
+          "push_to_talk": "none",
+          "audio": "none",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": null,
+          "round_display": false,
+          "display_in": 1.47
+        },
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
+            "search": "USB-C data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "Show a picture of a sunset on my gadget.",
+          "Put today's top three tasks on the gadget's screen."
+        ]
+      },
+      {
+        "device_id": "seeed-respeaker-lite-xiao-esp32s3",
+        "support": "possible",
+        "tier": "status",
+        "kind": "light",
+        "build": "tools/board.sh seeed-respeaker-lite build",
+        "chip": "esp32s3",
+        "fits": ["desk", "hidden"],
+        "note": "Experimental in the Muse SDK. Push-to-talk on the XIAO BOOT button; replies show as text in the Muse app. Needs Seeed's 16 kHz I2S XMOS firmware v1.0.9, and speaker playback isn't verified on hardware yet.",
+        "difficulty": {
+          "level": "blue",
+          "why": "The XMOS chip must run Seeed's 16 kHz I2S firmware v1.0.9 before you flash the XIAO ESP32-S3."
+        },
+        "flash": {
+          "warning": "Seeed reSpeaker Lite (experimental): the XMOS must run Seeed's 16 kHz I2S firmware v1.0.9. The ESP32 flash command doesn't update the XMOS.",
+          "connector_note": "Plug USB into the small XIAO board, not the larger reSpeaker board.",
+          "port": "The XIAO's own USB Serial/JTAG console: /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "before": [
+            "If the XMOS doesn't already run Seeed's 16 kHz I2S firmware v1.0.9, install it through the larger board's USB port first. The USB audio and 48 kHz I2S images don't match this profile.",
+            "Use a XIAO ESP32-S3 with 8 MB flash and 8 MB octal PSRAM, attach its external antenna, and use 2.4 GHz Wi-Fi."
+          ],
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/seeed-respeaker-lite.md"
+        },
+        "features": {
+          "home_tunnel": true,
+          "images": "none",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": null,
+          "round_display": false,
+          "display_in": null
+        },
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Seeed cable is USB-C to USB-A and carries USB 3.1 data ($2.50 on 2026-10-05). If your computer has only USB-C ports, use the USB-C to USB-C option.",
+            "buy_url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+            "search": "USB-C data cable",
+            "est_price_usd": 3,
+            "alternatives": [
+              {
+                "label": "Adafruit (USB-C to USB-C)",
+                "url": "https://www.adafruit.com/product/4199",
+                "note": "USB 3.1 cable with all data pins connected, 1 m, $9.95 on 2026-10-05.",
+                "est_price_usd": 10
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "(Hold XIAO BOOT) What's on my calendar tomorrow?",
+          "(Hold XIAO BOOT) Add milk to the grocery list."
+        ]
+      },
+      {
+        "device_id": "waveshare-esp32-s3-touch-amoled-1-75",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build s3n",
+        "chip": "esp32s3",
+        "fits": ["desk"],
+        "note": "Round AMOLED avatar with BOOT as push-to-talk; the 16 MB flash sibling of the 1.75C.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command. No backup or workaround."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": true,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "optional",
+          "round_display": true,
+          "display_in": 1.75
+        },
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
+            "search": "USB-C data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "(Hold to talk) What are you working on?",
+          "Show me the image you just found."
+        ]
+      },
+      {
+        "device_id": "espressif-esp32-s3-box-3",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build box3",
+        "chip": "esp32s3",
+        "fits": ["desk"],
+        "note": "Touch screen avatar; BOOT/CONFIG is push-to-talk and the hardware mic mute button still works.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command. Back up the factory firmware first only if you want to keep it."
+        },
+        "flash": {
+          "connector_note": "Use the main unit's USB-C connector.",
+          "port": "Native USB (VID:PID 303A:1001): /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. Other Espressif boards share that ID, so pick the BOX-3's port before flashing.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "before": [
+            "To keep the factory firmware, back up the full 16 MB flash first: python -m esptool --chip esp32s3 -p PORT read-flash 0 0x1000000 box3-factory.bin. Flashing Muse replaces the factory firmware and its partition layout."
+          ],
+          "recovery": "If the port is missing or flashing can't connect, hold BOOT/CONFIG, tap RESET, release BOOT/CONFIG, and check the ports again.",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/esp32-s3-box-3.md"
+        },
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": true,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": null,
+          "round_display": false,
+          "display_in": 2.4
+        },
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
+            "search": "USB-C data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "(Hold BOOT/CONFIG) What's next on my calendar?",
+          "Show me the image you just found."
+        ]
+      },
+      {
+        "device_id": "m5stack-cardputer-adv",
+        "support": "possible",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build cardputer-adv",
+        "chip": "esp32s3",
+        "fits": ["pocket"],
+        "note": "Experimental in the Muse SDK. Hold Space/GO to send a voice note; replies scroll past as text. No images, home-network tunnel or battery telemetry.",
+        "difficulty": {
+          "level": "blue",
+          "why": "Back up the 8 MB firmware first, and enter download mode by holding GO while you plug in USB."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "warning": "M5Stack Cardputer ADV (experimental): back up the original 8 MB firmware before the first flash.",
+          "before": [
+            "To enter download mode: switch it off, hold GO while you connect USB, then release GO."
+          ],
+          "backup": {
+            "what": "the original 8 MB firmware",
+            "commands": [
+              "python -m esptool --chip esp32s3 -p PORT read-flash 0 0x800000 cardputer-adv-backup.bin"
+            ],
+            "file": "cardputer-adv-backup.bin",
+            "bytes": 8388608,
+            "restore_note": "To go back, write the backup:",
+            "restore": [
+              "python -m esptool --chip esp32s3 -p PORT write-flash 0 cardputer-adv-backup.bin"
+            ]
+          },
+          "recovery": "If esptool can't connect, switch it off, hold GO while you connect USB, then release GO.",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md"
+        },
+        "features": {
+          "home_tunnel": false,
+          "images": "none",
+          "push_to_talk": "text",
+          "audio": "speaker-mic",
+          "touch": false,
+          "camera": false,
+          "air_sensors": false,
+          "ota": false,
+          "battery": null,
+          "round_display": false,
+          "display_in": 1.14
+        },
+        "parts": [
+          {
+            "name": "USB data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. Check which USB port your board has, then pick the matching cable.",
+            "search": "USB data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Adafruit (USB-C to USB-C)",
+                "url": "https://www.adafruit.com/product/4199",
+                "note": "For a USB-C board. All data pins connected, $9.95 on 2026-10-05.",
+                "est_price_usd": 10
+              },
+              {
+                "label": "Adafruit (USB-A to Micro-B)",
+                "url": "https://www.adafruit.com/product/592",
+                "note": "For a micro-USB board. USB 2.0 data, $2.95 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer, with the same data cable. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "(Hold Space/GO) Summarize my unread email.",
+          "What's the status of the task you're running?"
+        ]
+      },
+      {
+        "device_id": "m5stack-stopwatch",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build stopwatch",
+        "chip": "esp32s3",
+        "fits": ["desk", "pocket"],
+        "note": "Round AMOLED with the yellow button for push-to-talk, the blue one for sleep and settings on the touch screen.",
+        "difficulty": {
+          "level": "green",
+          "why": "It flashes over its own USB with one command; nothing special."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md"
+        },
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": true,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "yes",
+          "round_display": true,
+          "display_in": 1.75
+        },
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
+            "search": "USB-C data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "(Hold the yellow button) What's next today?",
+          "Show me the image you just found."
+        ]
+      },
+      {
+        "device_id": "m5stack-cores3",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build cores3",
+        "chip": "esp32s3",
+        "fits": ["desk"],
+        "note": "Touch screen avatar; PWR on the left side is push-to-talk. The camera isn't used yet.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command over its own USB."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "recovery": "If esptool can't connect, hold RST for 3 s until the green LED lights to enter the bootloader.",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md"
+        },
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": true,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "yes",
+          "round_display": false,
+          "display_in": 2
+        },
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
+            "search": "USB-C data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "(Press PWR) What's on my calendar tomorrow?",
+          "Show me the image you just found."
+        ]
+      },
+      {
+        "device_id": "guition-jc3248w535",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build jc3248w535",
+        "chip": "esp32s3",
+        "fits": ["desk"],
+        "note": "3.5\" touch avatar and speaker, but no microphone: push-to-talk records silence until you wire in an I2S mic.",
+        "difficulty": {
+          "level": "blue",
+          "why": "Back up the stock firmware first; push-to-talk also needs an I2S mic wired in."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "warning": "Guition JC3248W535: back up the stock firmware before the first flash. It has no microphone, so push-to-talk records silence until you add an I2S mic.",
+          "before": [
+            "For push-to-talk, wire an I2S MEMS mic such as an INMP441: SCK to GPIO42, WS to GPIO2 (shared with the amp), L/R to GND, VDD to 3.3 V, and SD to a free GPIO that you set as CONFIG_MUSE_JC3248W535_MIC_GPIO under Muse in menuconfig."
+          ],
+          "backup": {
+            "what": "the stock firmware (the full 16 MB flash)",
+            "commands": [
+              "python -m esptool --chip esp32s3 -p PORT read-flash 0 0x1000000 jc3248w535.bin"
+            ],
+            "file": "jc3248w535.bin",
+            "bytes": 16777216,
+            "restore_note": "To go back, write the backup:",
+            "restore": [
+              "python -m esptool --chip esp32s3 -p PORT write-flash 0 jc3248w535.bin"
+            ]
+          },
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md"
+        },
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "none",
+          "audio": "speaker",
+          "touch": true,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": null,
+          "round_display": false,
+          "display_in": 3.5
+        },
+        "parts": [
+          {
+            "name": "USB data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. Check which USB port your board has, then pick the matching cable.",
+            "search": "USB data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Adafruit (USB-C to USB-C)",
+                "url": "https://www.adafruit.com/product/4199",
+                "note": "For a USB-C board. All data pins connected, $9.95 on 2026-10-05.",
+                "est_price_usd": 10
+              },
+              {
+                "label": "Adafruit (USB-A to Micro-B)",
+                "url": "https://www.adafruit.com/product/592",
+                "note": "For a micro-USB board. USB 2.0 data, $2.95 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer, with the same data cable. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "Show my calendar for today on the screen.",
+          "Show me the image you just found."
+        ]
+      },
+      {
+        "device_id": "m5stack-core2-v1-0",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build core2",
+        "chip": "esp32",
+        "fits": ["desk"],
+        "note": "Core2 v1.0 only (AXP192 power chip); v1.1 isn't supported. Hold the middle touch zone to talk.",
+        "difficulty": {
+          "level": "blue",
+          "why": "Back up the 16 MB flash first, flash at 230400 baud, and check it's a v1.0."
+        },
+        "flash": {
+          "warning": "M5Stack Core2: only v1.0 (AXP192) is supported; v1.1 (AXP2101) isn't. Check the back sticker or PCB, and back up the 16 MB flash before the first flash.",
+          "port": "Its USB-UART bridge is a CP2104 on early units and a CH9102F on later ones; tools/muse/board.sh flash core2 uses 230400 baud, which both take.",
+          "before": [
+            "Keep any esptool command you run by hand at -b 230400."
+          ],
+          "backup": {
+            "what": "the full 16 MB flash",
+            "commands": [
+              "python -m esptool --chip esp32 -p PORT -b 230400 read-flash 0 0x1000000 core2.bin"
+            ],
+            "file": "core2.bin",
+            "bytes": 16777216,
+            "restore_note": "To go back, write the backup with the same chip, port and baud:",
+            "restore": [
+              "python -m esptool --chip esp32 -p PORT -b 230400 write-flash 0 core2.bin"
+            ]
+          },
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md"
+        },
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": true,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "yes",
+          "round_display": false,
+          "display_in": 2
+        },
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
+            "search": "USB-C data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "(Hold the middle touch zone) What's on my calendar tomorrow?",
+          "Show me the image you just found."
+        ]
+      },
+      {
+        "device_id": "freenove-fnk0104b",
+        "support": "official",
+        "tier": "full-ui",
+        "kind": "ui",
+        "build": "tools/muse/board.sh build fnk0104b",
+        "chip": "esp32s3",
+        "fits": ["desk"],
+        "note": "2.8\" touch avatar; BOOT is push-to-talk. Battery shows voltage only.",
+        "difficulty": {
+          "level": "green",
+          "why": "A USB-C data cable and one flash command."
+        },
+        "flash": {
+          "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
+          "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+        },
+        "features": {
+          "home_tunnel": true,
+          "images": "color",
+          "push_to_talk": "voice",
+          "audio": "speaker-mic",
+          "touch": true,
+          "camera": false,
+          "air_sensors": false,
+          "ota": true,
+          "battery": "optional",
+          "round_display": false,
+          "display_in": 2.8
+        },
+        "parts": [
+          {
+            "name": "USB-C data cable",
+            "qty": 1,
+            "required": true,
+            "note": "Must carry data, not just charge. Most flashing problems are charge-only cables. This Adafruit cable is USB-C on both ends with all data pins connected ($9.95 on 2026-10-05). If your computer has USB-A ports, the Seeed USB-C to USB-A cable works too.",
+            "buy_url": "https://www.adafruit.com/product/4199",
+            "search": "USB-C data cable",
+            "est_price_usd": 10,
+            "alternatives": [
+              {
+                "label": "Seeed Studio (USB-C to USB-A)",
+                "url": "https://www.seeedstudio.com/USB-3-1-Type-C-to-A-Cable-1-Meter-3-1A-p-4085.html",
+                "note": "USB 3.1 data cable, USB-C to USB-A, 1 m, $2.50 on 2026-10-05.",
+                "est_price_usd": 3
+              }
+            ]
+          },
+          {
+            "name": "USB-C power adapter (5 V / 2 A or more)",
+            "qty": 1,
+            "required": false,
+            "note": "Optional. Runs the gadget from a wall outlet instead of your computer. A phone charger that supplies 5 V / 2 A or more works.",
+            "search": "USB-C power adapter 5V 2A",
+            "est_price_usd": 10
+          }
+        ],
+        "try_saying": [
+          "(Hold BOOT) What's next today?",
+          "Show me the image you just found."
+        ]
       }
     ],
     "sources": [
@@ -918,7 +1734,9 @@
       "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/README.md",
       "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md",
       "https://gadgets.muse.ai/sdk-terms",
-      "https://www.engadget.com/2276312/meta-muse-gadgets-open-source-smart-home-link/"
+      "https://www.engadget.com/2276312/meta-muse-gadgets-open-source-smart-home-link/",
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/esp32-s3-box-3.md",
+      "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/devices/seeed-respeaker-lite.md"
     ],
     "last_verified": "2026-10-05"
   },
