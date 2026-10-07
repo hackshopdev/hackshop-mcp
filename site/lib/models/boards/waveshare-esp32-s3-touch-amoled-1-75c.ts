@@ -167,7 +167,10 @@ export const waveshareS3Amoled175c: BoardModel = {
       shape: "roundedBox",
       radius: 0.8,
       size: [2.4, 5, 3],
-      position: [25.6, 13.75, 0],
+      // Seat the cap into the circular rim. The old x=25.6 placement used the
+      // square outer bounds and left the whole button floating beyond the
+      // case at this y position.
+      position: [22.2, 13.75, 0],
       color: "#969da7",
       finish: "metal",
       explode: [14, 0, 0],
@@ -180,7 +183,7 @@ export const waveshareS3Amoled175c: BoardModel = {
       shape: "roundedBox",
       radius: 0.8,
       size: [2.4, 5, 3],
-      position: [25.6, -13.75, 0],
+      position: [22.2, -13.75, 0],
       color: COLORS.aluminum,
       finish: "metal",
       explode: [14, 0, 0],

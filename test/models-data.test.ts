@@ -117,6 +117,22 @@ describe("board models", () => {
     }
   });
 
+  it("seats the round Waveshare side buttons in the housing rim", () => {
+    const board = model("waveshare-esp32-s3-touch-amoled-1-75c");
+    const radius = board.outer.w / 2;
+
+    for (const id of ["pwr-button", "boot-button"]) {
+      const part = board.parts.find((candidate) => candidate.id === id)!;
+      const [x, y] = part.position;
+      const centerRadius = Math.hypot(x, y);
+      // Project the axis-aligned half extents onto the radial direction. The
+      // cap may protrude slightly so it is pressable, but it must still read as
+      // seated in the circular housing instead of floating beside it.
+      const radialHalf = (Math.abs(x) * part.size[0] / 2 + Math.abs(y) * part.size[1] / 2) / centerRadius;
+      expect(centerRadius + radialHalf, id).toBeLessThanOrEqual(radius + 1);
+    }
+  });
+
   it("takes outer size from the sources table and matches the catalog where it has numbers", () => {
     for (const m of BOARD_MODELS) {
       const dims = DIMENSION_SOURCES[m.deviceId];
