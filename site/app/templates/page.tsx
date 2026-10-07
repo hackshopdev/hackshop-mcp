@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StartBuildButton } from "@/components/StartBuildButton";
 import { pageMetadata } from "@/lib/page-metadata";
+import { embodimentRecipe } from "@/lib/embodiment-recipes";
 import {
   TEMPLATES,
   TEMPLATE_CATEGORIES,
@@ -32,6 +33,7 @@ const VIABILITY_COLOR: Record<Template["viability"], string> = {
 };
 
 function ProjectCard({ t }: { t: Template }) {
+  const recipe = embodimentRecipe(t.slug);
   return (
     <article
       style={{
@@ -87,6 +89,26 @@ function ProjectCard({ t }: { t: Template }) {
         {t.viability_note}
       </p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {recipe ? (
+          <Link
+            href={`/builds/${recipe.slug}`}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              minHeight: 40,
+              padding: "8px 14px",
+              background: "var(--accent)",
+              border: "1px solid var(--accent)",
+              color: "#111",
+              fontSize: 14,
+              fontWeight: 700,
+              borderRadius: 6,
+              textDecoration: "none",
+            }}
+          >
+            See full recipe →
+          </Link>
+        ) : null}
         {t.device_id ? (
           <StartBuildButton
             deviceId={t.device_id}
@@ -96,9 +118,9 @@ function ProjectCard({ t }: { t: Template }) {
             style={{
               minHeight: 40,
               padding: "8px 14px",
-              background: "var(--accent)",
-              color: "#111",
-              border: "1px solid var(--accent)",
+              background: recipe ? "transparent" : "var(--accent)",
+              color: recipe ? "var(--fg)" : "#111",
+              border: recipe ? "1px solid var(--border)" : "1px solid var(--accent)",
               borderRadius: 6,
               fontSize: 14,
               fontWeight: 700,

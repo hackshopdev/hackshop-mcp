@@ -1,0 +1,247 @@
+.crumbs {
+  margin: 26px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.crumbs a,
+.stepLinks a,
+.cautions a,
+.sources a {
+  color: var(--accent);
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.75fr);
+  gap: 48px;
+  align-items: end;
+  padding: 64px 0 40px;
+}
+
+.hero h1 {
+  max-width: 760px;
+  margin: 18px 0 14px;
+  color: var(--text);
+  font-size: clamp(46px, 8vw, 88px);
+  line-height: 0.96;
+  letter-spacing: -0.055em;
+}
+
+.dek {
+  max-width: 720px;
+  margin: 0 0 26px;
+  color: #c8c8c3;
+  font-size: clamp(19px, 2.4vw, 25px);
+  line-height: 1.45;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin: 0 0 28px;
+}
+
+.facts span {
+  display: grid;
+  gap: 1px;
+}
+
+.facts strong {
+  color: var(--text);
+  font-size: 20px;
+}
+
+.facts small {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.firstSuccess {
+  padding: 26px;
+  border: 1px solid rgba(255, 122, 0, 0.45);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(255, 122, 0, 0.12), rgba(255, 122, 0, 0.025));
+}
+
+.firstSuccess > p:nth-child(2) {
+  margin: 2px 0 18px;
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.firstSuccess small {
+  color: var(--muted);
+}
+
+.proofGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(290px, 0.7fr);
+  gap: 18px;
+}
+
+.videoCard,
+.proofState {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+}
+
+.videoCard video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #06090f;
+}
+
+.proofCaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.proofCaption strong { color: var(--text); }
+
+.proofState {
+  padding: 10px 20px 20px;
+}
+
+.proofState > p {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.proofRow {
+  display: grid;
+  gap: 4px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.proofRow span { color: var(--muted); font-size: 13px; }
+.proofRow strong[data-state="ready"] { color: var(--ok); }
+.proofRow strong[data-state="concept"] { color: var(--warn); }
+.proofRow strong[data-state="missing"] { color: var(--muted); }
+
+.anchor { scroll-margin-top: 90px; }
+
+.capabilityGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.capability {
+  min-height: 240px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+.capabilityDirection,
+.evidence {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.capability h3 { margin: 10px 0 8px; font-size: 24px; }
+.capability p { margin: 16px 0 0; color: var(--muted); font-size: 14px; }
+
+.supported,
+.integration {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.supported { color: var(--ok); background: rgba(122, 216, 138, 0.1); }
+.integration { color: var(--warn); background: rgba(245, 196, 81, 0.1); }
+
+.partsList { border-top: 1px solid var(--line); }
+
+.part {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.partQty { color: var(--accent); font-size: 20px; font-weight: 800; }
+.part h3 { margin: 0 0 4px; font-size: 18px; }
+.part p { margin: 0 0 4px; color: var(--muted); font-size: 14px; }
+.part div > span { color: var(--muted); font-size: 12px; text-transform: uppercase; }
+.part > a { color: var(--accent); font-size: 14px; font-weight: 700; }
+.priceNote { margin: 18px 0 0; color: var(--muted); font-size: 14px; }
+
+.steps { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+.steps > li { display: grid; grid-template-columns: 64px minmax(0, 1fr); border-bottom: 1px solid var(--line); }
+.stepNumber { padding: 27px 18px 0 0; color: var(--accent); font: 800 13px/1 monospace; }
+.stepBody { padding: 22px 0 26px; }
+.stepBody h3 { margin: 0; font-size: 23px; }
+.why { margin: 2px 0 12px; color: #c6c6c0; font-weight: 650; }
+.body { margin: 0 0 14px; color: var(--muted); }
+.body p { margin: 0 0 12px; }
+.body ul { margin: 0 0 14px; padding-left: 20px; }
+.body a { color: var(--accent); }
+.body h3 { margin: 18px 0 8px; color: var(--text); font-size: 17px; }
+.stepLinks { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 14px; }
+
+.checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.check { display: grid; grid-template-columns: 34px 1fr; gap: 10px; padding: 20px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+.check > span { color: var(--accent); font-weight: 800; }
+.check h3 { margin: 2px 0 6px; font-size: 18px; }
+.check p { margin: 0; color: var(--muted); font-size: 14px; }
+.check .evidence { color: var(--accent); }
+.check code { display: block; overflow-wrap: anywhere; margin-top: 10px; color: #d9d9d4; font-size: 12px; }
+
+.cautions {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.65fr) minmax(0, 1.35fr);
+  gap: 50px;
+}
+
+.cautions h2 { margin: 0; font-size: clamp(30px, 4vw, 42px); line-height: 1.12; }
+.cautions ul { margin: 0; padding-left: 20px; color: #c8c8c3; }
+.cautions li + li { margin-top: 9px; }
+.recovery { margin: 22px 0; padding: 16px; border-left: 3px solid var(--warn); background: rgba(245, 196, 81, 0.08); }
+
+.sources { padding-bottom: 88px; }
+.sources code { color: var(--text); }
+.sources ol { display: grid; gap: 8px; padding-left: 22px; }
+
+@media (max-width: 900px) {
+  .hero,
+  .proofGrid,
+  .cautions { grid-template-columns: 1fr; }
+  .capabilityGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .hero { padding-top: 42px; }
+  .hero h1 { font-size: 48px; }
+  .proofCaption { display: grid; }
+  .capabilityGrid,
+  .checks { grid-template-columns: 1fr; }
+  .capability { min-height: 0; }
+  .part { grid-template-columns: 40px minmax(0, 1fr); }
+  .part > a { grid-column: 2; }
+  .steps > li { grid-template-columns: 42px minmax(0, 1fr); }
+}

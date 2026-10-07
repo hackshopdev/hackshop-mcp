@@ -51,6 +51,16 @@ The catalog is the moat. New devices come in via PR. Tags come in via `tags.md` 
 - Devices you can't find in any secondary market. The point is helping users acquire them.
 - Devices with brand-new firmware updates that closed the hack. (These get removed quarterly.)
 
+## Publishing a featured build
+
+A project idea, device listing, or generic build guide is not automatically a featured build. Featured projects must pass `buildProofIssues()` in `site/lib/build-proof.ts` and follow [the featured build proof standard](docs/featured-build-proof-standard.md):
+
+- an inspectable whole-build 3D assembly presented in Three.js;
+- a demonstration video no longer than 45 seconds; and
+- an explicit physical-photo state.
+
+Concepts may use a labeled animation and `not-built` photo state. Physical-prototype and validated-build claims require a real-device demo and a provenance-linked photograph of the finished hardware.
+
 ## Tests must pass
 
 Before opening a PR:

@@ -410,9 +410,10 @@ function tokenStep(
   board?: PlatformBoard,
 ): BuildPlanStep {
   const configPath = board ? sdkconfigPathFor(board) : "build/sdkconfig";
+  const menuconfig = board ? menuconfigCommandFor(board) : "idf.py menuconfig";
   const body = mode === "linux"
     ? "Create a token at gadgets.muse.ai > Account > SDK tokens (https://gadgets.muse.ai/settings/sdk-tokens). It starts with `mgst_`. The Linux installer takes it as `--sdk-token mgst_YOUR_TOKEN`. Never commit the real token or paste it anywhere public."
-    : `Create a token at gadgets.muse.ai > Account > SDK tokens (https://gadgets.muse.ai/settings/sdk-tokens). It starts with \`mgst_\`. For this ESP32 build, set \`CONFIG_GADGET_SDK_TOKEN="mgst_YOUR_TOKEN"\` in \`${configPath}\` after the board build command has created that file, then run the build command again. \`idf.py menuconfig\` > ESP32 Device SDK > Muse Gadgets SDK token is the interactive alternative. Never commit the real token or paste it anywhere public.`;
+    : `Create a token at gadgets.muse.ai > Account > SDK tokens (https://gadgets.muse.ai/settings/sdk-tokens). It starts with \`mgst_\`. For this ESP32 build, set \`CONFIG_GADGET_SDK_TOKEN="mgst_YOUR_TOKEN"\` in \`${configPath}\` after the board build command has created that file, then run the build command again. \`${menuconfig}\` > ESP32 Device SDK > Muse Gadgets SDK token is the interactive alternative. Never commit the real token or paste it anywhere public.`;
 
   return {
     id: "token",
@@ -532,12 +533,15 @@ function esp32PairStep(platform: Platform, board?: PlatformBoard): BuildPlanStep
   const button = board ? boardButtonName(board) : "the board button";
   const status = board ? statusIndicator(board) : "status indicator";
   const name = board ? pairingName(board) : "MuseGadget-XXXXXX";
+  const reset = board?.tier === "full-ui"
+    ? "To reset pairing, open Settings > MUSE > Reset pairing on the device and tap again to confirm."
+    : "Hold the pairing button for 5 seconds to reset pairing.";
   return {
     id: "pair",
     title: "Pair it with the Muse app",
     why: "Pairing links the freshly flashed board to your Muse account.",
     body_md:
-      `In the Muse app, turn on Settings > Devices > Developer mode, then Settings > Devices > Add Device (+). Pick \`${name}\` and press ${button} when ${status} breathes blue. Green means connected. Status meanings: orange = ready for setup, blue breathing = press the button, blue = joining Wi-Fi and connecting, green = connected, yellow blinking = reconnecting, purple = unpaired, red blinking = error. Hold the button for 5 seconds to reset pairing.`,
+      `In the Muse app, turn on Settings > Devices > Developer mode, then Settings > Devices > Add Device (+). Pick \`${name}\` and press ${button} when ${status} breathes blue. Green means connected. Status meanings: orange = ready for setup, blue breathing = press the button, blue = joining Wi-Fi and connecting, green = connected, yellow blinking = reconnecting, purple = unpaired, red blinking = error. ${reset}`,
     commands: [],
     links: [
       { label: "Muse Gadgets", url: platform.homepage },
@@ -590,6 +594,15 @@ function sdkconfigPathFor(board: PlatformBoard): string {
   const boardSh = board.build.match(/^tools\/board\.sh\s+(\S+)\s+build$/);
   if (boardSh?.[1]) return `build-${boardSh[1]}/sdkconfig`;
   return "build/sdkconfig";
+}
+
+function menuconfigCommandFor(board: PlatformBoard): string {
+  const museProfile = museProfileFor(board);
+  if (museProfile) {
+    const target = board.chip ?? "esp32s3";
+    return `idf.py -B build-muse-${museProfile} -DIDF_TARGET=${target} -DSDKCONFIG=build-muse-${museProfile}/sdkconfig -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;devices/sdkconfig.muse;devices/sdkconfig.muse-${museProfile}" menuconfig`;
+  }
+  return "idf.py menuconfig";
 }
 
 function flashCommandFor(board: PlatformBoard): string {

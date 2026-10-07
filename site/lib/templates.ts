@@ -47,7 +47,7 @@ export const TEMPLATES: Template[] = [
     prompt:
       "Give my Muse AI agent a body on my desk: a round screen that shows its avatar, status and replies, push-to-talk, and shows images Muse sends me. USB powered, sits on a desk stand.",
     difficulty: 2,
-    est_cost_usd: { min: 40, max: 45 },
+    est_cost_usd: { min: 50, max: 52 },
     est_setup_hours_min: 1,
     est_setup_hours_max: 3,
     viability: "official",

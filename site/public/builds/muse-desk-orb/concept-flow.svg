@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Muse desk orb behavior</title>
+  <desc id="desc">Hold the top button, speak, and receive a text answer on the screen.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#0a0d15"/>
+      <stop offset="1" stop-color="#17112b"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#8bf2c3"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <text x="640" y="86" fill="#fff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700">First successful behavior</text>
+  <text x="640" y="128" fill="#aeb7c7" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22">One observable loop proves the input, connection and output.</text>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="75" y="225" width="300" height="245" rx="28" fill="#151925" stroke="#323b4e" stroke-width="2"/>
+    <circle cx="225" cy="294" r="36" fill="#8bf2c3"/>
+    <path d="M225 276 v36 M207 294 h36" stroke="#10151c" stroke-width="8" stroke-linecap="round"/>
+    <text x="225" y="376" fill="#fff" text-anchor="middle" font-size="31" font-weight="700">1. Hold + ask</text>
+    <text x="225" y="415" fill="#aeb7c7" text-anchor="middle" font-size="20">Upper PWR records</text>
+    <text x="225" y="444" fill="#aeb7c7" text-anchor="middle" font-size="20">a voice note</text>
+
+    <rect x="490" y="225" width="300" height="245" rx="28" fill="#151925" stroke="#323b4e" stroke-width="2"/>
+    <circle cx="640" cy="294" r="36" fill="#b9a7ff"/>
+    <path d="M618 295 Q640 270 662 295 Q640 321 618 295" fill="none" stroke="#19132f" stroke-width="7"/>
+    <text x="640" y="376" fill="#fff" text-anchor="middle" font-size="31" font-weight="700">2. Muse responds</text>
+    <text x="640" y="415" fill="#aeb7c7" text-anchor="middle" font-size="20">Paired through the</text>
+    <text x="640" y="444" fill="#aeb7c7" text-anchor="middle" font-size="20">personal SDK token</text>
+
+    <rect x="905" y="225" width="300" height="245" rx="28" fill="#151925" stroke="#323b4e" stroke-width="2"/>
+    <circle cx="1055" cy="294" r="42" fill="#ffca79"/>
+    <rect x="1028" y="276" width="54" height="37" rx="7" fill="#241c12"/>
+    <text x="1055" y="376" fill="#fff" text-anchor="middle" font-size="31" font-weight="700">3. Read the reply</text>
+    <text x="1055" y="415" fill="#aeb7c7" text-anchor="middle" font-size="20">Text or a color image</text>
+    <text x="1055" y="444" fill="#aeb7c7" text-anchor="middle" font-size="20">appears on the AMOLED</text>
+
+    <path d="M390 347 H468" stroke="#8bf2c3" stroke-width="7" marker-end="url(#arrow)"/>
+    <path d="M805 347 H883" stroke="#8bf2c3" stroke-width="7" marker-end="url(#arrow)"/>
+    <rect x="244" y="535" width="792" height="72" rx="22" fill="#211934" stroke="#564284"/>
+    <text x="640" y="580" fill="#fff" text-anchor="middle" font-size="25">Speaker hardware exists, but spoken replies need a separate TTS integration.</text>
+    <text x="640" y="674" fill="#ffca79" text-anchor="middle" font-size="20" font-weight="700">CONCEPT ANIMATION · REAL-HARDWARE CHECKS REMAIN OPEN</text>
+  </g>
+</svg>

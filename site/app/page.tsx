@@ -14,6 +14,7 @@ import { hasImage } from "@/lib/image-sources";
 import { boardPath } from "@/lib/board-slugs";
 import { getMusePageData, type MuseBoardRow } from "@/lib/muse-page";
 import { TEMPLATES } from "@/lib/templates";
+import { embodimentRecipe } from "@/lib/embodiment-recipes";
 import { difficultyMap } from "@/lib/ui/difficulty";
 import { plainTierLabel } from "@/lib/ui/labels";
 import styles from "./home.module.css";
@@ -164,6 +165,7 @@ export default function Home() {
           <div className={ui.grid3}>
             {museTemplates.map((template) => {
               const row = template.device_id ? rowsById.get(template.device_id) : undefined;
+              const recipe = embodimentRecipe(template.slug);
               return (
                 <article className={styles.ideaCard} key={template.slug}>
                   {template.device_id ? (
@@ -186,8 +188,8 @@ export default function Home() {
                         source="home_template"
                         label="Start this build"
                       />
-                      <Link className={ui.linkArrow} href={`/build/${template.device_id}`}>
-                        See the steps
+                      <Link className={ui.linkArrow} href={recipe ? `/builds/${recipe.slug}` : `/build/${template.device_id}`}>
+                        {recipe ? "See full recipe" : "See the steps"}
                       </Link>
                     </div>
                   ) : null}

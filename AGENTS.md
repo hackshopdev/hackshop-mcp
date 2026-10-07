@@ -43,6 +43,7 @@ Website (`site/`):
 ## Conventions
 
 - TypeScript, ESM, Vitest for tests; follow existing file layout when adding tools or catalog entries.
+- A project may be promoted as a featured build only when it passes the proof contract in `site/lib/build-proof.ts`: an inspectable interactive whole-build 3D assembly, a demo video no longer than 45 seconds, and an explicit physical-photo state. Concept videos must say the build is not yet physical; physical-prototype and validated-build claims require a real-device demo and provenance-linked finished-build photo. Keep renders and simulations distinct from physical proof. See `docs/featured-build-proof-standard.md`.
 - Run `npm run validate` after editing `catalog.json` or `platforms.json`.
 - Board-specific hardware claims (ports, backups, flash quirks, prices) must come from the Muse Gadgets SDK docs or a seller page you checked; record prices with the date.
 - Analytics: browser events go through `site/lib/analytics.ts` (`track`), server events through `site/lib/serverAnalytics.ts`, MCP usage pings through `src/telemetry.ts`. Send metadata only. Never send idea text, constraints, inventories, or tool arguments.

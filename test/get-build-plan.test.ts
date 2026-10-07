@@ -41,4 +41,19 @@ describe("get_build_plan MCP tool", () => {
     expect(result.text).toMatch(/Unknown device_id "nope"/);
     expect(result.text).toMatch(/Try one of: espressif-esp32-c5-devkitc-1/);
   });
+
+  it("uses the round Waveshare board's recovery and pairing reset path", async () => {
+    const runTool = createToolRunner({ devices, platforms });
+    const result = await runTool("get_build_plan", {
+      device_id: "waveshare-esp32-s3-touch-amoled-1-75c",
+    });
+    const plan = result.out as BuildPlan;
+    const flash = plan.steps.find((step) => step.id === "flash")!;
+    const pair = plan.steps.find((step) => step.id === "pair")!;
+
+    expect(flash.body_md).toMatch(/hold BOOT.*power/i);
+    expect(flash.body_md).not.toMatch(/tap RESET/i);
+    expect(pair.body_md).toMatch(/Settings > MUSE > Reset pairing/i);
+    expect(pair.body_md).not.toMatch(/Hold the button for 5 seconds/i);
+  });
 });

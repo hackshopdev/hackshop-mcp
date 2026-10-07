@@ -477,7 +477,8 @@
         "flash": {
           "port": "Native USB: it shows up as /dev/cu.usbmodem* on macOS or /dev/ttyACM* on Linux. On Linux, add yourself to the dialout (or uucp) group.",
           "list_ports": "ls /dev/cu.usbmodem* 2>/dev/null || ls /dev/ttyACM* 2>/dev/null",
-          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/main/esp32/AGENTS.md"
+          "recovery": "If flashing cannot connect, close every serial monitor, hold BOOT, disconnect and reconnect USB power while still holding BOOT, then release BOOT and check the port again.",
+          "source": "https://github.com/facebookincubator/muse-gadget-sdk/blob/b139b45064b4dcecf7bfe97e75bc7f99c10c28b6/esp32/AGENTS.md"
         },
         "parts": [
           {
