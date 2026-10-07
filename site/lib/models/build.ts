@@ -318,8 +318,8 @@ function extrudeCentered(shape: THREE.Shape, depth: number, bevel: number): THRE
     bevelThickness: bevel,
     bevelSize: bevel,
     bevelOffset: -bevel,
-    bevelSegments: 2,
-    curveSegments: 20,
+    bevelSegments: 3,
+    curveSegments: 48,
   });
   geometry.translate(0, 0, -usable / 2);
   return geometry;
