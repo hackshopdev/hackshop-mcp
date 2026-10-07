@@ -156,7 +156,7 @@ export function OrbFilm({ model }: { model: BoardModel }) {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.82;
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
 
     const scene = new THREE.Scene();
     const background = studioBackground();
@@ -164,7 +164,7 @@ export function OrbFilm({ model }: { model: BoardModel }) {
 
     const pmrem = new THREE.PMREMGenerator(renderer);
     const room = new RoomEnvironment();
-    const environment = pmrem.fromScene(room, 0.05);
+    const environment = pmrem.fromScene(room, 0.04);
     scene.environment = environment.texture;
     scene.environmentIntensity = 0.5;
     disposeObject(room);
