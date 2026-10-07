@@ -2,6 +2,7 @@ import { buildUrls } from "../build-plan/index.js";
 import { difficultySummary } from "./difficulty.js";
 import { getBuildPlan } from "./tools.js";
 import type { CoreContext, DeviceEntry, Platform, PlatformBoard } from "./types.js";
+import { getFirmwarePlaybook } from "./firmware-tools.js";
 
 export interface CoreResource {
   uri: string;
@@ -52,6 +53,13 @@ export const CORE_RESOURCES: CoreResource[] = [
     description: "The hackshop catalog tag list.",
     mimeType: "text/plain",
   },
+  {
+    uri: "hackshop://firmware/playbooks",
+    name: "firmware-playbooks",
+    title: "Firmware playbooks",
+    description: "Curated firmware, local-protocol and cloud-replacement playbook index. Destructive actions are human-run only.",
+    mimeType: "application/json",
+  },
 ];
 
 export const CORE_RESOURCE_TEMPLATES: CoreResourceTemplate[] = [
@@ -60,6 +68,13 @@ export const CORE_RESOURCE_TEMPLATES: CoreResourceTemplate[] = [
     name: "build-plan",
     title: "Build plan",
     description: "Build plan JSON for a hackshop catalog device id: difficulty, flash warnings, parts, shopping list, steps and assembly. Example: hackshop://build/seeed-sensecap-watcher.",
+    mimeType: "application/json",
+  },
+  {
+    uriTemplate: "hackshop://firmware/{playbook_id}",
+    name: "firmware-playbook",
+    title: "Firmware playbook",
+    description: "One curated firmware playbook with compatibility targets, backup, recovery, risks, evidence and validation.",
     mimeType: "application/json",
   },
 ];
@@ -97,6 +112,32 @@ export function readCoreResource(
   uri: string,
   ctx: CoreContext,
 ): { uri: string; mimeType: string; text: string } | null {
+  if (uri === "hackshop://firmware/playbooks") {
+    return {
+      uri,
+      mimeType: "application/json",
+      text: JSON.stringify((ctx.firmwarePlaybooks ?? []).map((playbook) => ({
+        id: playbook.id,
+        device_id: playbook.device_id,
+        family: playbook.family,
+        title: playbook.title,
+        intervention: playbook.intervention,
+        compatibility: playbook.compatibility,
+        last_verified: playbook.last_verified,
+      })), null, 2),
+    };
+  }
+
+  const firmwareMatch = uri.match(/^hackshop:\/\/firmware\/([^/]+)$/);
+  if (firmwareMatch?.[1]) {
+    const result = getFirmwarePlaybook(
+      { playbook_id: decodeURIComponent(firmwareMatch[1]) },
+      ctx,
+    );
+    if (!result.found) return null;
+    return { uri, mimeType: "application/json", text: JSON.stringify(result.playbook, null, 2) };
+  }
+
   const buildMatch = uri.match(/^hackshop:\/\/build\/([^/]+)$/);
   if (buildMatch?.[1]) {
     const plan = getBuildPlan({ device_id: decodeURIComponent(buildMatch[1]) }, ctx);
@@ -148,7 +189,11 @@ export function resourceNotFoundMessage(uri: string, ctx: CoreContext): string {
     const known = ctx.platforms.flatMap((platform) => platform.boards.map((board) => board.device_id));
     return `Unknown device_id "${id}" in ${uri}. Try ${EXAMPLE_BUILD_URI}, or read hackshop://muse/boards for every id${known.length > 0 ? ` (e.g. ${known.slice(0, 3).join(", ")})` : ""}.`;
   }
-  return `Unknown resource: ${uri}. Available: ${CORE_RESOURCES.map((resource) => resource.uri).join(", ")}, plus the template hackshop://build/{device_id} (e.g. ${EXAMPLE_BUILD_URI}).`;
+  const firmwareMatch = uri.match(/^hackshop:\/\/firmware\/([^/]*)$/);
+  if (firmwareMatch) {
+    return `Unknown firmware playbook "${decodeURIComponent(firmwareMatch[1] ?? "")}". Read hackshop://firmware/playbooks for curated ids.`;
+  }
+  return `Unknown resource: ${uri}. Available: ${CORE_RESOURCES.map((resource) => resource.uri).join(", ")}, plus hackshop://build/{device_id} and hackshop://firmware/{playbook_id}.`;
 }
 
 /** JSON-RPC code MCP uses for "resource not found". */

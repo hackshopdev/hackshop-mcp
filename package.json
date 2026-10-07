@@ -11,6 +11,7 @@
   "files": [
     "dist",
     "catalog.json",
+    "firmware-playbooks.json",
     "platforms.json",
     "tags.md",
     "examples",

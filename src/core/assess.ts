@@ -30,6 +30,13 @@ export interface AssessOutput {
     brick_risk_label: string;
     brick_risk_disclaimer: string | null;
     firmware_links: string[];
+    firmware_playbooks: Array<{
+      id: string;
+      title: string;
+      intervention: string;
+      compatibility: string;
+      last_verified: string;
+    }>;
     community_size: string;
     last_verified: string;
     notes: string;
@@ -83,6 +90,15 @@ export function assessHackability(
   const agentPlatforms = agentPlatformsFor(match.id, ctx.platforms);
   const hackable = match.firmware_links.length > 0 || match.hack_difficulty <= 4;
   const urls = buildUrls(match.id, ctx.siteUrl, agentPlatforms.length > 0);
+  const firmwarePlaybooks = (ctx.firmwarePlaybooks ?? [])
+    .filter((playbook) => playbook.device_id === match.id)
+    .map((playbook) => ({
+      id: playbook.id,
+      title: playbook.title,
+      intervention: playbook.intervention,
+      compatibility: playbook.compatibility,
+      last_verified: playbook.last_verified,
+    }));
   const nextSteps = agentPlatforms.length > 0
     ? [
       `Start a build at ${urls.build_page} to save the parts list, checklist and agent brief to My builds.`,
@@ -101,6 +117,7 @@ export function assessHackability(
       brick_risk_label: safety.brick_risk_label,
       brick_risk_disclaimer: safety.brick_risk_disclaimer,
       firmware_links: match.firmware_links,
+      firmware_playbooks: firmwarePlaybooks,
       community_size: match.community_size_bucket,
       last_verified: match.last_verified,
       notes: match.notes,

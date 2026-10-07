@@ -3,6 +3,7 @@ import type {
   FlashOverlay,
   PlatformBoardPartAlternative,
 } from "../build-plan/types.js";
+import type { FirmwarePlaybook } from "./firmware.js";
 
 export type { BoardDifficulty, FlashOverlay, PlatformBoardPartAlternative };
 
@@ -172,6 +173,7 @@ export interface PrintableFab {
 
 export interface CoreContext {
   catalog: DeviceEntry[];
+  firmwarePlaybooks?: FirmwarePlaybook[];
   platforms: Platform[];
   printablesFor(device: DeviceEntry, siteUrl: string): Printable[];
   siteUrl: string;

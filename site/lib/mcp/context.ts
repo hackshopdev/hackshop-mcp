@@ -1,4 +1,5 @@
 import platformsJson from "../../platforms.json";
+import firmwarePlaybooksJson from "../../firmware-playbooks.json";
 import cadManifestJson from "../../public/cad/manifest.json";
 import { loadCatalog } from "../catalog";
 import { Platforms } from "../platform-types";
@@ -8,6 +9,7 @@ import type {
   Printable,
   PrintableFab,
 } from "../core/types";
+import { FirmwarePlaybookCatalog } from "../core/firmware";
 
 const DEFAULT_SITE_URL = "https://www.hackshop.dev";
 
@@ -27,12 +29,14 @@ interface CadManifest {
 }
 
 const platforms = Platforms.parse(platformsJson);
+const firmwarePlaybooks = FirmwarePlaybookCatalog.parse(firmwarePlaybooksJson);
 const cadManifest = cadManifestJson as CadManifest;
 
 export function loadCoreContext(siteUrl = DEFAULT_SITE_URL): CoreContext {
   const { devices, tags } = loadCatalog();
   return {
     catalog: devices,
+    firmwarePlaybooks,
     platforms,
     printablesFor: printablesForDevice,
     siteUrl,

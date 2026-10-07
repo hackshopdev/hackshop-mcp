@@ -14,6 +14,8 @@ import {
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { loadCatalog } from "./catalog/load.js";
+import { loadFirmwarePlaybooks } from "./firmware/load.js";
+import type { FirmwarePlaybook } from "./core/firmware.js";
 import type { DeviceEntry } from "./catalog/schema.js";
 import { loadPlatforms } from "./platforms/load.js";
 import { printablesFor, setLoadedPlatforms } from "./platforms/index.js";
@@ -50,7 +52,7 @@ import type { CoreContext } from "./core/types.js";
 const NAME = "hackshop-mcp";
 const VERSION = "0.0.7";
 const STDIO_INSTRUCTIONS =
-  "hackshop maps a natural-language project idea to hackable, repurposable, or protocol-native hardware. For Muse agent-body gadgets, ask the intake questions from intake_gadget, then call plan_gadget with the answers; it is deterministic, instant and key-free. get_build_plan returns the parts, flash warnings and assembly checks. Use propose_hardware for broader repurposing ideas and existing hardware, especially when the host can sample or ANTHROPIC_API_KEY is set. hackshop never buys anything: show the exact items, sellers and total, ask \"Place this order for $<total> at <seller>?\" and wait for a clear yes. Anonymous usage telemetry (tool names and timings only) is on by default; set HACKSHOP_TELEMETRY=0 to turn it off.";
+  "hackshop maps a natural-language project idea to hackable, repurposable, or protocol-native hardware. For firmware reuse, call find_firmware_playbooks, then check_firmware_compatibility with exact observed identifiers before get_firmware_playbook or prepare_firmware_job; destructive actions are human-run only. For Muse agent-body gadgets, ask the intake questions from intake_gadget, then call plan_gadget with the answers; it is deterministic, instant and key-free. get_build_plan returns the parts, flash warnings and assembly checks. Use propose_hardware for broader repurposing ideas and existing hardware, especially when the host can sample or ANTHROPIC_API_KEY is set. hackshop never buys anything: show the exact items, sellers and total, ask \"Place this order for $<total> at <seller>?\" and wait for a clear yes. Anonymous usage telemetry (tool names and timings only) is on by default; set HACKSHOP_TELEMETRY=0 to turn it off.";
 
 const CORE_TOOL_NAMES = new Set<string>(CORE_TOOLS.map((tool) => tool.name));
 
@@ -59,6 +61,7 @@ export function createToolRunner(context: {
   platforms: Platform[];
   server?: Server;
   tags?: string[];
+  firmwarePlaybooks?: FirmwarePlaybook[];
 }): (name: string, args: unknown) => Promise<{
   out: unknown;
   degraded?: boolean;
@@ -80,7 +83,12 @@ export function createToolRunner(context: {
       const result = executeCoreTool(
         name,
         args,
-        coreContext(context.devices, context.platforms, context.tags),
+        coreContext(
+          context.devices,
+          context.platforms,
+          context.tags,
+          context.firmwarePlaybooks,
+        ),
       );
       return runnerResult(result);
     }
@@ -99,10 +107,12 @@ function coreContext(
   catalog: DeviceEntry[],
   platforms: Platform[],
   tags?: string[],
+  firmwarePlaybooks?: FirmwarePlaybook[],
 ): CoreContext {
   const siteUrl = siteUrlFromEnv();
   return {
     catalog,
+    firmwarePlaybooks: firmwarePlaybooks ?? loadFirmwarePlaybooks(),
     platforms,
     printablesFor: (device, baseUrl) => printablesFor(device as DeviceEntry, baseUrl),
     siteUrl,
@@ -128,11 +138,12 @@ function runnerResult(result: CoreToolResult): {
 async function main(): Promise<void> {
   // Boot validation. Refuses to start on bad catalog/tags.
   const { devices, tags } = loadCatalog();
+  const firmwarePlaybooks = loadFirmwarePlaybooks();
   const sortedTags = [...tags].sort();
   const platforms = loadPlatforms(devices);
   setLoadedPlatforms(platforms);
   process.stderr.write(
-    `[hackshop-mcp] Catalog loaded: ${devices.length} devices, ${tags.size} tags, ${platforms.length} platforms.\n`,
+    `[hackshop-mcp] Catalog loaded: ${devices.length} devices, ${tags.size} tags, ${platforms.length} platforms, ${firmwarePlaybooks.length} firmware playbooks.\n`,
   );
 
   // Note: sampling is a CLIENT capability, not a server one. We don't declare
@@ -222,7 +233,7 @@ async function main(): Promise<void> {
   }));
 
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    const ctx = coreContext(devices, platforms, sortedTags);
+    const ctx = coreContext(devices, platforms, sortedTags, firmwarePlaybooks);
     const resource = readCoreResource(request.params.uri, ctx);
     if (!resource) {
       throw new McpError(RESOURCE_NOT_FOUND_CODE, resourceNotFoundMessage(request.params.uri, ctx));
@@ -242,7 +253,13 @@ async function main(): Promise<void> {
     return prompt;
   });
 
-  const runTool = createToolRunner({ devices, platforms, server, tags: sortedTags });
+  const runTool = createToolRunner({
+    devices,
+    platforms,
+    server,
+    tags: sortedTags,
+    firmwarePlaybooks,
+  });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;

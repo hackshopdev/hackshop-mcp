@@ -8,16 +8,21 @@ You describe a project. The agent surfaces 3-5 hackable hardware options you wou
 
 A tinkerer has an idea. The idea would be cooler with the right piece of hardware attached: an old screen, an abandoned smart speaker, a bricked frame, a hackable handheld. The tinkerer doesn't know what hardware exists, what's hackable, or what would creatively *fit* the idea. So the idea stays purely software, or gets paired with a Raspberry Pi.
 
-This is a hardware-knowledge layer on top of LLMs. Six tools, 80+ researched devices, one closed-set tag vocabulary, and a brick-risk safety rule that won't let the agent fabricate a score for hardware classes where bricks are unrecoverable. `simulate_assembly` drops a proposed robot into a MuJoCo physics world and tells you, honestly, whether it would actually move.
+This is a hardware-knowledge layer on top of LLMs. Eleven tools, 100 researched devices, 15 curated firmware playbooks, one closed-set tag vocabulary, and safety rules that fail closed when brick risk or exact firmware compatibility is unknown. `simulate_assembly` drops a proposed robot into a MuJoCo physics world and tells you, honestly, whether it would actually move.
 
 hackshop knows Meta's Muse Gadgets SDK: ESP32 boards and Linux machines that can become a physical body for Muse, Meta's personal AI agent. Muse recommendations include the SDK tier, a ski-style difficulty level, board-specific flash warnings, setup path, supported features, printable stand/enclosure links when available, and the required terms caveat: personal, non-commercial use only, at most 50 devices per token, no selling or public marketplace listing, and revocable access.
 
 ## Status
 
-v0.0.7 - published on npm and hosted at `https://www.hackshop.dev/mcp`. The hosted MCP exposes the deterministic tools (`intake_gadget`, `plan_gadget`, `get_build_plan`, `assess_hackability`); the npm server also includes `propose_hardware` and `simulate_assembly`. The simulation layer is live at [hackshop.dev](https://hackshop.dev). Source: [github.com/hackshopdev/hackshop-mcp](https://github.com/hackshopdev/hackshop-mcp).
+v0.0.7 is published on npm and hosted at `https://www.hackshop.dev/mcp`. The repository now also contains an unreleased Firmware Playbooks slice: 15 curated playbooks and five deterministic MCP tools. The npm server additionally includes `propose_hardware` and `simulate_assembly`. The simulation layer is live at [hackshop.dev](https://hackshop.dev). Source: [github.com/hackshopdev/hackshop-mcp](https://github.com/hackshopdev/hackshop-mcp).
 
 ### Changelog
 
+- **Unreleased — Firmware Playbooks**
+  - Fifteen curated playbooks spanning five supported TECHO5 Echo targets, OpenWrt, Tasmota, Thingino, a Wyze overlay, Hue/Zigbee, SoundTouch Reborn, dorita980 and Valetudo.
+  - Exact, fail-closed compatibility checks for model, codename, hardware revision, SoC, sensor, radio and firmware where a playbook requires them.
+  - Five deterministic MCP tools for discovery, compatibility, playbook retrieval, artifact-metadata verification and non-executing job preparation.
+  - No generic flash tool: every destructive action remains human-run and requires backup, recovery and an explicit confirmation prompt.
 - **0.0.7**
   - Shared intake: `intake_gadget` returns the 4 questions; `plan_gadget` and `/api/plan` take `answers`, report `intake.complete` and keep asking until it is.
   - Budget-honest ranking: boards that meet the hard needs and fit the budget rank first, cheapest first. `fit` is `none` when nothing that works fits the budget, with a note naming the cheapest board that does.
@@ -56,7 +61,7 @@ Or add the local npm server to your MCP client config (Claude Desktop / Claude C
 }
 ```
 
-`ANTHROPIC_API_KEY` is optional. It only improves `propose_hardware` in the local npm server when the MCP host cannot sample; `plan_gadget`, `get_build_plan`, and `assess_hackability` never need a key. Anonymous usage telemetry (tool names and timings only) is on by default in the npm server; set `HACKSHOP_TELEMETRY=0` to turn it off.
+`ANTHROPIC_API_KEY` is optional. It only improves `propose_hardware` in the local npm server when the MCP host cannot sample; the deterministic planning and firmware-playbook tools never need a key. Anonymous usage telemetry (tool names and timings only) is on by default in the npm server; set `HACKSHOP_TELEMETRY=0` to turn it off.
 
 ## Tools
 
@@ -75,7 +80,17 @@ Returns 3-5 hardware proposals, each with:
 
 ### `assess_hackability(device_name)`
 
-Lookup by id, exact name, or substring. Returns the same shape as a single proposal. Use when you have a device in mind and want to verify hackability before searching for one to buy.
+Lookup by id, exact name, or substring. Returns the same shape as a single proposal plus any curated firmware-playbook summaries. Use when you have a device in mind and want to verify hackability before searching for one to buy.
+
+### Firmware playbook tools
+
+- `find_firmware_playbooks(query, device_id?, intervention?, risk_tolerance?, limit?)` finds curated local-control and firmware paths, preferring the least-invasive match.
+- `check_firmware_compatibility(playbook_id, observed)` compares required physical identifiers with exact curated targets. Missing facts return `unknown`; explicit mismatches return `unsupported`.
+- `get_firmware_playbook(playbook_id)` returns prerequisites, backups, recovery, independent risk axes, sources, steps and validation.
+- `verify_firmware_artifact(playbook_id, filename, sha256, source_url)` compares supplied metadata with curated records. It never fetches or uploads a binary, and absent hashes stay `unknown`.
+- `prepare_firmware_job(playbook_id, owner_authorized, observed)` returns a non-executing manifest and stop points only after owner authorization and a confirmed match.
+
+There is intentionally no generic flashing tool. Proprietary vendor firmware, keys, certificates, serials, calibration data and identity partitions are not redistributed; when needed, the owner extracts and retains them locally.
 
 ### `intake_gadget()`
 
@@ -110,7 +125,9 @@ Both hosted MCP and npm expose:
 - `hackshop://muse/boards` - JSON for every Muse board: ids, names, platform, tier, price, difficulty, features, build command and build page URL.
 - `hackshop://muse/sdk-terms` - text summary of Muse SDK token terms.
 - `hackshop://catalog/tags` - catalog tag list.
+- `hackshop://firmware/playbooks` - compact index of the curated firmware playbooks.
 - Template `hackshop://build/{device_id}` (from `resources/templates/list`) - the build plan JSON, e.g. `hackshop://build/seeed-sensecap-watcher`.
+- Template `hackshop://firmware/{playbook_id}` - one complete firmware playbook, e.g. `hackshop://firmware/techo5-echo-dot-2`.
 - Prompt `plan-muse-gadget` - tells an agent to do intake, call `plan_gadget`, call `get_build_plan`, show the shopping list, ask before buying, assemble, flash and pair.
 
 The hosted MCP is stateless: JSON-RPC over POST, no `mcp-session-id`; GET and DELETE return 405. CORS allows any origin so browser agents can call it. The planner is also a plain HTTP API: `POST https://www.hackshop.dev/api/plan` (OpenAPI at `https://www.hackshop.dev/openapi.json`).
@@ -150,7 +167,7 @@ The `simulate_assembly` MCP tool above is the bounded, single-call entry point i
 - TypeScript + `@modelcontextprotocol/sdk`
 - LLM reasoning for `propose_hardware` delegates to the host via `sampling/createMessage` first, then falls back to a direct Anthropic API call (`@anthropic-ai/sdk`) only when optional `ANTHROPIC_API_KEY` is set
 - `simulate_assembly` calls out to a separate Python MuJoCo **sim-worker** over HTTP (`SIM_WORKER_URL`); the worker isn't bundled in the npm package
-- Catalog stored as `catalog.json` in the repo (JSON, version-controllable, 80 devices and growing)
+- Catalog stored as `catalog.json`; firmware playbooks are separately versioned in `firmware-playbooks.json`
 - Tag vocabulary in `tags.md`, validated at boot — server refuses to start on tag drift
 
 ## Install (local dev)
@@ -159,7 +176,7 @@ The `simulate_assembly` MCP tool above is the bounded, single-call entry point i
 git clone https://github.com/hackshopdev/hackshop-mcp
 cd hackshop-mcp
 npm install
-npm run validate   # verifies catalog + tags
+npm run validate   # verifies catalog + tags + firmware playbooks
 npm test           # safety + schema + lookup tests
 npm run build      # tsc -> dist/
 ```

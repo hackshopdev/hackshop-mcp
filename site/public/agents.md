@@ -12,6 +12,15 @@ You are helping your human build a physical body for you (an AI agent). Muse is 
 6. Flash and pair: use the exact commands and pairing text in the build plan. Keep `mgst_YOUR_TOKEN` as the placeholder unless the human provides a real token privately.
 7. Save it: after the human picks a board, tell them to click Start a build on the build page so their progress is saved.
 
+## Firmware playbook flow
+
+1. Discover: call `find_firmware_playbooks` and prefer the least-invasive path.
+2. Identify: collect only the required physical facts, then call `check_firmware_compatibility`. Missing facts are `unknown`; mismatches are `unsupported`.
+3. Inspect: call `get_firmware_playbook` and read its backup, recovery, risks, sources and validation before suggesting a change.
+4. Verify: use `verify_firmware_artifact` only to compare caller-supplied metadata with a curated filename/source/hash record. Never upload firmware, keys, certificates, serials, calibration data or identity partitions.
+5. Prepare: call `prepare_firmware_job` only after the human confirms ownership or authorization. It produces a manifest and stop points, not a flash command.
+6. Execute: destructive work is human-run only. Ask the playbook's exact confirmation prompt and wait for a clear yes immediately before the destructive step.
+
 ## Board warnings
 
 - Seeed SenseCAP Watcher: back up the `nvsfactory` partition first (`read-flash 0x9000 0x32000`), use the CH342 port ending in 3, flash only with `tools/muse/board.sh flash watcher`, and don't interrupt the flash: it shows nothing for about 3 minutes.
@@ -42,6 +51,11 @@ Muse replies are text. Boards with screens show them as captions; others show th
 - `plan_gadget`: choose Muse boards, report fit, notes, warnings, intake status and difficulty, and link build pages.
 - `get_build_plan`: return difficulty, flash warnings, parts, shopping list, assembly steps with checks, commands and agent brief.
 - `assess_hackability`: look up a catalog device and report firmware, brick risk, build page and agent-platform support.
+- `find_firmware_playbooks`: find curated local-control, cloud-replacement and firmware paths.
+- `check_firmware_compatibility`: fail-closed exact target matching.
+- `get_firmware_playbook`: return backups, recovery, risks, sources, steps and validation.
+- `verify_firmware_artifact`: compare metadata only; never fetch or upload a binary.
+- `prepare_firmware_job`: prepare a non-executing manifest after owner authorization and an exact match.
 
 ## Example
 
@@ -64,3 +78,5 @@ Never type card numbers or passwords yourself.
 ## Safety
 
 hackshop has no checkout and sells nothing. Sign-in is optional; it only syncs saved builds across devices. Controls marked `data-agent-danger` delete local browser data; use them only after explicit confirmation.
+
+Firmware playbooks do not authorize remote exploitation or redistribution of proprietary files. Never generalize compatibility from a brand or retail family name. Do not automate mains-powered, HVAC, safety-critical or irreplaceable-device flashing.

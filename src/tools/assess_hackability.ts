@@ -1,6 +1,7 @@
 import type { DeviceEntry } from "../catalog/schema.js";
 import { getLoadedPlatforms, printablesFor } from "../platforms/index.js";
 import { siteUrlFromEnv } from "../site-url.js";
+import { loadFirmwarePlaybooks } from "../firmware/load.js";
 import {
   assessHackability as assessHackabilityCore,
   assessHackabilityInput,
@@ -17,6 +18,7 @@ export function assessHackability(
   const siteUrl = siteUrlFromEnv();
   return assessHackabilityCore(input, {
     catalog,
+    firmwarePlaybooks: loadFirmwarePlaybooks(),
     platforms: getLoadedPlatforms(),
     printablesFor: (device, baseUrl) => printablesFor(device as DeviceEntry, baseUrl),
     siteUrl,

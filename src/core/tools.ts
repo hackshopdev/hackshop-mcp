@@ -16,6 +16,18 @@ import {
   type PlanGadgetQuestion,
 } from "./plan-gadget.js";
 import { DIFFICULTY_LEVELS } from "./difficulty.js";
+import {
+  checkFirmwareCompatibility,
+  checkFirmwareCompatibilityInput,
+  findFirmwarePlaybooks,
+  findFirmwarePlaybooksInput,
+  getFirmwarePlaybook,
+  getFirmwarePlaybookInput,
+  prepareFirmwareJob,
+  prepareFirmwareJobInput,
+  verifyFirmwareArtifact,
+  verifyFirmwareArtifactInput,
+} from "./firmware-tools.js";
 import type { CoreContext, DeviceEntry, Platform, PlatformBoard } from "./types.js";
 
 export const getBuildPlanInput = z.object({
@@ -51,7 +63,16 @@ const OBJECT_OUTPUT_SCHEMA = {
 };
 
 export interface CoreTool<Input, Output> {
-  name: "intake_gadget" | "plan_gadget" | "get_build_plan" | "assess_hackability";
+  name:
+    | "intake_gadget"
+    | "plan_gadget"
+    | "get_build_plan"
+    | "assess_hackability"
+    | "find_firmware_playbooks"
+    | "check_firmware_compatibility"
+    | "get_firmware_playbook"
+    | "verify_firmware_artifact"
+    | "prepare_firmware_job";
   title: string;
   description: string;
   inputSchema: JsonSchema;
@@ -187,7 +208,7 @@ export const CORE_TOOLS = [
     name: "assess_hackability",
     title: "Assess hackability",
     description:
-      "Look up a device by id, exact name or substring and return hackability, brick risk, firmware links, community size, build page and agent platform support. Input: `device_name` 1-200 chars.",
+      "Look up a device by id, exact name or substring and return hackability, brick risk, firmware links, curated firmware playbooks, community size, build page and agent platform support. Input: `device_name` 1-200 chars.",
     inputSchema: {
       type: "object",
       properties: {
@@ -204,7 +225,119 @@ export const CORE_TOOLS = [
     zodSchema: assessHackabilityInput,
     run: assessHackability,
   } satisfies CoreTool<z.infer<typeof assessHackabilityInput>, AssessOutput>,
+  {
+    name: "find_firmware_playbooks",
+    title: "Find firmware playbooks",
+    description:
+      "Find curated owner-authorized firmware, local-protocol and cloud-replacement playbooks. Results prefer the least-invasive path and are not compatibility approval; call check_firmware_compatibility before preparation.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", minLength: 1, maxLength: 2000 },
+        device_id: { type: "string", minLength: 1, maxLength: 200 },
+        intervention: {
+          type: "string",
+          enum: ["official_local_api", "protocol_replacement", "cloud_replacement", "stock_firmware_overlay", "custom_userspace", "full_replacement", "research_only"],
+        },
+        risk_tolerance: { type: "string", enum: ["low", "moderate", "high"], default: "moderate" },
+        limit: { type: "number", minimum: 1, maximum: 10, default: 5 },
+      },
+      required: ["query"],
+    },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
+    zodSchema: findFirmwarePlaybooksInput,
+    run: findFirmwarePlaybooks,
+  } satisfies CoreTool<z.infer<typeof findFirmwarePlaybooksInput>, unknown>,
+  {
+    name: "check_firmware_compatibility",
+    title: "Check firmware compatibility",
+    description:
+      "Fail-closed compatibility check for one firmware playbook. Required model, codename, revision, SoC or firmware identifiers must exactly match a curated target; missing facts return unknown and mismatches return unsupported.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        playbook_id: { type: "string", minLength: 1, maxLength: 200 },
+        observed: {
+          type: "object",
+          properties: observedDeviceProperties(),
+          additionalProperties: false,
+        },
+      },
+      required: ["playbook_id", "observed"],
+    },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
+    zodSchema: checkFirmwareCompatibilityInput,
+    run: checkFirmwareCompatibility,
+  } satisfies CoreTool<z.infer<typeof checkFirmwareCompatibilityInput>, unknown>,
+  {
+    name: "get_firmware_playbook",
+    title: "Get a firmware playbook",
+    description:
+      "Return a curated firmware playbook with exact targets, prerequisites, backups, recovery, independent risk axes, sources, validation checks and the human-only destructive-action boundary.",
+    inputSchema: {
+      type: "object",
+      properties: { playbook_id: { type: "string", minLength: 1, maxLength: 200 } },
+      required: ["playbook_id"],
+    },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
+    zodSchema: getFirmwarePlaybookInput,
+    run: getFirmwarePlaybook,
+  } satisfies CoreTool<z.infer<typeof getFirmwarePlaybookInput>, unknown>,
+  {
+    name: "verify_firmware_artifact",
+    title: "Verify firmware artifact metadata",
+    description:
+      "Compare a caller-supplied filename, source URL and SHA-256 with Hackshop's curated metadata. Hackshop does not fetch, upload or redistribute the artifact; absent hashes return unknown.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        playbook_id: { type: "string", minLength: 1, maxLength: 200 },
+        filename: { type: "string", minLength: 1, maxLength: 500 },
+        sha256: { type: "string", pattern: "^[a-fA-F0-9]{64}$" },
+        source_url: { type: "string", format: "uri" },
+      },
+      required: ["playbook_id", "filename", "sha256", "source_url"],
+    },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
+    zodSchema: verifyFirmwareArtifactInput,
+    run: verifyFirmwareArtifact,
+  } satisfies CoreTool<z.infer<typeof verifyFirmwareArtifactInput>, unknown>,
+  {
+    name: "prepare_firmware_job",
+    title: "Prepare a firmware job manifest",
+    description:
+      "Prepare a non-executing firmware manifest after owner authorization and an exact compatibility match. Returns backup, recovery, sources, validation and stop points; never returns a flash command.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        playbook_id: { type: "string", minLength: 1, maxLength: 200 },
+        owner_authorized: { type: "boolean" },
+        observed: {
+          type: "object",
+          properties: observedDeviceProperties(),
+          additionalProperties: false,
+        },
+      },
+      required: ["playbook_id", "owner_authorized", "observed"],
+    },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
+    zodSchema: prepareFirmwareJobInput,
+    run: prepareFirmwareJob,
+  } satisfies CoreTool<z.infer<typeof prepareFirmwareJobInput>, unknown>,
 ] as const;
+
+function observedDeviceProperties(): Record<string, object> {
+  const property = { type: "string", minLength: 1, maxLength: 200 };
+  return {
+    model_number: { ...property, description: "Model number from the physical label, not the retail family name." },
+    codename: { ...property, description: "Documented hardware codename, when available." },
+    hardware_revision: { ...property, description: "Exact hardware or PCB revision." },
+    soc: { ...property, description: "Confirmed SoC or module identifier." },
+    sensor: { ...property, description: "Confirmed image sensor or other sensor identifier." },
+    wifi_module: { ...property, description: "Confirmed Wi-Fi or radio module identifier." },
+    firmware_version: { ...property, description: "Installed vendor firmware version." },
+  };
+}
 
 export type CoreToolName = (typeof CORE_TOOLS)[number]["name"];
 

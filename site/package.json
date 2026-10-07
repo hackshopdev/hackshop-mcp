@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
-    "sync-data": "cp ../catalog.json ./catalog.json && cp ../tags.md ./tags.md && cp ../platforms.json ./platforms.json && mkdir -p ./lib/build-plan ./lib/core && cp ../src/build-plan/*.ts ./lib/build-plan/ && cp ../src/core/*.ts ./lib/core/"
+    "sync-data": "cp ../catalog.json ./catalog.json && cp ../firmware-playbooks.json ./firmware-playbooks.json && cp ../tags.md ./tags.md && cp ../platforms.json ./platforms.json && mkdir -p ./lib/build-plan ./lib/core && cp ../src/build-plan/*.ts ./lib/build-plan/ && cp ../src/core/*.ts ./lib/core/"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.0",

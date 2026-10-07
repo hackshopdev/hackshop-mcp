@@ -32,6 +32,11 @@ describe("hosted MCP route", () => {
       "plan_gadget",
       "get_build_plan",
       "assess_hackability",
+      "find_firmware_playbooks",
+      "check_firmware_compatibility",
+      "get_firmware_playbook",
+      "verify_firmware_artifact",
+      "prepare_firmware_job",
     ]);
     expect(tools.result.tools.every((tool: { outputSchema?: { type?: string } }) =>
       tool.outputSchema?.type === "object"
@@ -66,6 +71,12 @@ describe("hosted MCP route", () => {
     expect(templates.result.resourceTemplates).toContainEqual(
       expect.objectContaining({
         uriTemplate: "hackshop://build/{device_id}",
+        mimeType: "application/json",
+      }),
+    );
+    expect(templates.result.resourceTemplates).toContainEqual(
+      expect.objectContaining({
+        uriTemplate: "hackshop://firmware/{playbook_id}",
         mimeType: "application/json",
       }),
     );

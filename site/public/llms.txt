@@ -47,9 +47,14 @@ Local npm server:
 - `plan_gadget`: deterministic Muse board planner. Pass the human's `answers`; it returns fit, warnings, notes, intake status, remaining questions, and picks with difficulty and build links.
 - `get_build_plan`: deterministic difficulty, flash warnings, parts, shopping list, assembly with verify checks, flashing, pairing and agent brief.
 - `assess_hackability`: catalog lookup with brick risk, firmware links and build-page URL.
+- `find_firmware_playbooks`: discover curated firmware, local-protocol and cloud-replacement paths, preferring the least invasive.
+- `check_firmware_compatibility`: exact fail-closed target matching; missing identifiers return unknown and mismatches return unsupported.
+- `get_firmware_playbook`: prerequisites, backup, recovery, risks, sources, steps and validation.
+- `verify_firmware_artifact`: compare supplied filename/source/SHA-256 metadata only; no binary upload or fetch.
+- `prepare_firmware_job`: non-executing manifest and stop points after owner authorization and a confirmed match.
 - Local npm only: `propose_hardware`, `simulate_assembly`. The hosted MCP answers these with a `try_instead` hint.
 
-Resources: `hackshop://muse/boards`, `hackshop://muse/sdk-terms`, `hackshop://catalog/tags`, and the template `hackshop://build/{device_id}` (listed under `resources/templates/list`; e.g. `hackshop://build/seeed-sensecap-watcher`).
+Resources: `hackshop://muse/boards`, `hackshop://muse/sdk-terms`, `hackshop://catalog/tags`, `hackshop://firmware/playbooks`, and the templates `hackshop://build/{device_id}` and `hackshop://firmware/{playbook_id}`.
 
 ## Difficulty
 
@@ -58,6 +63,8 @@ Every board has a ski-style level: green = Beginner (no tools), blue = Intermedi
 ## Agent Rule
 
 Ask the intake questions (skip any already answered), call `plan_gadget` with `answers`, let the human choose, then tell the human to click Start a build so progress is saved. Fetch `get_build_plan` or `/build/<id>/plan.json` and read its `warnings` before flashing (the SenseCAP Watcher needs an nvsfactory backup and the port ending in 3). Show the shopping list, follow the purchase policy, follow `assembly` and its `verify` checks, then flash and pair. Muse replies are text; add a text-to-speech service for spoken replies.
+
+For firmware work: discover, collect exact identifiers, run `check_firmware_compatibility`, inspect the full playbook, verify backup and recovery, then prepare a non-executing manifest. Destructive actions remain human-run. Never upload or redistribute proprietary firmware, device keys, certificates, serials, calibration data or identity partitions.
 
 ## Purchase Policy
 

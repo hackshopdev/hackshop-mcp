@@ -97,4 +97,17 @@ describe("assess_hackability", () => {
     expect(out.device?.physical).toBeTruthy();
     expect(out.device?.printables[0]?.part).toBe("desk-stand");
   });
+
+  it("surfaces curated firmware playbooks for a catalog device", () => {
+    const { devices } = loadCatalog();
+    const out = assessHackability({ device_name: "Echo Dot 2" }, devices);
+
+    expect(out.found).toBe(true);
+    expect(out.device?.firmware_playbooks).toContainEqual(
+      expect.objectContaining({
+        id: "techo5-echo-dot-2",
+        intervention: "custom_userspace",
+      }),
+    );
+  });
 });
