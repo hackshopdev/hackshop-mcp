@@ -110,7 +110,7 @@ export default async function EmbodimentRecipePage({ params }: Props) {
                 <source src={`/${recipe.proof.demo_video?.href}`} type="video/mp4" />
               </video>
               <div className={styles.proofCaption}>
-                <strong>15-second concept animation</strong>
+                <strong>{Math.round(recipe.proof.demo_video?.duration_seconds ?? 0)}-second 3D build tour</strong>
                 <span>No real hardware is shown.</span>
               </div>
             </div>
@@ -125,7 +125,7 @@ export default async function EmbodimentRecipePage({ params }: Props) {
         </section>
 
         <div id="interactive-build" className={styles.anchor}>
-          <SeeInside deviceId={recipe.device_id} name="complete desk orb" />
+          <SeeInside deviceId={recipe.device_id} name="complete desk orb" variant="recipe" />
         </div>
 
         <section className={ui.section} aria-labelledby="capabilities">

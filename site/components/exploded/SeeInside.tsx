@@ -9,7 +9,15 @@ import { ExplodedViewerLazy } from "./ExplodedViewerLazy";
  * the board with part lessons. Renders nothing for boards without a model.
  * Server component; the viewer itself loads on the client.
  */
-export function SeeInside({ deviceId, name }: { deviceId: string; name: string }) {
+export function SeeInside({
+  deviceId,
+  name,
+  variant = "standard",
+}: {
+  deviceId: string;
+  name: string;
+  variant?: "standard" | "recipe";
+}) {
   const model = getBoardModel(deviceId);
   if (!model) return null;
   const steps = modelStepsForDevice(deviceId);
@@ -23,7 +31,7 @@ export function SeeInside({ deviceId, name }: { deviceId: string; name: string }
           <Link href={`/models/${deviceId}`}>Open the full 3D view</Link>
         </p>
       </div>
-      <ExplodedViewerLazy model={model} steps={steps} />
+      <ExplodedViewerLazy model={model} steps={steps} variant={variant} />
     </section>
   );
 }

@@ -30,6 +30,7 @@ const LISTED = [
 const KINDS: PartKind[] = [
   "shell-front", "shell-back", "glass", "screen", "pcb", "chip", "battery", "speaker",
   "mic", "camera", "button", "port", "led", "antenna", "stand", "sensor",
+  "cable",
 ];
 
 const root = process.cwd();
@@ -104,7 +105,7 @@ describe("board models", () => {
     for (const m of BOARD_MODELS) {
       const half = [m.outer.w / 2, m.outer.h / 2, m.outer.t / 2];
       for (const part of m.parts) {
-        if (part.kind === "stand") continue;
+        if (part.kind === "stand" || part.external) continue;
         for (let axis = 0; axis < 3; axis += 1) {
           const lo = part.position[axis]! - part.size[axis]! / 2;
           const hi = part.position[axis]! + part.size[axis]! / 2;
@@ -301,6 +302,29 @@ describe("3D builder", () => {
         const mesh = built.group.getObjectByName(part.id);
         expect(mesh, `${m.deviceId}/${part.id}`).toBeDefined();
       }
+    }
+  });
+
+  it("models every physical piece required for the Muse Desk Orb", () => {
+    const orb = model("waveshare-esp32-s3-touch-amoled-1-75c");
+    const ids = new Set(orb.parts.map((part) => part.id));
+
+    expect(ids.has("printed-stand")).toBe(true);
+    expect(ids.has("usb-c-device-plug")).toBe(true);
+    expect(ids.has("usb-c-data-cable")).toBe(true);
+    expect(orb.parts.find((part) => part.id === "usb-c-data-cable")?.shape).toBe("tube");
+
+    const electronics = orb.parts.filter((part) =>
+      ["esp32-s3", "flash", "power-chip", "imu", "mic-1", "mic-2"].includes(part.id),
+    );
+    const finalPositions = new Set(
+      electronics.map((part) => `${part.position[0] + part.explode[0]},${part.position[1] + part.explode[1]}`),
+    );
+    expect(finalPositions.size).toBe(electronics.length);
+    for (const part of electronics) {
+      const x = part.position[0] + part.explode[0];
+      const y = part.position[1] + part.explode[1];
+      expect(Math.hypot(x, y), `${part.id} clears the round display`).toBeGreaterThan(22);
     }
   });
 

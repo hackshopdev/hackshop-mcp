@@ -191,9 +191,11 @@ const MUSE_DESK_ORB: EmbodimentRecipe = {
     demo_video: {
       href: "builds/muse-desk-orb/concept-demo.mp4",
       kind: "concept-animation",
-      duration_seconds: 15,
+      duration_seconds: 12,
       poster_href: "builds/muse-desk-orb/concept-poster.webp",
       shows_real_hardware: false,
+      resolution: { width: 1920, height: 1080 },
+      source_href: "/builds/muse-desk-orb/film",
     },
     finished_build_photo: {
       status: "unavailable",

@@ -21,10 +21,11 @@ export type PartKind =
   | "port"
   | "led"
   | "antenna"
+  | "cable"
   | "stand"
   | "sensor";
 
-export type PartShape = "box" | "roundedBox" | "cylinder";
+export type PartShape = "box" | "roundedBox" | "cylinder" | "tube";
 
 export type Vec3 = [number, number, number];
 
@@ -71,11 +72,17 @@ export interface ModelPart {
   approx?: boolean;
   /** The part is an optional add-on (sold separately or a variant). */
   optional?: boolean;
+  /** External build piece that intentionally sits outside the device envelope. */
+  external?: boolean;
   finish?: PartFinish;
   /** Corner radius in the x/y plane for roundedBox. */
   radius?: number;
   /** Cylinder axis; defaults to z (facing the viewer). */
   axis?: "x" | "y" | "z";
+  /** Local centreline used by tube parts such as external cables. */
+  path?: Vec3[];
+  /** Tube radius in millimetres. */
+  thickness?: number;
   /**
    * Turns a roundedBox or cylinder into a shell: walls of this thickness,
    * plus an optional floor on the back (-z) or front (+z) side.

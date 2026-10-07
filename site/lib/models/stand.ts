@@ -145,7 +145,7 @@ export function printedStandPart(args: {
     shape: "box",
     size: box.size,
     position: box.center,
-    color: "#7f8a99",
+    color: "#292e38",
     explode: args.explode,
     lesson: `A desk stand you can 3D print from hackshop's STL. It tilts the board back 15 degrees. ${cable}`,
     finish: "plastic",

@@ -17,6 +17,7 @@ export const KIND_LABELS: Record<PartKind, string> = {
   port: "Port",
   led: "Light",
   antenna: "Radio",
+  cable: "Cable",
   stand: "Stand",
   sensor: "Sensor",
 };

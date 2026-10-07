@@ -35,7 +35,15 @@ function hasWebGL(): boolean {
  * from site/lib/models (getBoardModel) and, optionally, the build steps from
  * modelStepsForDevice (site/lib/models/plan-steps, server side).
  */
-export function ExplodedViewerLazy({ model, steps }: { model: BoardModel; steps?: ModelStep[] }) {
+export function ExplodedViewerLazy({
+  model,
+  steps,
+  variant = "standard",
+}: {
+  model: BoardModel;
+  steps?: ModelStep[];
+  variant?: "standard" | "recipe";
+}) {
   const [support, setSupport] = useState<"checking" | "yes" | "no">("checking");
   const [reason, setReason] = useState<string | undefined>();
   const holder = useRef<HTMLDivElement | null>(null);
@@ -72,6 +80,7 @@ export function ExplodedViewerLazy({ model, steps }: { model: BoardModel; steps?
     <ExplodedViewer
       model={model}
       steps={steps}
+      variant={variant}
       onUnavailable={(message) => {
         setReason(message);
         setSupport("no");

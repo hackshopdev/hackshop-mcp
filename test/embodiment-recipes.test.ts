@@ -78,7 +78,9 @@ describe("embodiment recipes", () => {
     const poster = join(root, "site/public", recipe.proof.demo_video!.poster_href);
     expect(existsSync(video), video).toBe(true);
     expect(existsSync(poster), poster).toBe(true);
-    expect(statSync(video).size, video).toBeGreaterThan(10_000);
+    expect(recipe.proof.demo_video?.resolution).toEqual({ width: 1920, height: 1080 });
+    expect(recipe.proof.demo_video?.source_href).toBe("/builds/muse-desk-orb/film");
+    expect(statSync(video).size, video).toBeGreaterThan(500_000);
     expect(statSync(poster).size, poster).toBeGreaterThan(1_000);
   });
 });

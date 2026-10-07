@@ -26,10 +26,10 @@ export const STEP_PART_KINDS: Record<Action, PartKind[]> = {
   print: ["stand"],
   place: ["stand", "shell-back", "pcb"],
   insert: ["port"],
-  connect: ["port"],
-  route_cable: ["port", "stand"],
+  connect: ["port", "cable"],
+  route_cable: ["port", "cable", "stand"],
   fasten: ["shell-front", "shell-back"],
-  power: ["port", "battery"],
+  power: ["port", "cable", "battery"],
   backup: ["chip", "port"],
   flash: ["chip", "port", "button"],
   pair: ["button", "led", "screen", "antenna"],
@@ -82,16 +82,16 @@ export function partsForStep(model: BoardModel, step: Pick<AssemblyStep, "action
       picked = ofKind(parts, "port").filter((part) => part.id.includes("sd"));
       break;
     case "connect":
-      picked = ofKind(parts, "port").filter((part) => part.id.startsWith("usb"));
+      picked = [...ofKind(parts, "port").filter((part) => part.id.startsWith("usb")), ...ofKind(parts, "cable")];
       break;
     case "route_cable":
-      picked = [...powerPorts(parts), ...printed];
+      picked = [...powerPorts(parts), ...ofKind(parts, "cable"), ...printed];
       break;
     case "fasten":
       picked = ofKind(parts, "shell-front", "shell-back");
       break;
     case "power":
-      picked = [...powerPorts(parts), ...ofKind(parts, "battery").filter((part) => !part.optional)];
+      picked = [...powerPorts(parts), ...ofKind(parts, "cable"), ...ofKind(parts, "battery").filter((part) => !part.optional)];
       break;
     case "backup":
       picked = [...mainChips(parts), ...powerPorts(parts)];

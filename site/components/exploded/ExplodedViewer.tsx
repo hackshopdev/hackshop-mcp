@@ -25,6 +25,8 @@ export interface ExplodedViewerProps {
   steps?: ModelStep[];
   /** Called when WebGL can't start, so the wrapper can show the static fallback. */
   onUnavailable?: (reason: string) => void;
+  /** Recipe pages use a larger product-teardown stage and a horizontal parts bench. */
+  variant?: "standard" | "recipe";
 }
 
 interface SceneContext {
@@ -46,7 +48,18 @@ const OUTSIDE_KINDS = new Set<ModelPart["kind"]>([
   "glass",
   "button",
   "port",
+  "cable",
   "stand",
+]);
+
+const RECIPE_LABEL_IDS = new Set([
+  "glass",
+  "amoled",
+  "pcb",
+  "battery",
+  "case",
+  "usb-c-data-cable",
+  "printed-stand",
 ]);
 
 function easeInOutCubic(t: number): number {
@@ -57,7 +70,7 @@ function prefersReducedMotion(): boolean {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
 }
 
-export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedViewerProps) {
+export function ExplodedViewer({ model, steps = [], onUnavailable, variant = "standard" }: ExplodedViewerProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const ctxRef = useRef<SceneContext | null>(null);
@@ -77,6 +90,7 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
   const [labelsOn, setLabelsOn] = useState(false);
   const [tab, setTab] = useState<"parts" | "steps">("parts");
   const [exporting, setExporting] = useState(false);
+  const [touring, setTouring] = useState(false);
 
   const partsById = useMemo(() => new Map(model.parts.map((part) => [part.id, part])), [model]);
   const selected = selectedId ? partsById.get(selectedId) ?? null : null;
@@ -85,11 +99,15 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
 
   const labelIds = useMemo(() => {
     const ids = new Set<string>();
-    if (labelsOn) for (const part of model.parts) ids.add(part.id);
+    if (labelsOn) {
+      for (const part of model.parts) {
+        if (variant !== "recipe" || RECIPE_LABEL_IDS.has(part.id)) ids.add(part.id);
+      }
+    }
     if (activeStep) for (const id of activeStep.partIds) ids.add(id);
     if (selectedId) ids.add(selectedId);
     return [...ids];
-  }, [activeStep, labelsOn, model.parts, selectedId]);
+  }, [activeStep, labelsOn, model.parts, selectedId, variant]);
   const labelIdsRef = useRef<string[]>([]);
   labelIdsRef.current = labelIds;
 
@@ -111,7 +129,7 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = variant === "recipe" ? 1.18 : 1.05;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
 
@@ -120,7 +138,7 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
     const room = new RoomEnvironment();
     const envTarget = pmrem.fromScene(room, 0.04);
     scene.environment = envTarget.texture;
-    scene.environmentIntensity = 0.55;
+    scene.environmentIntensity = variant === "recipe" ? 0.82 : 0.55;
     disposeObject(room);
 
     const board = buildBoard(model, {
@@ -147,7 +165,7 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
 
     const hemi = new THREE.HemisphereLight("#e8eeff", "#2a2118", 0.9);
     scene.add(hemi);
-    const key = new THREE.DirectionalLight("#ffffff", 2.4);
+    const key = new THREE.DirectionalLight("#fff8ed", variant === "recipe" ? 3.1 : 2.4);
     key.position.set(center.x + radius * 0.9, center.y + radius * 1.6, center.z + radius * 1.2);
     key.target.position.copy(center);
     key.castShadow = true;
@@ -162,9 +180,15 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
     shadowCam.near = radius * 0.2;
     shadowCam.far = radius * 5;
     scene.add(key, key.target);
-    const rim = new THREE.DirectionalLight("#a9c1ff", 0.9);
+    const rim = new THREE.DirectionalLight("#9fb8ff", variant === "recipe" ? 1.45 : 0.9);
     rim.position.set(center.x - radius * 1.2, center.y + radius * 0.6, center.z - radius * 1.4);
     scene.add(rim);
+    if (variant === "recipe") {
+      const fill = new THREE.RectAreaLight("#d8fff1", 3.2, radius * 2.2, radius * 2.2);
+      fill.position.set(center.x - radius * 1.4, center.y + radius * 0.8, center.z + radius * 1.6);
+      fill.lookAt(center);
+      scene.add(fill);
+    }
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(radius * 8, radius * 8),
@@ -181,7 +205,9 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
     const direction =
       model.orientation === "flat"
         ? new THREE.Vector3(0.42, 0.95, 0.9).normalize()
-        : new THREE.Vector3(1, 0.42, 0.85).normalize();
+        : variant === "recipe"
+          ? new THREE.Vector3(0.62, 0.3, 1.48).normalize()
+          : new THREE.Vector3(1, 0.42, 0.85).normalize();
     const controls = new OrbitControls(camera, canvas);
     controls.enableDamping = true;
     controls.dampingFactor = 0.09;
@@ -339,7 +365,7 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
       ctxRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [model]);
+  }, [model, variant]);
 
   // --- explode --------------------------------------------------------------
   useEffect(() => {
@@ -369,6 +395,40 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
     };
     animRef.current = requestAnimationFrame(tick);
   }, []);
+
+  const playTour = useCallback(() => {
+    const ctx = ctxRef.current;
+    if (!ctx || touring) return;
+    cancelAnimationFrame(animRef.current);
+    autoFrame.current = true;
+    if (prefersReducedMotion()) {
+      setExplode(explodeRef.current >= 50 ? 0 : 100);
+      return;
+    }
+    setTouring(true);
+    const started = performance.now();
+    const duration = 9000;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - started) / duration);
+      let amount = 0;
+      if (t >= 0.2 && t < 0.58) amount = easeInOutCubic((t - 0.2) / 0.38);
+      else if (t >= 0.58 && t < 0.76) amount = 1;
+      else if (t >= 0.76) amount = 1 - easeInOutCubic((t - 0.76) / 0.24);
+      const angle = THREE.MathUtils.lerp(-0.22, 0.68, easeInOutCubic(t));
+      const direction = new THREE.Vector3(Math.sin(angle) * 0.95, 0.3, Math.cos(angle) * 1.45).normalize();
+      explodeRef.current = amount * 100;
+      setExplode(amount * 100);
+      applyExplode(ctx.board, amount);
+      ctx.frameFor(amount, direction);
+      ctx.requestRender();
+      if (t < 1) animRef.current = requestAnimationFrame(tick);
+      else {
+        setTouring(false);
+        setExplode(0);
+      }
+    };
+    animRef.current = requestAnimationFrame(tick);
+  }, [touring]);
 
   // --- highlight ------------------------------------------------------------
   const applyHighlights = useCallback(() => {
@@ -513,7 +573,7 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
 
   return (
     <div
-      className={styles.viewer}
+      className={`${styles.viewer} ${variant === "recipe" ? styles.viewerRecipe : ""}`}
       data-testid="exploded-viewer"
       onKeyDown={(event) => {
         if (event.key === "Escape") {
@@ -539,6 +599,12 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
           <div className={styles.hint} aria-hidden="true">
             Drag to orbit · Pinch or scroll to zoom · Tap a part
           </div>
+          {variant === "recipe" ? (
+            <div className={styles.stageTitle} aria-hidden="true">
+              <strong>Complete desk build</strong>
+              <span>{model.parts.length} inspectable pieces</span>
+            </div>
+          ) : null}
           <div className={styles.dims} aria-hidden="true">
             {dims}
           </div>
@@ -599,6 +665,11 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
             <output aria-live="off">{Math.round(explode)}%</output>
           </label>
           <div className={styles.toolGroup}>
+            {variant === "recipe" ? (
+              <button type="button" className={styles.btn} onClick={playTour} disabled={!ready || touring}>
+                {touring ? "Playing tour" : "Play 9s teardown"}
+              </button>
+            ) : null}
             <button type="button" className={styles.btn} onClick={resetView}>
               Reset view
             </button>
@@ -608,7 +679,7 @@ export function ExplodedViewer({ model, steps = [], onUnavailable }: ExplodedVie
               aria-pressed={labelsOn}
               onClick={() => setLabelsOn((value) => !value)}
             >
-              {labelsOn ? "Hide labels" : "Show labels"}
+              {labelsOn ? "Hide labels" : variant === "recipe" ? "Show key labels" : "Show labels"}
             </button>
             <button type="button" className={styles.btn} onClick={downloadGlb} disabled={!ready || exporting}>
               {exporting ? "Preparing .glb" : "Download 3D model (.glb)"}

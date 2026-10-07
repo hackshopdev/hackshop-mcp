@@ -58,6 +58,7 @@ const DEFAULT_FINISH: Record<ModelPart["kind"], PartFinish> = {
   port: "metal",
   led: "led",
   antenna: "pcb",
+  cable: "rubber",
   stand: "plastic",
   sensor: "chip",
 };
@@ -220,6 +221,12 @@ export function disposeObject(root: THREE.Object3D): void {
 
 export function geometryForPart(part: ModelPart): THREE.BufferGeometry {
   const [sx, sy, sz] = part.size;
+  if (part.shape === "tube") {
+    const points = part.path?.map(([x, y, z]) => new THREE.Vector3(x, y, z));
+    if (!points || points.length < 2) throw new Error(`${part.id} tube needs at least two path points`);
+    const curve = new THREE.CatmullRomCurve3(points, false, "centripetal", 0.45);
+    return new THREE.TubeGeometry(curve, Math.max(48, points.length * 18), part.thickness ?? 1.8, 16, false);
+  }
   if (part.shape === "cylinder") {
     if (part.hollow || part.cutouts?.length) {
       const r = sx / 2;
@@ -395,7 +402,7 @@ function materialFor(part: ModelPart, finish: PartFinish, textures: TextureCache
         clearcoat: 1,
         clearcoatRoughness: 0.04,
         transparent: true,
-        opacity: 0.32,
+        opacity: 0.18,
         depthWrite: false,
       });
     case "pcb": {
@@ -513,13 +520,15 @@ function detailMeshes(part: ModelPart, textures: TextureCache, outer: BoardModel
           ? new THREE.CircleGeometry(sx / 2 - 0.15, 72)
           : new THREE.PlaneGeometry(sx - 0.3, sy - 0.3);
       const material = new THREE.MeshStandardMaterial({
+        color: isPaper ? "#ffffff" : "#050507",
         map: texture,
         roughness: isPaper ? 0.92 : 0.28,
         metalness: 0,
         emissive: new THREE.Color(isPaper ? "#000000" : "#ffffff"),
         emissiveMap: isPaper ? null : texture,
-        emissiveIntensity: isPaper ? 0 : 0.85,
+        emissiveIntensity: isPaper ? 0 : 0.92,
       });
+      if (!isPaper) material.toneMapped = false;
       const mesh = new THREE.Mesh(face, material);
       mesh.position.z = sz / 2 + 0.02;
       mesh.name = `${part.id}-face`;
@@ -663,8 +672,9 @@ function drawScreen(
     ctx.fillRect(0, 0, w, h);
   } else {
     const bg = ctx.createRadialGradient(w / 2, h * 0.42, s * 0.05, w / 2, h / 2, Math.max(w, h) * 0.7);
-    bg.addColorStop(0, content === "avatar" ? "#24345a" : "#1a2433");
-    bg.addColorStop(1, "#05070b");
+    bg.addColorStop(0, content === "avatar" ? "#4939a3" : "#1a2433");
+    bg.addColorStop(0.55, content === "avatar" ? "#171a38" : "#111927");
+    bg.addColorStop(1, "#04050a");
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
   }
@@ -676,7 +686,7 @@ function drawScreen(
 
   if (content === "avatar" || paper || content === "status") {
     // A simple friendly character: round head, two eyes and a smile.
-    ctx.fillStyle = paper ? (content === "epaper-color" ? "#3d6fd6" : "#ffffff") : "#6c8cff";
+    ctx.fillStyle = paper ? (content === "epaper-color" ? "#3d6fd6" : "#ffffff") : "#8974ff";
     ctx.strokeStyle = ink;
     ctx.lineWidth = Math.max(2, s * 0.012);
     ctx.beginPath();

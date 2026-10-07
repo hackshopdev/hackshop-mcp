@@ -30,6 +30,10 @@ export interface BuildDemoVideo {
   poster_href: string;
   /** True only when the video demonstrates the assembled physical hardware. */
   shows_real_hardware: boolean;
+  /** Encoded frame size, used to prevent low-resolution featured media. */
+  resolution?: { width: number; height: number };
+  /** Inspectable route or source used to produce the video. */
+  source_href?: string;
 }
 
 export interface AvailableFinishedBuildPhoto {
