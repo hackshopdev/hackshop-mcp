@@ -4,6 +4,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
+      // Site modules import each other through the site's "@/" path alias.
+      "@": fileURLToPath(new URL("./site", import.meta.url)),
       "@clerk/nextjs/server": fileURLToPath(
         new URL("./test/fixtures/clerk-nextjs-server.ts", import.meta.url),
       ),

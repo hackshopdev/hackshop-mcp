@@ -1,9 +1,10 @@
 import Link from "next/link";
 import ui from "@/components/ui.module.css";
-import { MUSE_DESK_ORB_ASSEMBLY } from "@/lib/models/assemblies/muse-desk-orb";
+import { MUSE_DESK_ORB_PACKAGE } from "@/lib/models/assemblies/muse-desk-orb";
 import { RESPEAKER_VOICE_NODE_ASSEMBLY } from "@/lib/models/assemblies/respeaker-voice-node";
 import { getBoardModel } from "@/lib/models/boards";
 import { modelStepsForDevice } from "@/lib/models/plan-steps";
+import { AssemblyExperienceLazy } from "./AssemblyExperienceLazy";
 import { ExplodedViewerLazy } from "./ExplodedViewerLazy";
 
 /**
@@ -20,14 +21,23 @@ export function SeeInside({
   name: string;
   variant?: "standard" | "recipe";
 }) {
+  if (variant === "recipe" && deviceId === "waveshare-esp32-s3-touch-amoled-1-75c") {
+    return (
+      <section className={ui.section} aria-labelledby="see-inside" id="see-inside">
+        <div className={ui.sectionHead}>
+          <p className={ui.eyebrow}>Assembly model</p>
+          <h2 id="see-inside">Build the {name}</h2>
+          <p>
+            Orbit the finished build, walk the three build steps, and trace power, data and Muse&apos;s voice and reply
+            paths. The purchased Orb stays sealed: only its published exterior is shown.
+          </p>
+        </div>
+        <AssemblyExperienceLazy pkg={MUSE_DESK_ORB_PACKAGE} />
+      </section>
+    );
+  }
   const recipeAssembly =
-    variant !== "recipe"
-      ? null
-      : deviceId === "waveshare-esp32-s3-touch-amoled-1-75c"
-        ? MUSE_DESK_ORB_ASSEMBLY
-        : deviceId === "seeed-respeaker-lite-xiao-esp32s3"
-          ? RESPEAKER_VOICE_NODE_ASSEMBLY
-          : null;
+    variant === "recipe" && deviceId === "seeed-respeaker-lite-xiao-esp32s3" ? RESPEAKER_VOICE_NODE_ASSEMBLY : null;
   const model = recipeAssembly?.model ?? getBoardModel(deviceId);
   if (!model) return null;
   const steps = recipeAssembly?.steps ?? modelStepsForDevice(deviceId);

@@ -4,8 +4,11 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
+import { FIDELITY_LABELS, PHYSICAL_LABELS } from "@/lib/models/assembly-experience";
+import { sampleChoreography, type AssemblyPackage } from "@/lib/models/assembly-package";
 import {
   applyExplode,
+  applyPartExplode,
   attachStlGeometry,
   buildBoard,
   disposeObject,
@@ -169,12 +172,21 @@ function tuneMaterials(board: ReturnType<typeof buildBoard>, variant: BuildFilmV
   }
 }
 
+function railLabel(component: AssemblyPackage["components"][number]): string {
+  if (component.handling === "sealed") return `${component.name} · sealed`;
+  const fidelity = FIDELITY_LABELS[component.fidelity];
+  return `${component.name} · ${fidelity[0]!.toLowerCase()}${fidelity.slice(1)}`;
+}
+
 export function OrbFilm({
   model,
   variant = "orb",
+  assembly,
 }: {
   model: BoardModel;
   variant?: BuildFilmVariant;
+  /** When set, explode choreography and copy come from the assembly package. */
+  assembly?: AssemblyPackage;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const filmRef = useRef<HTMLElement | null>(null);
@@ -292,6 +304,9 @@ export function OrbFilm({
     const camera = new THREE.PerspectiveCamera(31, 16 / 9, 0.5, 3000);
     const target = new THREE.Vector3();
     const direction = new THREE.Vector3();
+    const partComponent = new Map(
+      assembly?.components.flatMap((component) => component.partIds.map((id) => [id, component.id] as const)) ?? [],
+    );
     const buttonMaterials = board.parts.get("pwr-button")?.materials ?? [];
     const screenMaterials = board.parts.get("amoled")?.materials ?? [];
 
@@ -340,7 +355,14 @@ export function OrbFilm({
         targetY = THREE.MathUtils.lerp(variant === "voice-node" ? 1 : -8, variant === "voice-node" ? 3 : -5, t);
       }
 
-      applyExplode(board, amount);
+      if (assembly) {
+        const sample = sampleChoreography(assembly, inputSeconds);
+        applyPartExplode(board, (id) => sample.amounts[partComponent.get(id) ?? ""] ?? 0);
+        amount = Math.max(0, ...Object.values(sample.amounts));
+        film.dataset.filmState = sample.stateId;
+      } else {
+        applyExplode(board, amount);
+      }
       rig.position.x = subjectX;
       plinth.position.x = subjectX;
       lightRing.position.x = subjectX;
@@ -420,10 +442,14 @@ export function OrbFilm({
       pmrem.dispose();
       renderer.dispose();
     };
-  }, [model, variant]);
+  }, [assembly, model, variant]);
 
   return (
-    <main ref={filmRef} className={styles.film}>
+    <main
+      ref={filmRef}
+      className={styles.film}
+      data-film-state={assembly ? sampleChoreography(assembly, 0).stateId : undefined}
+    >
       <canvas
         ref={canvasRef}
         className={styles.canvas}
@@ -457,6 +483,12 @@ export function OrbFilm({
               <span>Self-assembled acrylic</span>
               <span>XIAO USB data path</span>
             </>
+          ) : assembly ? (
+            assembly.components.map((component) => (
+              <span key={component.id} data-film-component={component.id}>
+                {railLabel(component)}
+              </span>
+            ))
           ) : (
             <>
               <span>Purchased 55 mm Orb</span>
@@ -474,7 +506,11 @@ export function OrbFilm({
         <span>One working loop before any extras.</span>
       </section>
 
-      <div className={styles.truth}>Concept render · physical build not yet verified</div>
+      <div className={styles.truth}>
+        {assembly
+          ? `Concept render · ${PHYSICAL_LABELS[assembly.evidence.physical]}`
+          : "Concept render · physical build not yet verified"}
+      </div>
       <div className={styles.progress} aria-hidden="true"><span /></div>
     </main>
   );

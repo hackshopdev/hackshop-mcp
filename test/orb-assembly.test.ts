@@ -1,5 +1,12 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { MUSE_DESK_ORB_ASSEMBLY } from "../site/lib/models/assemblies/muse-desk-orb";
+import { embodimentRecipe } from "../site/lib/embodiment-recipes";
+import {
+  MUSE_DESK_ORB_ASSEMBLY,
+  MUSE_DESK_ORB_PACKAGE,
+} from "../site/lib/models/assemblies/muse-desk-orb";
+import { assemblyPackageIssues } from "../site/lib/models/assembly-package";
 
 describe("Muse Desk Orb exterior assembly", () => {
   it("treats the purchased device, printable stand and data cable as the three build assemblies", () => {
@@ -66,5 +73,121 @@ describe("Muse Desk Orb exterior assembly", () => {
       "connect-cable",
     ]);
     expect(MUSE_DESK_ORB_ASSEMBLY.steps.flatMap((step) => step.partIds)).not.toContain("esp32-s3");
+  });
+});
+
+describe("Muse Desk Orb assembly package", () => {
+  const pkg = MUSE_DESK_ORB_PACKAGE;
+  const recipe = embodimentRecipe("muse-desk-orb")!;
+  const fab = JSON.parse(
+    readFileSync(
+      join(process.cwd(), "site/public/cad/waveshare-esp32-s3-touch-amoled-1-75c/desk-stand.fab.json"),
+      "utf8",
+    ),
+  ) as {
+    params: { tilt_deg: number; clearance: number; plug_overmold: [number, number] };
+    print: { material: string; orientation: string };
+    checks: Record<string, boolean>;
+  };
+  const component = (id: string) => pkg.components.find((candidate) => candidate.id === id)!;
+
+  it("passes the package integrity gate", () => {
+    expect(assemblyPackageIssues(pkg)).toEqual([]);
+  });
+
+  it("keeps the purchased Orb sealed and the stand and cable user-assembled", () => {
+    expect(pkg.components.map((c) => [c.id, c.handling, c.origin, c.fidelity])).toEqual([
+      ["purchased-orb", "sealed", "purchased", "published-dimensions"],
+      ["printed-stand", "user-assembled", "printed", "generated-cad"],
+      ["data-cable", "user-assembled", "purchased", "schematic"],
+    ]);
+    expect(component("purchased-orb").partIds).toEqual(MUSE_DESK_ORB_ASSEMBLY.groups[0]!.partIds);
+    expect(component("purchased-orb").sources.map((source) => source.url)).toContain(
+      "https://www.waveshare.com/img/devkit/ESP32-S3-Touch-AMOLED-1.75C/ESP32-S3-Touch-AMOLED-1.75C-details-size.jpg",
+    );
+  });
+
+  it("states stand fit facts exactly as the generated fabrication package records them", () => {
+    const facts = new Map(component("printed-stand").facts!.map((fact) => [fact.label, fact]));
+    expect(facts.get("Viewing tilt")?.value).toBe(`${fab.params.tilt_deg}°`);
+    expect(facts.get("Cradle clearance")?.value).toBe(`${fab.params.clearance} mm`);
+    expect(facts.get("Plug overmold limit")?.value).toBe(
+      `${fab.params.plug_overmold[0]} × ${fab.params.plug_overmold[1]} mm`,
+    );
+    expect(facts.get("Print")?.value).toBe(`${fab.print.material}, ${fab.print.orientation.toLowerCase()}`);
+    const passed = Object.entries(fab.checks).filter(([, ok]) => ok).length;
+    expect(facts.get("Generator checks")?.value).toBe(`${passed} of ${Object.keys(fab.checks).length} passed`);
+    for (const fact of facts.values()) {
+      expect(fact.basis).toMatch(/desk-stand\.fab\.json/);
+      expect(`${fact.value} ${fact.basis}`).not.toMatch(/\bverified\b(?! physically)/i);
+    }
+    expect(facts.get("Generator checks")?.basis).toMatch(/not a physical test/i);
+  });
+
+  it("connects the stand, plug and cable to the sealed Orb's exterior", () => {
+    expect(pkg.edges.map((edge) => [edge.id, edge.kind, edge.from, edge.to])).toEqual([
+      ["cradle-fit", "mechanical-fit", "stand-cradle", "orb-rim"],
+      ["usb-c-mate", "usb-c", "cable-device-plug", "orb-usb-c"],
+      ["cable-slot", "cable-route", "stand-cable-slot", "cable-device-plug"],
+      ["cable-run", "cable-route", "cable-device-plug", "cable-host-plug"],
+    ]);
+    const orbParts = new Set(component("purchased-orb").partIds);
+    for (const endpoint of pkg.endpoints.filter((e) => e.componentId === "purchased-orb")) {
+      expect(orbParts.has(endpoint.partId)).toBe(true);
+    }
+  });
+
+  it("maps power, data and Muse input and output flows through those connections", () => {
+    const system = (id: string) => pkg.systems.find((candidate) => candidate.id === id)!;
+    expect(pkg.systems.map((s) => [s.id, s.kind])).toEqual([
+      ["usb-power", "power"],
+      ["usb-data", "data"],
+      ["voice-in", "agent-input"],
+      ["reply-out", "agent-output"],
+      ["spoken-out", "agent-output"],
+    ]);
+    expect(system("usb-power").path).toEqual(["usb-host", "cable-host-plug", "cable-device-plug", "orb-usb-c"]);
+    expect(system("usb-power").edgeIds).toEqual(["cable-run", "usb-c-mate"]);
+    expect(system("voice-in").path[0]).toBe("you");
+    expect(system("voice-in").path).toContain("orb-pwr");
+    expect(system("voice-in").path.at(-1)).toBe("muse-vm");
+    expect(system("reply-out").path.slice(-2)).toEqual(["orb-screen", "you"]);
+
+    const support = new Map(recipe.capabilities.map((capability) => [capability.id, capability.support]));
+    expect(system("voice-in").support).toBe(support.get("audio-in"));
+    expect(system("reply-out").support).toBe(support.get("image-out"));
+    expect(system("spoken-out").support).toBe(support.get("audio-out"));
+  });
+
+  it("guides the three real build steps without opening the Orb", () => {
+    expect(pkg.steps.map((step) => [step.id, step.action, step.stateId])).toEqual([
+      ["print-stand", "print", "step-print-stand"],
+      ["seat-orb", "insert", "step-seat-orb"],
+      ["connect-cable", "connect", "step-connect-cable"],
+    ]);
+    const state = (id: string) => pkg.states.find((candidate) => candidate.id === id)!;
+    expect(state("step-print-stand").components["printed-stand"]).toEqual({ explode: 0, emphasis: "focus" });
+    expect(state("step-seat-orb").components["purchased-orb"]).toEqual({ explode: 0, emphasis: "focus" });
+    expect(state("step-seat-orb").edgeIds).toEqual(["cradle-fit"]);
+    expect(state("step-connect-cable").components["data-cable"]).toEqual({ explode: 0, emphasis: "focus" });
+    expect(MUSE_DESK_ORB_ASSEMBLY.steps.map((step) => step.id)).toEqual(pkg.steps.map((step) => step.id));
+  });
+
+  it("offers assembled, guided-build and connections modes", () => {
+    expect(pkg.modes.map((mode) => [mode.id, mode.stateIds])).toEqual([
+      ["assembled", ["assembled"]],
+      ["build", ["exploded", "step-print-stand", "step-seat-orb", "step-connect-cable"]],
+      ["connections", ["connections"]],
+    ]);
+    const connections = pkg.states.find((state) => state.id === "connections")!;
+    expect(connections.edgeIds).toEqual(pkg.edges.map((edge) => edge.id));
+  });
+
+  it("keeps the concept render distinct from physical proof", () => {
+    expect(pkg.evidence).toMatchObject({ render: "concept-render", physical: "not-built" });
+    expect(recipe.proof.maturity).toBe("concept");
+    expect(recipe.proof.finished_build_photo).toEqual({ status: "unavailable", reason: "not-built" });
+    expect(pkg.evidence.statement).toMatch(/not been physically built/i);
+    expect(pkg.film.durationSeconds).toBe(recipe.proof.demo_video!.duration_seconds);
   });
 });

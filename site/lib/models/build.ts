@@ -135,6 +135,15 @@ export function applyExplode(board: BuiltBoard, amount: number): void {
   board.group.updateMatrixWorld(true);
 }
 
+/** Moves each part by its own explode amount (0-1), e.g. one per assembly component. */
+export function applyPartExplode(board: BuiltBoard, amountFor: (partId: string) => number): void {
+  for (const [id, built] of board.parts) {
+    const t = Math.min(1, Math.max(0, amountFor(id)));
+    built.mesh.position.copy(built.base).addScaledVector(built.offset, t);
+  }
+  board.group.updateMatrixWorld(true);
+}
+
 /** World-space bounds of the board at a given explode amount. */
 export function boundsAt(board: BuiltBoard, amount: number): THREE.Box3 {
   const previous = board.explode;
