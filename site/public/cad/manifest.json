@@ -87,7 +87,7 @@
     },
     {
       "bbox_mm": [
-        44.0,
+        36.0,
         45.05,
         57.981
       ],
@@ -111,7 +111,7 @@
       },
       "part": "desk-stand",
       "title": "Printable desk stand",
-      "volume_cm3": 19.739
+      "volume_cm3": 14.52
     }
   ]
 }

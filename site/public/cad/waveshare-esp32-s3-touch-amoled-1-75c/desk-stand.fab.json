@@ -29,7 +29,7 @@
     }
   ],
   "bbox_mm": [
-    44.0,
+    36.0,
     45.05,
     57.981
   ],
@@ -52,8 +52,8 @@
   },
   "device_id": "waveshare-esp32-s3-touch-amoled-1-75c",
   "device_name": "Waveshare ESP32-S3-Touch-AMOLED-1.75C (round)",
-  "est_filament_m": 8.206,
-  "est_mass_g_pla": 24.476,
+  "est_filament_m": 6.037,
+  "est_mass_g_pla": 18.005,
   "files": {
     "fab": "desk-stand.fab.json",
     "step": "desk-stand.step",
@@ -94,5 +94,5 @@
     "w": 55.0
   },
   "title": "Printable desk stand",
-  "volume_cm3": 19.739
+  "volume_cm3": 14.52
 }

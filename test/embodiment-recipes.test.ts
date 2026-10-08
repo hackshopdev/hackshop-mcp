@@ -54,6 +54,9 @@ describe("embodiment recipes", () => {
       reason: "not-built",
     });
     expect(buildProofIssues(recipe.proof)).toEqual([]);
+    expect(recipe.proof.interactive_3d?.source_href).toContain(
+      "site/lib/models/assemblies/muse-desk-orb.ts",
+    );
   });
 
   it("includes a first-success check and reproducible acceptance checks", () => {

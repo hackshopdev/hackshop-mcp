@@ -245,7 +245,9 @@ def _make_pose(dims: DeviceDims, params: StandParams, backrest_h: float) -> Stan
     usb_face = dims.usb_faces[0] if dims.usb_faces else None
     side_margin = max(params.side_margin, params.wall)
     if dims.shape == "round":
-        support_width = max(0.8 * w, 36.0)
+        # A narrow yoke keeps the round product visible from the front while
+        # still leaving enough material under the ±30° cradle probes.
+        support_width = max(0.64 * w, 36.0)
         support_min_x = -support_width / 2
         support_max_x = support_width / 2
     else:
@@ -402,6 +404,11 @@ def desk_stand(dims: DeviceDims, params: StandParams | dict[str, Any] | None = N
     if usb_face == "bottom":
         slot_w = params.plug_overmold[0] + 2 * params.clearance
         slot_d = params.plug_overmold[1] + 2 * params.clearance
+        if dims.shape == "round":
+            # The centre opening is both the USB path and the visual reveal.
+            # Two side rails carry the round device instead of a solid slab.
+            slot_w = max(slot_w, support_w * 0.64)
+            slot_d = max(slot_d, t + 2 * params.clearance + backrest_thick + 2.0)
         slot_h = shelf_thick + cradle_height + 2.0
         slot = _box_local(
             pose,

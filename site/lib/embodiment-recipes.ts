@@ -186,7 +186,7 @@ const MUSE_DESK_ORB: EmbodimentRecipe = {
       authoring: "procedural-threejs",
       browser: "threejs",
       source_href:
-        "https://github.com/hackshopdev/hackshop-mcp/blob/main/site/lib/models/boards/waveshare-esp32-s3-touch-amoled-1-75c.ts",
+        "https://github.com/hackshopdev/hackshop-mcp/blob/main/site/lib/models/assemblies/muse-desk-orb.ts",
     },
     demo_video: {
       href: "builds/muse-desk-orb/concept-demo.mp4",

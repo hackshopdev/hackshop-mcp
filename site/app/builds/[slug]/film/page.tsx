@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { OrbFilm } from "@/components/exploded/OrbFilm";
 import { embodimentRecipe, embodimentRecipeSlugs } from "@/lib/embodiment-recipes";
-import { getBoardModel } from "@/lib/models/boards";
+import { MUSE_DESK_ORB_ASSEMBLY } from "@/lib/models/assemblies/muse-desk-orb";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -15,7 +15,6 @@ export function generateStaticParams() {
 export default async function BuildFilmPage({ params }: Props) {
   const { slug } = await params;
   const recipe = embodimentRecipe(slug);
-  const model = recipe ? getBoardModel(recipe.device_id) : null;
-  if (!recipe || !model) notFound();
-  return <OrbFilm model={model} />;
+  if (!recipe) notFound();
+  return <OrbFilm model={MUSE_DESK_ORB_ASSEMBLY.model} />;
 }

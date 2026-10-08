@@ -602,7 +602,7 @@ export function ExplodedViewer({ model, steps = [], onUnavailable, variant = "st
           {variant === "recipe" ? (
             <div className={styles.stageTitle} aria-hidden="true">
               <strong>Complete desk build</strong>
-              <span>{model.parts.length} inspectable pieces</span>
+              <span>3 physical assemblies · {model.parts.length} inspectable surfaces</span>
             </div>
           ) : null}
           <div className={styles.dims} aria-hidden="true">
@@ -686,7 +686,11 @@ export function ExplodedViewer({ model, steps = [], onUnavailable, variant = "st
             </button>
           </div>
         </div>
-        <p className={styles.note}>{MODEL_NOTE}</p>
+        <p className={styles.note}>
+          {variant === "recipe"
+            ? "Exterior assembly model. Orb envelope uses published dimensions; stand is generated CAD; cable routing is schematic."
+            : MODEL_NOTE}
+        </p>
       </div>
 
       <aside className={styles.side} aria-label={`${model.name} parts`}>
@@ -711,9 +715,11 @@ export function ExplodedViewer({ model, steps = [], onUnavailable, variant = "st
             </>
           ) : (
             <>
-              <p className={styles.kicker}>What&apos;s inside</p>
+              <p className={styles.kicker}>{variant === "recipe" ? "How it goes together" : "What's inside"}</p>
               <p className={styles.lessonText}>
-                Tap a part on the model or in the list to see what it does. Press Explode to pull the layers apart.
+                {variant === "recipe"
+                  ? "Tap a surface or choose a build step. Explode separates the purchased Orb, printable stand and data cable."
+                  : "Tap a part on the model or in the list to see what it does. Press Explode to pull the layers apart."}
               </p>
             </>
           )}

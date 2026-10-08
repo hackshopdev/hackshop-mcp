@@ -140,7 +140,10 @@ export function OrbFilm({ model }: { model: BoardModel }) {
     const film = filmRef.current;
     if (!canvas || !film) return;
 
-    const fixedTimeline = new URLSearchParams(window.location.search).has("render");
+    const search = new URLSearchParams(window.location.search);
+    const fixedTimeline = search.has("render");
+    const requestedTime = Number(search.get("time") ?? "0");
+    const initialSeconds = Number.isFinite(requestedTime) ? requestedTime : 0;
     window.__hackshopFilmReady = false;
 
     const renderer = new THREE.WebGLRenderer({
@@ -253,38 +256,44 @@ export function OrbFilm({ model }: { model: BoardModel }) {
       let yaw = 0.34;
       let distance = 158;
       let targetY = -12;
+      let subjectX = 34;
 
       if (seconds < 3.15) {
         const t = ease(seconds / 3.15);
         yaw = THREE.MathUtils.lerp(0.42, 0.06, t);
-        distance = THREE.MathUtils.lerp(174, 146, t);
+        distance = THREE.MathUtils.lerp(215, 190, t);
         targetY = THREE.MathUtils.lerp(-15, -9, t);
+        subjectX = THREE.MathUtils.lerp(-38, -46, t);
       } else if (seconds < 4.45) {
         const t = ease((seconds - 3.15) / 1.3);
         amount = 0.86 * t;
         yaw = THREE.MathUtils.lerp(0.06, -0.28, t);
-        distance = THREE.MathUtils.lerp(146, 244, t);
+        distance = THREE.MathUtils.lerp(190, 254, t);
         targetY = THREE.MathUtils.lerp(-9, -5, t);
+        subjectX = THREE.MathUtils.lerp(-46, 34, t);
       } else if (seconds < 8.85) {
         const t = ease((seconds - 4.45) / 4.4);
         amount = 0.86;
         yaw = THREE.MathUtils.lerp(-0.28, -0.76, t);
-        distance = THREE.MathUtils.lerp(244, 258, t);
+        distance = THREE.MathUtils.lerp(254, 266, t);
         targetY = -5;
       } else if (seconds < 10.15) {
         const t = ease((seconds - 8.85) / 1.3);
         amount = 0.86 * (1 - t);
         yaw = THREE.MathUtils.lerp(-0.76, 0.22, t);
-        distance = THREE.MathUtils.lerp(258, 148, t);
+        distance = THREE.MathUtils.lerp(266, 190, t);
         targetY = THREE.MathUtils.lerp(-5, -8, t);
       } else {
         const t = ease((seconds - 10.15) / 2.25);
         yaw = THREE.MathUtils.lerp(0.22, 0.08, t);
-        distance = THREE.MathUtils.lerp(148, 138, t);
+        distance = THREE.MathUtils.lerp(190, 178, t);
         targetY = THREE.MathUtils.lerp(-8, -5, t);
       }
 
       applyExplode(board, amount);
+      rig.position.x = subjectX;
+      plinth.position.x = subjectX;
+      lightRing.position.x = subjectX;
       rig.rotation.y = Math.sin(seconds * 0.34) * 0.025;
       target.set(0, targetY, 0);
       direction.set(Math.sin(yaw) * 0.95, 0.17, Math.cos(yaw) * 1.42).normalize();
@@ -322,7 +331,7 @@ export function OrbFilm({ model }: { model: BoardModel }) {
     };
 
     window.__hackshopFilmSetTime = renderAt;
-    renderAt(0);
+    renderAt(initialSeconds);
     if (!fixedTimeline) frame = requestAnimationFrame(animate);
 
     const stand = model.parts.find((part) => part.stl && part.stlMatrix);
@@ -332,7 +341,7 @@ export function OrbFilm({ model }: { model: BoardModel }) {
           attachStlGeometry(board, stand.id, geometry);
           geometry.dispose();
           tuneMaterials(board);
-          renderAt(0);
+          renderAt(initialSeconds);
         }).catch(() => undefined)
       : Promise.resolve();
     standReady.finally(() => {
@@ -368,15 +377,13 @@ export function OrbFilm({ model }: { model: BoardModel }) {
       </section>
 
       <section className={`${styles.sceneCopy} ${styles.anatomyCopy}`}>
-        <p>Built to be understood.</p>
-        <h2>19 inspectable pieces</h2>
+        <p>Three physical assemblies.</p>
+        <h2>Built to fit, not to pretend.</h2>
         <div className={styles.partRail}>
-          <span>Touch + AMOLED</span>
-          <span>Dual microphone</span>
-          <span>ESP32-S3</span>
-          <span>Speaker</span>
-          <span>Battery</span>
-          <span>USB-C data</span>
+          <span>Purchased 55 mm Orb</span>
+          <span>Generated stand CAD</span>
+          <span>USB-C data path</span>
+          <span>Buttons stay clear</span>
         </div>
       </section>
 

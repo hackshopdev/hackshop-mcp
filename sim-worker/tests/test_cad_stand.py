@@ -79,3 +79,6 @@ def test_round_desk_stand_has_real_cradle_and_button_clearance():
     checks = stand_checks(part, dims, pose)
     assert checks["cradle_supports"] is True
     assert checks["buttons_clear"] is True
+    # The Orb stand should read as an open yoke, not a solid pedestal hiding
+    # the lower half of the purchased device.
+    assert part.volume / 1000.0 <= 15.6

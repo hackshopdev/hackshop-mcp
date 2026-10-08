@@ -116,7 +116,7 @@ export const STAND_STL_BOUNDS: Record<string, { min: Vec3; max: Vec3 }> = {
   "m5stack-sticks3": { min: [-16, 0, 0], max: [16, 45, 53.93] },
   "m5stack-stickc-plus2": { min: [-16, 0, 0], max: [16, 43.5, 54.124] },
   "waveshare-esp32-c6-touch-amoled-1-8": { min: [-22.8, 0, 0], max: [15.8, 45, 33.594] },
-  "waveshare-esp32-s3-touch-amoled-1-75c": { min: [-22, 0, 0], max: [22, 45.05, 57.981] },
+  "waveshare-esp32-s3-touch-amoled-1-75c": { min: [-18, 0, 0], max: [18, 45.05, 57.981] },
 };
 
 export function standStlUrl(deviceId: string): string {
