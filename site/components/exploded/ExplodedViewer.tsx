@@ -60,6 +60,12 @@ const RECIPE_LABEL_IDS = new Set([
   "case",
   "usb-c-data-cable",
   "printed-stand",
+  "respeaker-cad",
+  "xiao-antenna",
+  "speaker",
+  "acrylic-top",
+  "xiao-usb-plug",
+  "usb-data-cable",
 ]);
 
 function easeInOutCubic(t: number): number {
@@ -328,27 +334,32 @@ export function ExplodedViewer({ model, steps = [], onUnavailable, variant = "st
     setReady(true);
     requestRender();
 
-    const stand = model.parts.find((part) => part.stl && part.stlMatrix);
-    if (stand?.stl) {
-      void import("three/examples/jsm/loaders/STLLoader.js")
-        .then(({ STLLoader }) => new STLLoader().loadAsync(stand.stl!))
-        .then((geometry) => {
-          if (disposed) {
-            geometry.dispose();
-            return;
-          }
-          attachStlGeometry(board, stand.id, geometry);
-          geometry.dispose();
-          computeCenters();
-          board.parts.get(stand.id)!.mesh.visible = true;
-          requestRender();
-        })
-        .catch(() => {
-          if (disposed) return;
-          const built = board.parts.get(stand.id);
-          if (built) built.mesh.visible = true;
-          requestRender();
-        });
+    const stlParts = model.parts.filter((part) => part.stl && part.stlMatrix);
+    if (stlParts.length > 0) {
+      void import("three/examples/jsm/loaders/STLLoader.js").then(({ STLLoader }) => {
+        const loader = new STLLoader();
+        for (const part of stlParts) {
+          void loader
+            .loadAsync(part.stl!)
+            .then((geometry) => {
+              if (disposed) {
+                geometry.dispose();
+                return;
+              }
+              attachStlGeometry(board, part.id, geometry);
+              geometry.dispose();
+              computeCenters();
+              board.parts.get(part.id)!.mesh.visible = true;
+              requestRender();
+            })
+            .catch(() => {
+              if (disposed) return;
+              const built = board.parts.get(part.id);
+              if (built) built.mesh.visible = true;
+              requestRender();
+            });
+        }
+      });
     }
 
     return () => {
@@ -570,6 +581,8 @@ export function ExplodedViewer({ model, steps = [], onUnavailable, variant = "st
 
   const exploded = explode >= 50;
   const hoverPart = hover ? partsById.get(hover.id) : null;
+  const assemblyCount = new Set(model.parts.map((part) => part.explode.join(","))).size;
+  const isVoiceNode = model.deviceId === "muse-respeaker-voice-node-assembly";
 
   return (
     <div
@@ -601,8 +614,8 @@ export function ExplodedViewer({ model, steps = [], onUnavailable, variant = "st
           </div>
           {variant === "recipe" ? (
             <div className={styles.stageTitle} aria-hidden="true">
-              <strong>Complete desk build</strong>
-              <span>3 physical assemblies · {model.parts.length} inspectable surfaces</span>
+              <strong>{isVoiceNode ? "Complete voice-node build" : "Complete desk build"}</strong>
+              <span>{assemblyCount} physical assemblies · {model.parts.length} inspectable surfaces</span>
             </div>
           ) : null}
           <div className={styles.dims} aria-hidden="true">
@@ -688,7 +701,9 @@ export function ExplodedViewer({ model, steps = [], onUnavailable, variant = "st
         </div>
         <p className={styles.note}>
           {variant === "recipe"
-            ? "Exterior assembly model. Orb envelope uses published dimensions; stand is generated CAD; cable routing is schematic."
+            ? isVoiceNode
+              ? "Whole-build assembly model. The reSpeaker board uses Seeed's official CAD; the speaker, acrylic enclosure, antenna and cable are schematic."
+              : "Exterior assembly model. Orb envelope uses published dimensions; stand is generated CAD; cable routing is schematic."
             : MODEL_NOTE}
         </p>
       </div>
@@ -718,7 +733,9 @@ export function ExplodedViewer({ model, steps = [], onUnavailable, variant = "st
               <p className={styles.kicker}>{variant === "recipe" ? "How it goes together" : "What's inside"}</p>
               <p className={styles.lessonText}>
                 {variant === "recipe"
-                  ? "Tap a surface or choose a build step. Explode separates the purchased Orb, printable stand and data cable."
+                  ? isVoiceNode
+                    ? "Tap a surface or choose a build step. Explode separates the official board CAD, XIAO antenna, speaker, acrylic enclosure and data cable."
+                    : "Tap a surface or choose a build step. Explode separates the purchased Orb, printable stand and data cable."
                   : "Tap a part on the model or in the list to see what it does. Press Explode to pull the layers apart."}
               </p>
             </>

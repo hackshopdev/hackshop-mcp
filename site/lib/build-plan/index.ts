@@ -716,6 +716,32 @@ function assembleStep(
     };
   }
 
+  if (board?.device_id === "seeed-respeaker-lite-xiao-esp32s3") {
+    return {
+      id: "assemble",
+      title: "Assemble the voice node",
+      why:
+        "The acrylic stack keeps the microphones exposed, carries the board above the speaker and makes both USB-C ports reachable for recovery.",
+      body_md:
+        "Power the board down. Keep the pre-soldered XIAO attached to the reSpeaker carrier. Mount the complete board on the upper acrylic deck, connect the keyed speaker lead, then fasten the upper and lower plates around the speaker. Start every fastener by hand and tighten only until secure. Snap the external antenna lead straight down onto the XIAO U.FL connector, place the antenna where its cable is relaxed, and leave both microphones clear. For Muse flashing and power, plug the data cable into the small XIAO USB-C port, not the larger reSpeaker USB-C port.",
+      commands: [],
+      links: [
+        {
+          label: "Seeed reSpeaker/XIAO hardware guide",
+          url: "https://wiki.seeedstudio.com/xiao_respeaker/",
+        },
+        {
+          label: "Seeed acrylic enclosure",
+          url: "https://www.seeedstudio.com/Acrylic-Speaker-DIY-Kit-for-Respeaker-Lite-p-5937.html",
+        },
+        {
+          label: "Seeed 4 ohm / 5 W speaker",
+          url: "https://www.seeedstudio.com/Mono-Enclosed-Speaker-4R-5W-p-5931.html",
+        },
+      ],
+    };
+  }
+
   const printable = printables[0];
   const fabCue = printable?.fab?.print?.orientation
     ? `The printable was designed to print ${printable.fab.print.orientation}. `

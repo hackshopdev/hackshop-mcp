@@ -1130,6 +1130,24 @@
         },
         "parts": [
           {
+            "name": "Mono enclosed speaker (4 ohm / 5 W)",
+            "qty": 1,
+            "required": true,
+            "note": "Required for the complete physical voice-node assembly. Seeed lists this speaker for the reSpeaker Lite kit at $2.00 on 2026-10-07. Muse speaker playback is not verified on hardware yet, so this part establishes the hardware path rather than a working spoken-reply claim.",
+            "buy_url": "https://www.seeedstudio.com/Mono-Enclosed-Speaker-4R-5W-p-5931.html",
+            "search": "Seeed Mono Enclosed Speaker 4R 5W 114993346",
+            "est_price_usd": 2
+          },
+          {
+            "name": "Acrylic enclosure for reSpeaker Lite",
+            "qty": 1,
+            "required": true,
+            "note": "The self-assembled black acrylic frame mounts the reSpeaker board above the enclosed speaker. Seeed listed it at $5.00 on 2026-10-07.",
+            "buy_url": "https://www.seeedstudio.com/Acrylic-Speaker-DIY-Kit-for-Respeaker-Lite-p-5937.html",
+            "search": "Seeed Acrylic Enclosure reSpeaker Lite 110991984",
+            "est_price_usd": 5
+          },
+          {
             "name": "USB-C data cable",
             "qty": 1,
             "required": true,

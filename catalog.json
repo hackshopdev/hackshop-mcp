@@ -2384,10 +2384,10 @@
       "https://wiki.seeedstudio.com/xiao_respeaker/"
     ],
     "community_size_bucket": "small",
-    "notes": "Experimental in the Muse SDK. reSpeaker Lite 2-mic array with a XIAO ESP32-S3 (8 MB flash, 8 MB PSRAM). RGB status LED and push-to-talk on the XIAO BOOT button; replies show as text in the Muse app. The XMOS must run Seeed's 16 kHz I2S firmware v1.0.9. Seeed's kit with the XIAO soldered on was $30.99 on 2026-10-05.",
+    "notes": "Experimental in the Muse SDK. reSpeaker Lite 2-mic array with a XIAO ESP32-S3 (8 MB flash, 8 MB PSRAM). RGB status LED and push-to-talk on the XIAO BOOT button; replies show as text in the Muse app. The XMOS must run Seeed's 16 kHz I2S firmware v1.0.9. Seeed listed the pre-soldered reSpeaker/XIAO board at $30.99, the 4 ohm / 5 W speaker at $2, and the self-assembled acrylic enclosure at $5 on 2026-10-07.",
     "est_used_price_usd_min": 31,
     "est_used_price_usd_max": 31,
-    "buy_url": "https://www.seeedstudio.com/ReSpeaker-Lite-Voice-Assistant-Kit-p-5929.html"
+    "buy_url": "https://www.seeedstudio.com/ReSpeaker-Lite-Voice-Assistant-Kit-Full-Kit-of-2-Mic-Array-pre-soldered-XIAO-ESP32S3-Mono-Enclosed-Speaker-and-Enclosure.html"
   },
   {
     "id": "waveshare-esp32-s3-touch-amoled-1-75",

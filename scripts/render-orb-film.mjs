@@ -3,7 +3,7 @@
 import { spawn } from "node:child_process";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dirname, "..");
 const FPS = Number(process.env.FILM_FPS ?? 30);
@@ -26,6 +26,8 @@ const frames = join(workspace, "frames");
 const profile = join(workspace, "chrome-profile");
 await mkdir(frames, { recursive: true });
 await mkdir(profile, { recursive: true });
+await mkdir(dirname(OUTPUT), { recursive: true });
+await mkdir(dirname(POSTER), { recursive: true });
 
 const chrome = spawn(CHROME, [
   "--headless=new",

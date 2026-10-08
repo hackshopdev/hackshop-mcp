@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ui from "@/components/ui.module.css";
 import { MUSE_DESK_ORB_ASSEMBLY } from "@/lib/models/assemblies/muse-desk-orb";
+import { RESPEAKER_VOICE_NODE_ASSEMBLY } from "@/lib/models/assemblies/respeaker-voice-node";
 import { getBoardModel } from "@/lib/models/boards";
 import { modelStepsForDevice } from "@/lib/models/plan-steps";
 import { ExplodedViewerLazy } from "./ExplodedViewerLazy";
@@ -19,20 +20,28 @@ export function SeeInside({
   name: string;
   variant?: "standard" | "recipe";
 }) {
-  const isDeskOrbRecipe = variant === "recipe" && deviceId === "waveshare-esp32-s3-touch-amoled-1-75c";
-  const model = isDeskOrbRecipe ? MUSE_DESK_ORB_ASSEMBLY.model : getBoardModel(deviceId);
+  const recipeAssembly =
+    variant !== "recipe"
+      ? null
+      : deviceId === "waveshare-esp32-s3-touch-amoled-1-75c"
+        ? MUSE_DESK_ORB_ASSEMBLY
+        : deviceId === "seeed-respeaker-lite-xiao-esp32s3"
+          ? RESPEAKER_VOICE_NODE_ASSEMBLY
+          : null;
+  const model = recipeAssembly?.model ?? getBoardModel(deviceId);
   if (!model) return null;
-  const steps = isDeskOrbRecipe ? MUSE_DESK_ORB_ASSEMBLY.steps : modelStepsForDevice(deviceId);
+  const steps = recipeAssembly?.steps ?? modelStepsForDevice(deviceId);
+  const isRecipe = recipeAssembly !== null;
   return (
     <section className={ui.section} aria-labelledby="see-inside" id="see-inside">
       <div className={ui.sectionHead}>
-        <p className={ui.eyebrow}>{isDeskOrbRecipe ? "Assembly model" : "See inside"}</p>
-        <h2 id="see-inside">{isDeskOrbRecipe ? `Build the ${name}` : `Take the ${name} apart`}</h2>
+        <p className={ui.eyebrow}>{isRecipe ? "Assembly model" : "See inside"}</p>
+        <h2 id="see-inside">{isRecipe ? `Build the ${name}` : `Take the ${name} apart`}</h2>
         <p>
-          {isDeskOrbRecipe
-            ? "Drag to inspect the fit, explode the three physical assemblies, and follow the actual build order."
+          {isRecipe
+            ? `Drag to inspect the fit, explode the ${recipeAssembly.groups.length} physical assemblies, and follow the actual build order.`
             : "Drag to turn it, pull the slider to explode it, and tap a part to learn what it does."}{" "}
-          <Link href={`/models/${deviceId}`}>Open the full 3D view</Link>
+          {!isRecipe ? <Link href={`/models/${deviceId}`}>Open the full 3D view</Link> : null}
         </p>
       </div>
       <ExplodedViewerLazy model={model} steps={steps} variant={variant} />

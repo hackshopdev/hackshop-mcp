@@ -9,14 +9,56 @@ import {
   embodimentRecipe,
   embodimentRecipeSlugs,
 } from "../site/lib/embodiment-recipes";
+import { TEMPLATES } from "../site/lib/templates";
 
 const root = process.cwd();
 
 describe("embodiment recipes", () => {
-  it("ships one reviewable Muse/open-platform recipe first", () => {
-    expect(embodimentRecipeSlugs()).toEqual(["muse-desk-orb"]);
+  it("ships reviewable Muse/open-platform recipes first", () => {
+    expect(embodimentRecipeSlugs()).toEqual(["muse-desk-orb", "muse-respeaker-voice-node"]);
     expect(EMBODIMENT_RECIPES[0]?.path).toBe("endorsed-open-platform");
     expect(EMBODIMENT_RECIPES[0]?.platform_id).toBe("muse-esp32");
+    expect(EMBODIMENT_RECIPES[1]?.path).toBe("endorsed-open-platform");
+    expect(EMBODIMENT_RECIPES[1]?.platform_id).toBe("muse-esp32");
+  });
+
+  it("surfaces both recipes in the Muse build list", () => {
+    const slugs = TEMPLATES.filter((template) => template.category === "agents").map(
+      (template) => template.slug,
+    );
+
+    expect(slugs).toContain("muse-desk-orb");
+    expect(slugs).toContain("muse-respeaker-voice-node");
+  });
+
+  it("adds a real self-assembly recipe with source-linked concept proof", () => {
+    const recipe = embodimentRecipe("muse-respeaker-voice-node")!;
+    expect(recipe.device_id).toBe("seeed-respeaker-lite-xiao-esp32s3");
+    expect(recipe.title).toMatch(/voice node/i);
+    expect(recipe.proof.maturity).toBe("concept");
+    expect(recipe.proof.interactive_3d?.source_href).toContain(
+      "site/lib/models/assemblies/respeaker-voice-node.ts",
+    );
+    expect(recipe.proof.demo_video?.source_href).toBe(
+      "/builds/muse-respeaker-voice-node/film",
+    );
+    expect(recipe.proof.finished_build_photo).toEqual({
+      status: "unavailable",
+      reason: "not-built",
+    });
+    expect(buildProofIssues(recipe.proof)).toEqual([]);
+
+    const plan = buildPlanForDevice(recipe.device_id)!;
+    expect(plan.parts.filter((part) => part.required).map((part) => part.name)).toEqual(
+      expect.arrayContaining([
+        "Mono enclosed speaker (4 ohm / 5 W)",
+        "Acrylic enclosure for reSpeaker Lite",
+        "USB-C data cable",
+      ]),
+    );
+    expect(plan.steps.find((step) => step.id === "assemble")?.body_md).toMatch(
+      /small XIAO USB-C port/i,
+    );
   });
 
   it("joins the recipe to a real build plan and whole-build model", () => {
@@ -75,15 +117,16 @@ describe("embodiment recipes", () => {
     for (const source of recipe.sources) expect(source.url).toMatch(/^https:\/\//);
   });
 
-  it("references non-empty local concept-video assets", () => {
-    const recipe = embodimentRecipe("muse-desk-orb")!;
-    const video = join(root, "site/public", recipe.proof.demo_video!.href);
-    const poster = join(root, "site/public", recipe.proof.demo_video!.poster_href);
-    expect(existsSync(video), video).toBe(true);
-    expect(existsSync(poster), poster).toBe(true);
-    expect(recipe.proof.demo_video?.resolution).toEqual({ width: 1920, height: 1080 });
-    expect(recipe.proof.demo_video?.source_href).toBe("/builds/muse-desk-orb/film");
-    expect(statSync(video).size, video).toBeGreaterThan(500_000);
-    expect(statSync(poster).size, poster).toBeGreaterThan(1_000);
+  it("references non-empty local concept-video assets for every recipe", () => {
+    for (const recipe of EMBODIMENT_RECIPES) {
+      const video = join(root, "site/public", recipe.proof.demo_video!.href);
+      const poster = join(root, "site/public", recipe.proof.demo_video!.poster_href);
+      expect(existsSync(video), video).toBe(true);
+      expect(existsSync(poster), poster).toBe(true);
+      expect(recipe.proof.demo_video?.resolution).toEqual({ width: 1920, height: 1080 });
+      expect(recipe.proof.demo_video?.source_href).toBe(`/builds/${recipe.slug}/film`);
+      expect(statSync(video).size, video).toBeGreaterThan(500_000);
+      expect(statSync(poster).size, poster).toBeGreaterThan(1_000);
+    }
   });
 });

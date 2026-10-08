@@ -95,7 +95,8 @@ export default async function EmbodimentRecipePage({ params }: Props) {
             <h2 id="proof">See the whole build before touching the board</h2>
             <p>
               This clip explains the intended interaction. It is a concept animation, not footage of a verified
-              physical build. The interactive model below is generated from published board dimensions.
+              physical build. The interactive model below distinguishes official CAD and published dimensions from
+              clearly labeled schematic accessories.
             </p>
           </div>
           <div className={styles.proofGrid}>
@@ -125,7 +126,11 @@ export default async function EmbodimentRecipePage({ params }: Props) {
         </section>
 
         <div id="interactive-build" className={styles.anchor}>
-          <SeeInside deviceId={recipe.device_id} name="complete desk orb" variant="recipe" />
+          <SeeInside
+            deviceId={recipe.device_id}
+            name={recipe.title.replace(/^A\s+/i, "")}
+            variant="recipe"
+          />
         </div>
 
         <section className={ui.section} aria-labelledby="capabilities">
@@ -175,7 +180,7 @@ export default async function EmbodimentRecipePage({ params }: Props) {
         <section className={ui.section} aria-labelledby="build-steps">
           <div className={ui.sectionHead}>
             <p className={ui.eyebrow}>How to build it</p>
-            <h2 id="build-steps">From unopened board to first conversation</h2>
+            <h2 id="build-steps">From unopened parts to first conversation</h2>
             <p>The commands and recovery path are generated from the same machine-readable plan your agent receives.</p>
           </div>
           <ol className={styles.steps}>

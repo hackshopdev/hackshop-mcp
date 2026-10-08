@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { OrbFilm } from "@/components/exploded/OrbFilm";
 import { embodimentRecipe, embodimentRecipeSlugs } from "@/lib/embodiment-recipes";
 import { MUSE_DESK_ORB_ASSEMBLY } from "@/lib/models/assemblies/muse-desk-orb";
+import { RESPEAKER_VOICE_NODE_ASSEMBLY } from "@/lib/models/assemblies/respeaker-voice-node";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -16,5 +17,8 @@ export default async function BuildFilmPage({ params }: Props) {
   const { slug } = await params;
   const recipe = embodimentRecipe(slug);
   if (!recipe) notFound();
-  return <OrbFilm model={MUSE_DESK_ORB_ASSEMBLY.model} />;
+  if (slug === "muse-respeaker-voice-node") {
+    return <OrbFilm model={RESPEAKER_VOICE_NODE_ASSEMBLY.model} variant="voice-node" />;
+  }
+  return <OrbFilm model={MUSE_DESK_ORB_ASSEMBLY.model} variant="orb" />;
 }

@@ -57,6 +57,23 @@ export const TEMPLATES: Template[] = [
     category: "agents",
   },
   {
+    slug: "muse-respeaker-voice-node",
+    title: "A self-assembled voice node for Muse",
+    blurb:
+      "Build the complete reSpeaker Lite kit: dual microphones, XIAO ESP32-S3, 5 W speaker and acrylic enclosure.",
+    prompt:
+      "Build a self-assembled voice node for my Muse AI agent using the reSpeaker Lite full kit, with microphone input, a physical talk button and speaker output.",
+    difficulty: 2,
+    est_cost_usd: { min: 41, max: 48 },
+    est_setup_hours_min: 1,
+    est_setup_hours_max: 3,
+    viability: "experimental",
+    viability_note:
+      "The board, speaker and acrylic enclosure are official Seeed parts and the board is on Muse's full-UI list. Hackshop's assembly is CAD-checked, but its speaker playback and finished physical build are not yet verified.",
+    device_id: "seeed-respeaker-lite-xiao-esp32s3",
+    category: "agents",
+  },
+  {
     slug: "muse-pocket-remote",
     title: "Pocket push-to-talk remote for Muse",
     blurb: "M5Stack StickS3 on a keychain or desk dock: press, talk, read Muse's answer on the screen.",

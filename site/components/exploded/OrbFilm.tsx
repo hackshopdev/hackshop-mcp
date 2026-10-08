@@ -14,7 +14,7 @@ import type { BoardModel } from "@/lib/models/types";
 import styles from "./orb-film.module.css";
 
 const DURATION_SECONDS = 12.4;
-const FLOOR_Y = -62;
+export type BuildFilmVariant = "orb" | "voice-node";
 
 declare global {
   interface Window {
@@ -75,7 +75,7 @@ function studioBackground(): THREE.CanvasTexture {
   return texture;
 }
 
-function tuneMaterials(board: ReturnType<typeof buildBoard>) {
+function tuneMaterials(board: ReturnType<typeof buildBoard>, variant: BuildFilmVariant) {
   const tune = (id: string, fn: (material: THREE.MeshStandardMaterial) => void) => {
     const part = board.parts.get(id);
     if (!part) return;
@@ -128,9 +128,54 @@ function tuneMaterials(board: ReturnType<typeof buildBoard>) {
       material.roughness = 0.68;
     });
   }
+  if (variant === "voice-node") {
+    tune("respeaker-cad", (material) => {
+      material.color.set("#1c2525");
+      material.metalness = 0.14;
+      material.roughness = 0.34;
+      material.envMapIntensity = 0.78;
+    });
+    tune("speaker", (material) => {
+      material.color.set("#12171d");
+      material.metalness = 0.03;
+      material.roughness = 0.42;
+    });
+    tune("speaker-cone", (material) => {
+      material.color.set("#050709");
+      material.metalness = 0.08;
+      material.roughness = 0.3;
+    });
+    for (const id of ["acrylic-top", "acrylic-base"]) {
+      tune(id, (material) => {
+        material.color.set("#222c34");
+        material.metalness = 0.08;
+        material.roughness = 0.25;
+        if (material instanceof THREE.MeshPhysicalMaterial) {
+          material.clearcoat = 0.74;
+          material.clearcoatRoughness = 0.18;
+        }
+      });
+    }
+    tune("xiao-antenna", (material) => {
+      material.color.set("#183a33");
+      material.roughness = 0.48;
+    });
+    for (const id of ["xiao-usb-plug", "usb-data-cable"]) {
+      tune(id, (material) => {
+        material.color.set("#141a22");
+        material.roughness = 0.62;
+      });
+    }
+  }
 }
 
-export function OrbFilm({ model }: { model: BoardModel }) {
+export function OrbFilm({
+  model,
+  variant = "orb",
+}: {
+  model: BoardModel;
+  variant?: BuildFilmVariant;
+}) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const filmRef = useRef<HTMLElement | null>(null);
   const timelineStart = useRef(0);
@@ -180,7 +225,8 @@ export function OrbFilm({ model }: { model: BoardModel }) {
         return textureCanvas;
       },
     });
-    tuneMaterials(board);
+    tuneMaterials(board, variant);
+    const floorY = variant === "voice-node" ? -29 : -62;
 
     const rig = new THREE.Group();
     rig.add(board.group);
@@ -213,12 +259,14 @@ export function OrbFilm({ model }: { model: BoardModel }) {
       new THREE.MeshStandardMaterial({ color: "#11161e", roughness: 0.34, metalness: 0.42 }),
     );
     floor.rotation.x = -Math.PI / 2;
-    floor.position.set(0, FLOOR_Y, 8);
+    floor.position.set(0, floorY, 8);
     floor.receiveShadow = true;
     scene.add(floor);
 
     const plinth = new THREE.Mesh(
-      new THREE.CylinderGeometry(68, 73, 3.4, 128),
+      variant === "voice-node"
+        ? new THREE.BoxGeometry(148, 3.4, 94, 8, 1, 8)
+        : new THREE.CylinderGeometry(68, 73, 3.4, 128),
       new THREE.MeshPhysicalMaterial({
         color: "#171d27",
         roughness: 0.22,
@@ -227,16 +275,18 @@ export function OrbFilm({ model }: { model: BoardModel }) {
         clearcoatRoughness: 0.2,
       }),
     );
-    plinth.position.y = FLOOR_Y + 1.7;
+    plinth.position.y = floorY + 1.7;
     plinth.receiveShadow = true;
     scene.add(plinth);
 
     const lightRing = new THREE.Mesh(
-      new THREE.TorusGeometry(68.4, 0.28, 10, 160),
+      variant === "voice-node"
+        ? new THREE.BoxGeometry(146, 0.32, 92)
+        : new THREE.TorusGeometry(68.4, 0.28, 10, 160),
       new THREE.MeshBasicMaterial({ color: "#7567e8", transparent: true, opacity: 0.6 }),
     );
-    lightRing.rotation.x = Math.PI / 2;
-    lightRing.position.y = FLOOR_Y + 3.43;
+    if (variant === "orb") lightRing.rotation.x = Math.PI / 2;
+    lightRing.position.y = floorY + 3.43;
     scene.add(lightRing);
 
     const camera = new THREE.PerspectiveCamera(31, 16 / 9, 0.5, 3000);
@@ -253,41 +303,41 @@ export function OrbFilm({ model }: { model: BoardModel }) {
       const seconds = ((inputSeconds % DURATION_SECONDS) + DURATION_SECONDS) % DURATION_SECONDS;
 
       let amount = 0;
-      let yaw = 0.34;
-      let distance = 158;
-      let targetY = -12;
-      let subjectX = 34;
+      let yaw = variant === "voice-node" ? 0.62 : 0.34;
+      let distance = variant === "voice-node" ? 225 : 158;
+      let targetY = variant === "voice-node" ? 1 : -12;
+      let subjectX = variant === "voice-node" ? 28 : 34;
 
       if (seconds < 3.15) {
         const t = ease(seconds / 3.15);
-        yaw = THREE.MathUtils.lerp(0.42, 0.06, t);
-        distance = THREE.MathUtils.lerp(215, 190, t);
-        targetY = THREE.MathUtils.lerp(-15, -9, t);
-        subjectX = THREE.MathUtils.lerp(-38, -46, t);
+        yaw = THREE.MathUtils.lerp(variant === "voice-node" ? 0.7 : 0.42, 0.06, t);
+        distance = THREE.MathUtils.lerp(variant === "voice-node" ? 270 : 215, variant === "voice-node" ? 228 : 190, t);
+        targetY = THREE.MathUtils.lerp(variant === "voice-node" ? 5 : -15, variant === "voice-node" ? 1 : -9, t);
+        subjectX = THREE.MathUtils.lerp(variant === "voice-node" ? -20 : -38, variant === "voice-node" ? -34 : -46, t);
       } else if (seconds < 4.45) {
         const t = ease((seconds - 3.15) / 1.3);
         amount = 0.86 * t;
         yaw = THREE.MathUtils.lerp(0.06, -0.28, t);
-        distance = THREE.MathUtils.lerp(190, 254, t);
-        targetY = THREE.MathUtils.lerp(-9, -5, t);
-        subjectX = THREE.MathUtils.lerp(-46, 34, t);
+        distance = THREE.MathUtils.lerp(variant === "voice-node" ? 228 : 190, variant === "voice-node" ? 292 : 254, t);
+        targetY = THREE.MathUtils.lerp(variant === "voice-node" ? 1 : -9, variant === "voice-node" ? 3 : -5, t);
+        subjectX = THREE.MathUtils.lerp(variant === "voice-node" ? -34 : -46, variant === "voice-node" ? 28 : 34, t);
       } else if (seconds < 8.85) {
         const t = ease((seconds - 4.45) / 4.4);
         amount = 0.86;
         yaw = THREE.MathUtils.lerp(-0.28, -0.76, t);
-        distance = THREE.MathUtils.lerp(254, 266, t);
-        targetY = -5;
+        distance = THREE.MathUtils.lerp(variant === "voice-node" ? 292 : 254, variant === "voice-node" ? 302 : 266, t);
+        targetY = variant === "voice-node" ? 3 : -5;
       } else if (seconds < 10.15) {
         const t = ease((seconds - 8.85) / 1.3);
         amount = 0.86 * (1 - t);
         yaw = THREE.MathUtils.lerp(-0.76, 0.22, t);
-        distance = THREE.MathUtils.lerp(266, 190, t);
-        targetY = THREE.MathUtils.lerp(-5, -8, t);
+        distance = THREE.MathUtils.lerp(variant === "voice-node" ? 302 : 266, variant === "voice-node" ? 232 : 190, t);
+        targetY = THREE.MathUtils.lerp(variant === "voice-node" ? 3 : -5, variant === "voice-node" ? 1 : -8, t);
       } else {
         const t = ease((seconds - 10.15) / 2.25);
         yaw = THREE.MathUtils.lerp(0.22, 0.08, t);
-        distance = THREE.MathUtils.lerp(190, 178, t);
-        targetY = THREE.MathUtils.lerp(-8, -5, t);
+        distance = THREE.MathUtils.lerp(variant === "voice-node" ? 232 : 190, variant === "voice-node" ? 218 : 178, t);
+        targetY = THREE.MathUtils.lerp(variant === "voice-node" ? 1 : -8, variant === "voice-node" ? 3 : -5, t);
       }
 
       applyExplode(board, amount);
@@ -296,7 +346,13 @@ export function OrbFilm({ model }: { model: BoardModel }) {
       lightRing.position.x = subjectX;
       rig.rotation.y = Math.sin(seconds * 0.34) * 0.025;
       target.set(0, targetY, 0);
-      direction.set(Math.sin(yaw) * 0.95, 0.17, Math.cos(yaw) * 1.42).normalize();
+      direction
+        .set(
+          Math.sin(yaw) * 0.95,
+          variant === "voice-node" ? 0.62 : 0.17,
+          Math.cos(yaw) * 1.42,
+        )
+        .normalize();
       camera.position.copy(target).addScaledVector(direction, distance);
       camera.lookAt(target);
 
@@ -334,17 +390,22 @@ export function OrbFilm({ model }: { model: BoardModel }) {
     renderAt(initialSeconds);
     if (!fixedTimeline) frame = requestAnimationFrame(animate);
 
-    const stand = model.parts.find((part) => part.stl && part.stlMatrix);
-    const standReady = stand?.stl
-      ? new STLLoader().loadAsync(stand.stl).then((geometry) => {
-          if (disposed) return geometry.dispose();
-          attachStlGeometry(board, stand.id, geometry);
-          geometry.dispose();
-          tuneMaterials(board);
-          renderAt(initialSeconds);
-        }).catch(() => undefined)
-      : Promise.resolve();
-    standReady.finally(() => {
+    const stlParts = model.parts.filter((part) => part.stl && part.stlMatrix);
+    const stlReady = Promise.all(
+      stlParts.map((part) =>
+        new STLLoader()
+          .loadAsync(part.stl!)
+          .then((geometry) => {
+            if (disposed) return geometry.dispose();
+            attachStlGeometry(board, part.id, geometry);
+            geometry.dispose();
+            tuneMaterials(board, variant);
+            renderAt(initialSeconds);
+          })
+          .catch(() => undefined),
+      ),
+    );
+    stlReady.finally(() => {
       if (!disposed) window.__hackshopFilmReady = true;
     });
 
@@ -359,37 +420,57 @@ export function OrbFilm({ model }: { model: BoardModel }) {
       pmrem.dispose();
       renderer.dispose();
     };
-  }, [model]);
+  }, [model, variant]);
 
   return (
     <main ref={filmRef} className={styles.film}>
-      <canvas ref={canvasRef} className={styles.canvas} aria-label="Cinematic 3D teardown of the Muse Desk Orb" />
+      <canvas
+        ref={canvasRef}
+        className={styles.canvas}
+        aria-label={
+          variant === "voice-node"
+            ? "Cinematic 3D assembly of the Muse reSpeaker Voice Node"
+            : "Cinematic 3D teardown of the Muse Desk Orb"
+        }
+      />
 
       <div className={styles.identity}>
-        <span className={styles.buildNumber}>001</span>
+        <span className={styles.buildNumber}>{variant === "voice-node" ? "002" : "001"}</span>
         <span>hackshop / Muse body</span>
       </div>
 
       <section className={`${styles.sceneCopy} ${styles.heroCopy}`}>
-        <p>Give Muse a place on your desk.</p>
-        <h1>Muse Desk Orb</h1>
-        <span>Hear · touch · show</span>
+        <p>{variant === "voice-node" ? "Build Muse a voice of its own." : "Give Muse a place on your desk."}</p>
+        <h1>{variant === "voice-node" ? "Muse Voice Node" : "Muse Desk Orb"}</h1>
+        <span>{variant === "voice-node" ? "Hear · press · connect" : "Hear · touch · show"}</span>
       </section>
 
       <section className={`${styles.sceneCopy} ${styles.anatomyCopy}`}>
-        <p>Three physical assemblies.</p>
-        <h2>Built to fit, not to pretend.</h2>
+        <p>{variant === "voice-node" ? "Five physical assemblies." : "Three physical assemblies."}</p>
+        <h2>{variant === "voice-node" ? "Real CAD where it matters." : "Built to fit, not to pretend."}</h2>
         <div className={styles.partRail}>
-          <span>Purchased 55 mm Orb</span>
-          <span>Generated stand CAD</span>
-          <span>USB-C data path</span>
-          <span>Buttons stay clear</span>
+          {variant === "voice-node" ? (
+            <>
+              <span>Official board CAD</span>
+              <span>Pre-soldered XIAO</span>
+              <span>5 W speaker path</span>
+              <span>Self-assembled acrylic</span>
+              <span>XIAO USB data path</span>
+            </>
+          ) : (
+            <>
+              <span>Purchased 55 mm Orb</span>
+              <span>Generated stand CAD</span>
+              <span>USB-C data path</span>
+              <span>Buttons stay clear</span>
+            </>
+          )}
         </div>
       </section>
 
       <section className={`${styles.sceneCopy} ${styles.successCopy}`}>
         <p>The first proof</p>
-        <h2>Hold. Ask. See the answer.</h2>
+        <h2>{variant === "voice-node" ? "Hold. Ask. Read the reply." : "Hold. Ask. See the answer."}</h2>
         <span>One working loop before any extras.</span>
       </section>
 
