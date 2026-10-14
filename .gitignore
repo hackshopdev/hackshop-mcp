@@ -1,4 +1,4 @@
-node_modules/
+node_modules
 dist/
 *.log
 .env
@@ -9,3 +9,6 @@ coverage/
 .claude/
 .vercel
 .gstack/
+__pycache__/
+*.pyc
+supabase/.temp/

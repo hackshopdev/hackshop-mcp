@@ -1,0 +1,36 @@
+name: Promote reviewed hardware discoveries
+
+on:
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: hardware-discovery-publisher
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    if: github.repository == 'hackshopdev/hackshop-mcp' && github.ref == 'refs/heads/main' && vars.DISCOVERY_PIPELINE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Prepare manual-merge data PRs and verify merged publications
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCOVERY_WORKER_TOKEN: ${{ secrets.DISCOVERY_WORKER_TOKEN }}
+          DISCOVERY_PIPELINE_ENABLED: ${{ vars.DISCOVERY_PIPELINE_ENABLED }}
+        run: npx tsx scripts/discoveries/promote.ts --live

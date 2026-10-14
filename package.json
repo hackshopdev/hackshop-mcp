@@ -29,6 +29,8 @@
     "regress": "tsx scripts/regress.ts",
     "validate": "tsx scripts/validate-catalog.ts",
     "smoke": "tsx scripts/smoke.ts",
+    "discovery:run": "tsx scripts/discoveries/run.ts",
+    "discovery:promote": "tsx scripts/discoveries/promote.ts",
     "prepublishOnly": "npm run build && npm test && npm run validate"
   },
   "keywords": [

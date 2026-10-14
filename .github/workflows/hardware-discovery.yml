@@ -1,0 +1,44 @@
+name: Daily hardware discovery
+
+on:
+  schedule:
+    - cron: "17 7 * * *"
+      timezone: "America/Chicago"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hardware-discovery
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    if: github.repository == 'hackshopdev/hackshop-mcp' && github.ref == 'refs/heads/main' && vars.DISCOVERY_PIPELINE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Discover and research public hardware hacks
+        run: npm run discovery:run -- --live
+        env:
+          DISCOVERY_WORKER_TOKEN: ${{ secrets.DISCOVERY_WORKER_TOKEN }}
+          DISCOVERY_PIPELINE_ENABLED: ${{ vars.DISCOVERY_PIPELINE_ENABLED }}
+          SCRAPECREATORS_API_KEY: ${{ secrets.SCRAPECREATORS_API_KEY }}
+          GROKBOT_WEBHOOK_URL: ${{ secrets.GROKBOT_WEBHOOK_URL }}
+          GROKBOT_WEBHOOK_SECRET: ${{ secrets.GROKBOT_WEBHOOK_SECRET }}
+          GROKBOT_RELAY_URL: ${{ secrets.GROKBOT_RELAY_URL }}
+          GROKBOT_RELAY_READ_SECRET: ${{ secrets.GROKBOT_RELAY_READ_SECRET }}
+          GROKBOT_CALLBACK_SECRET: ${{ secrets.GROKBOT_CALLBACK_SECRET }}
+          GROKBOT_WEBHOOK_STATE_DIR: ${{ runner.temp }}/grokbot-webhook

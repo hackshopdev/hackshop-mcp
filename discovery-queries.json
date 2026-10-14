@@ -1,0 +1,8 @@
+[
+  { "id": "reverse-engineered-hardware", "query": "(\"reverse engineered\" OR \"reverse-engineered\") (hardware OR device OR bluetooth OR firmware)" },
+  { "id": "cheap-dashboard-screens", "query": "(\"photo frame\" OR \"cheap display\" OR \"e-ink\") (hack OR root OR calendar OR dashboard)" },
+  { "id": "smart-speaker-repurpose", "query": "(\"Echo Show\" OR \"Echo Dot\" OR \"smart clock\") (Linux OR Muse OR jailbreak OR rooted)" },
+  { "id": "local-smart-lighting", "query": "(Hue OR bulb OR Zigbee) (\"local control\" OR \"reverse engineered\" OR BLE OR open-source)" },
+  { "id": "appliance-protocols", "query": "(\"air conditioner\" OR \"water heater\" OR vacuum OR appliance) (\"reverse engineered\" OR MQTT OR ESPHome OR MCP)" },
+  { "id": "wearable-input-repurpose", "query": "(\"Apple Watch\" OR wearable OR keyboard OR printer) (\"reverse engineering\" OR firmware OR \"local control\" OR Android)" }
+]
