@@ -1,12 +1,10 @@
 {
   "name": "hackshop",
-  "description": "Hosted MCP for planning Muse gadget bodies: intake questions, board picks with difficulty, build plans with flash warnings, shopping lists and machine-readable assembly steps.",
+  "description": "Hosted MCP for planning Muse gadget bodies, finding source-linked hardware reverse-engineering examples, and inspecting exact-model firmware playbooks with explicit evidence and safety boundaries.",
   "url": "https://www.hackshop.dev/mcp",
   "transport": "streamable-http",
   "stateless": true,
-  "methods": [
-    "POST"
-  ],
+  "methods": ["POST"],
   "transport_notes": "Stateless, POST only. No mcp-session-id is issued; GET and DELETE return 405. CORS allows any origin.",
   "tools": [
     {
@@ -24,23 +22,46 @@
     {
       "name": "assess_hackability",
       "description": "Look up catalog hackability, brick risk, firmware links and build support."
+    },
+    {
+      "name": "find_reverse_engineering_examples",
+      "description": "Search source-linked hardware projects and analysis methods with exact models, evidence, repeatability, risk and checked sources."
+    },
+    {
+      "name": "find_firmware_playbooks",
+      "description": "Find curated firmware, local-protocol and cloud-replacement paths, preferring the least invasive option."
+    },
+    {
+      "name": "check_firmware_compatibility",
+      "description": "Fail-closed exact target matching; missing identifiers return unknown and mismatches return unsupported."
+    },
+    {
+      "name": "get_firmware_playbook",
+      "description": "Return prerequisites, backup, recovery, risks, sources, steps and validation for one playbook."
+    },
+    {
+      "name": "verify_firmware_artifact",
+      "description": "Compare supplied filename, source and SHA-256 metadata without fetching or uploading a binary."
+    },
+    {
+      "name": "prepare_firmware_job",
+      "description": "Prepare a non-executing manifest and stop points after owner authorization and a confirmed exact match."
     }
   ],
-  "npm_only_tools": [
-    "propose_hardware",
-    "simulate_assembly"
-  ],
+  "npm_only_tools": ["propose_hardware", "simulate_assembly"],
   "resources": [
     "hackshop://muse/boards",
     "hackshop://muse/sdk-terms",
-    "hackshop://catalog/tags"
+    "hackshop://catalog/tags",
+    "hackshop://firmware/playbooks",
+    "hackshop://reverse-engineering/examples"
   ],
   "resource_templates": [
-    "hackshop://build/{device_id}"
+    "hackshop://build/{device_id}",
+    "hackshop://firmware/{playbook_id}",
+    "hackshop://reverse-engineering/{example_id}"
   ],
-  "prompts": [
-    "plan-muse-gadget"
-  ],
+  "prompts": ["plan-muse-gadget"],
   "openapi": "https://www.hackshop.dev/openapi.json",
   "npm": "hackshop-mcp",
   "docs": "https://github.com/hackshopdev/hackshop-mcp"

@@ -3,6 +3,8 @@ import { difficultySummary } from "./difficulty.js";
 import { getBuildPlan } from "./tools.js";
 import type { CoreContext, DeviceEntry, Platform, PlatformBoard } from "./types.js";
 import { getFirmwarePlaybook } from "./firmware-tools.js";
+import { REVERSE_ENGINEERING_EVIDENCE_NOTE } from "./reverse-engineering.js";
+import { reverseEngineeringExampleSummary } from "./reverse-engineering-tools.js";
 
 export interface CoreResource {
   uri: string;
@@ -60,6 +62,13 @@ export const CORE_RESOURCES: CoreResource[] = [
     description: "Curated firmware, local-protocol and cloud-replacement playbook index. Destructive actions are human-run only.",
     mimeType: "application/json",
   },
+  {
+    uri: "hackshop://reverse-engineering/examples",
+    name: "reverse-engineering-examples",
+    title: "Reverse-engineering examples",
+    description: "Curated hardware reverse-engineering examples, repurposing projects, author demos and analysis methods with explicit evidence and reproducibility labels.",
+    mimeType: "application/json",
+  },
 ];
 
 export const CORE_RESOURCE_TEMPLATES: CoreResourceTemplate[] = [
@@ -75,6 +84,13 @@ export const CORE_RESOURCE_TEMPLATES: CoreResourceTemplate[] = [
     name: "firmware-playbook",
     title: "Firmware playbook",
     description: "One curated firmware playbook with compatibility targets, backup, recovery, risks, evidence and validation.",
+    mimeType: "application/json",
+  },
+  {
+    uriTemplate: "hackshop://reverse-engineering/{example_id}",
+    name: "reverse-engineering-example",
+    title: "Reverse-engineering example",
+    description: "One complete curated reverse-engineering record with exact models, outcome, evidence level, warnings and checked sources.",
     mimeType: "application/json",
   },
 ];
@@ -112,6 +128,36 @@ export function readCoreResource(
   uri: string,
   ctx: CoreContext,
 ): { uri: string; mimeType: string; text: string } | null {
+  if (uri === "hackshop://reverse-engineering/examples") {
+    return {
+      uri,
+      mimeType: "application/json",
+      text: JSON.stringify({
+        total: (ctx.reverseEngineeringExamples ?? []).length,
+        examples: (ctx.reverseEngineeringExamples ?? [])
+          .slice()
+          .sort((a, b) => {
+            if (a.published_at && b.published_at) {
+              return b.published_at.localeCompare(a.published_at) || a.id.localeCompare(b.id);
+            }
+            if (a.published_at) return -1;
+            if (b.published_at) return 1;
+            return a.id.localeCompare(b.id);
+          })
+          .map(reverseEngineeringExampleSummary),
+        evidence_note: REVERSE_ENGINEERING_EVIDENCE_NOTE,
+      }, null, 2),
+    };
+  }
+
+  const reverseEngineeringMatch = uri.match(/^hackshop:\/\/reverse-engineering\/([^/]+)$/);
+  if (reverseEngineeringMatch?.[1]) {
+    const id = decodeURIComponent(reverseEngineeringMatch[1]);
+    const example = (ctx.reverseEngineeringExamples ?? []).find((candidate) => candidate.id === id);
+    if (!example) return null;
+    return { uri, mimeType: "application/json", text: JSON.stringify(example, null, 2) };
+  }
+
   if (uri === "hackshop://firmware/playbooks") {
     return {
       uri,
@@ -181,6 +227,12 @@ export const EXAMPLE_BUILD_URI = "hackshop://build/seeed-sensecap-watcher";
 /** A helpful message for a resources/read that can't be resolved. */
 export function resourceNotFoundMessage(uri: string, ctx: CoreContext): string {
   if (uri.includes("{") || uri.includes("}")) {
+    if (uri.startsWith("hackshop://reverse-engineering/")) {
+      return `${uri} is a URI template, not a resource. Replace {example_id} with a curated id from hackshop://reverse-engineering/examples.`;
+    }
+    if (uri.startsWith("hackshop://firmware/")) {
+      return `${uri} is a URI template, not a resource. Replace {playbook_id} with a curated id from hackshop://firmware/playbooks.`;
+    }
     return `${uri} is a URI template, not a resource. Replace {device_id} with a catalog device id, for example ${EXAMPLE_BUILD_URI}. resources/templates/list lists the template; hackshop://muse/boards lists the board ids.`;
   }
   const buildMatch = uri.match(/^hackshop:\/\/build\/([^/]*)$/);
@@ -193,7 +245,11 @@ export function resourceNotFoundMessage(uri: string, ctx: CoreContext): string {
   if (firmwareMatch) {
     return `Unknown firmware playbook "${decodeURIComponent(firmwareMatch[1] ?? "")}". Read hackshop://firmware/playbooks for curated ids.`;
   }
-  return `Unknown resource: ${uri}. Available: ${CORE_RESOURCES.map((resource) => resource.uri).join(", ")}, plus hackshop://build/{device_id} and hackshop://firmware/{playbook_id}.`;
+  const reverseEngineeringMatch = uri.match(/^hackshop:\/\/reverse-engineering\/([^/]*)$/);
+  if (reverseEngineeringMatch) {
+    return `Unknown reverse-engineering example "${decodeURIComponent(reverseEngineeringMatch[1] ?? "")}". Read hackshop://reverse-engineering/examples for curated ids.`;
+  }
+  return `Unknown resource: ${uri}. Available: ${CORE_RESOURCES.map((resource) => resource.uri).join(", ")}, plus hackshop://build/{device_id}, hackshop://firmware/{playbook_id} and hackshop://reverse-engineering/{example_id}.`;
 }
 
 /** JSON-RPC code MCP uses for "resource not found". */

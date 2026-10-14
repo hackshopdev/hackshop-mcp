@@ -22,6 +22,8 @@ export function SiteFooter() {
             <Link href="/muse">Muse gadgets</Link>
             <Link href="/store">Store</Link>
             <Link href="/templates">Templates</Link>
+            <Link href="/reverse-engineering">Reverse engineering library</Link>
+            <Link href="/displays">Cheap display designs</Link>
             <Link href="/projects">My builds</Link>
           </div>
           <div>
@@ -34,6 +36,7 @@ export function SiteFooter() {
           <div>
             <h2>About</h2>
             <a href="https://github.com/hackshopdev/hackshop-mcp">GitHub</a>
+            <Link href="/reverse-engineering">Hardware research</Link>
             <Link href="/resources">Field guides</Link>
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>

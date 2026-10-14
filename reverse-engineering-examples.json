@@ -1,0 +1,1212 @@
+[
+  {
+    "id": "biuframe-synergy-10x1-dashboard",
+    "title": "Root a $50 BIUFRAME into a home dashboard",
+    "device_name": "BIUFRAME 10.1-inch smart photo frame",
+    "exact_models": ["Synergy 10X1", "Rockchip RK3126", "Android 6.0.1"],
+    "category": "display",
+    "summary": "Wes Bos documented a guarded ADB-and-SuperSU workflow that identifies the board, verifies a full backup, removes vendor/FOTA apps, updates the browser stack and turns the frame into a USB-powered kiosk.",
+    "outcome": "A rooted touch display running a modern web dashboard. Independent photos and videos from Philip Ideson and Deepak show the broader frame-dashboard idea reproduced, although their exact boards are undisclosed.",
+    "method": "root",
+    "evidence": "reproduced",
+    "reproducibility": "repeatable",
+    "published_at": "2026-10-09",
+    "catalog_device_ids": [],
+    "tags": ["photo-frame", "dashboard", "android", "adb", "kiosk", "no-declared-license"],
+    "design_ideas": [
+      { "title": "Family calendar and chores hub", "description": "Run a responsive browser dashboard with the next appointments, weather and chores. A computer or server supplies authenticated data; a matching rooted frame displays it.", "use_case": "calendar" },
+      { "title": "AI briefing panel", "description": "Render a short daily briefing as a web page. Keep AI generation and account credentials on a trusted backend; expose only the finished display content to the frame.", "use_case": "ai_interface" }
+    ],
+    "risk_level": "medium",
+    "warnings": [
+      "The same Amazon listing now ships materially different boards; confirm the Rockchip RK3126 fingerprint and partition layout before using this guide.",
+      "The Android 6 security base is obsolete. Keep the frame on an isolated network and do not use primary accounts.",
+      "The community replications do not disclose their board identity, so they do not establish compatibility for every frame sold under the listing."
+    ],
+    "sources": [
+      { "label": "Wes Bos article", "url": "https://wesbos.com/hacking-smart-photo-frames", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "Photo Frame Dashboard repository", "url": "https://github.com/wesbos/photo-frame-dashboard", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "BIUFRAME setup guide", "url": "https://github.com/wesbos/photo-frame-dashboard/blob/main/docs/biuframe-setup-guide.md", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "Original Wes Bos post", "url": "https://x.com/wesbos/status/2108550413599265045", "kind": "social_post", "checked_at": "2026-10-14" },
+      { "label": "Philip Ideson family-hub replication", "url": "https://x.com/pideson/status/2110211959752683597", "kind": "social_post", "checked_at": "2026-10-14" },
+      { "label": "Deepak build video", "url": "https://x.com/software_chef/status/2110118983001428202", "kind": "social_post", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "aimor-pf1007l-photo-frame",
+    "title": "Reclaim the Allwinner photo frame hiding under the same listing",
+    "device_name": "AiMOR / BIUFRAME Allwinner photo frame",
+    "exact_models": ["PF1007L", "Allwinner A33", "Android 6.0.1"],
+    "category": "display",
+    "summary": "A separate guide covers the Allwinner A33 PF1007L now commonly shipped under the BIUFRAME listing, with identity-dependent paths through stock ADB, an AiMOR-mediated temporary root, FEL or a guarded boot patch.",
+    "outcome": "A local kiosk or dashboard on the Allwinner frame without applying the incompatible Rockchip instructions.",
+    "method": "root",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-08",
+    "catalog_device_ids": [],
+    "tags": ["photo-frame", "allwinner", "android", "kiosk", "variant-sensitive", "no-declared-license"],
+    "design_ideas": [
+      { "title": "Room information display", "description": "Use the board-specific kiosk path to show an HTML calendar, weather or household page. Confirm the firmware and browser capability first; this is separate from the Rockchip frame design.", "use_case": "info_panel" }
+    ],
+    "risk_level": "high",
+    "warnings": [
+      "Do not use the Synergy 10X1/Rockchip guide on this board. Confirm model string, SoC, USB IDs, fingerprint and partitions first.",
+      "Require a byte-verified backup before any write and stop on every identity or hash mismatch.",
+      "Some units expose unauthenticated root ADB or a vendor remote-root path; isolate them from untrusted networks."
+    ],
+    "sources": [
+      { "label": "PF1007L start page", "url": "https://github.com/wesbos/photo-frame-dashboard/blob/main/docs/pf1007l-start-here.md", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "Photo-frame device index", "url": "https://github.com/wesbos/photo-frame-dashboard/blob/main/docs/devices.md", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "Photo Frame Dashboard repository", "url": "https://github.com/wesbos/photo-frame-dashboard", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "echo-show-5-2nd-gen-hey-muse",
+    "title": "Replace Alexa with Muse on an Echo Show 5",
+    "device_name": "Amazon Echo Show 5 (2nd generation)",
+    "exact_models": ["C76N82", "cronos", "Echo Show 5 2nd gen"],
+    "category": "display",
+    "summary": "Hey Muse builds on TECHO5 to pair an unlocked Echo Show with Meta's Muse app, run a local Hey Muse wake word and speak answers through a built-in or cloud voice.",
+    "outcome": "A repurposed smart display that boots a small Linux image and acts as a Muse voice-and-screen body without Alexa or Amazon cloud services.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-14",
+    "catalog_device_ids": ["amazon-echo-show-5-2nd-gen-techo5"],
+    "tags": ["echo", "muse", "voice", "display", "linux", "mit"],
+    "risk_level": "high",
+    "warnings": [
+      "The public release image and physical test cover one Echo Show 5 2nd gen only. The Dot shown in the social clip is explicitly untested by this repository.",
+      "Unlocking and flashing can brick the device; preserve TECHO5 backups, TWRP and restore material.",
+      "Wake-word detection is local, but up to 60 seconds of post-wake audio is uploaded to and retained by Muse; cloud TTS also receives answer text."
+    ],
+    "sources": [
+      { "label": "Hey Muse repository", "url": "https://github.com/wobsoriano/hey-muse", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Hey Muse setup guide", "url": "https://github.com/wobsoriano/hey-muse/blob/muse/docs/muse.md", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "Author demonstration", "url": "https://x.com/wobsoriano/status/2110259185799864695", "kind": "social_post", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "echo-dot-and-echo-2-local-assist",
+    "title": "Turn three Amazon speakers into local Assist satellites",
+    "device_name": "Amazon Echo Dot / Echo 2",
+    "exact_models": ["Echo Dot 3 D9N29T / donut / Fire OS 6574.1", "Echo Dot 2 RS03QR / biscuit / Fire OS 6574.1", "Echo 2 XC56PY / radar / Fire OS 6572"],
+    "category": "speaker",
+    "summary": "Echo Dot Assist preserves Amazon's microphone and wake-word stack while replacing Alexa with a local Home Assistant ESPHome/Wyoming daemon on three tightly pinned hardware and firmware combinations.",
+    "outcome": "Local wake-word, voice capture and Home Assistant Assist on otherwise cloud-bound Echo speakers.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-09-21",
+    "catalog_device_ids": ["amazon-echo-dot-2nd-gen-echocli"],
+    "tags": ["echo", "home-assistant", "voice", "wyoming", "esphome", "mit"],
+    "risk_level": "high",
+    "warnings": [
+      "The author labels the project vibecoded and unaudited. Bootloader and system writes can brick the speaker.",
+      "Support is exact-model and exact-firmware only; Dot 3 refresh C78MP8 and Dot-with-clock 36EBT3 are excluded.",
+      "Download stock images and rehearse the documented TWRP/fallback restore path before writing."
+    ],
+    "sources": [
+      { "label": "Echo Dot Assist repository", "url": "https://github.com/Gamer92000/echo-dot-assist", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "lenovo-smart-clock-2-helios",
+    "title": "Reclaim a Lenovo Smart Clock 2 without permanent flashing",
+    "device_name": "Lenovo Smart Clock 2",
+    "exact_models": ["MT8167", "Android 10", "LenovoCD-24502F_ROW_1.2.2.627_220105"],
+    "category": "display",
+    "summary": "smartclock2tool uses a runtime-only kernel exploit for temporary root, SSH and Wi-Fi ADB; Helios adds a local Home Assistant dashboard, wake word and Music Assistant interface.",
+    "outcome": "A local smart display that returns to stock after a power cycle and avoids bootloader or partition writes.",
+    "method": "root",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-05",
+    "catalog_device_ids": [],
+    "tags": ["lenovo", "home-assistant", "display", "voice", "runtime-root", "apache-2.0"],
+    "risk_level": "medium",
+    "warnings": [
+      "Validated on one exact build; the exploit can kernel-panic and is not evidence for other Smart Clock firmware.",
+      "While active, SELinux is permissive and ADB authentication is disabled. Isolate the clock and disable ADB outside setup.",
+      "Power cycling removes root and ADB, which is recovery—not proof that every failure mode is harmless."
+    ],
+    "sources": [
+      { "label": "smartclock2tool", "url": "https://github.com/SychPL/smartclock2tool", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Helios dashboard", "url": "https://github.com/SychPL/helios", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "roborock-s8-local-server",
+    "title": "Replace Roborock cloud services with a local server",
+    "device_name": "Roborock S8",
+    "exact_models": ["a51", "firmware 02.17.42"],
+    "category": "other",
+    "summary": "local_roborock_server recreates the vacuum's HTTPS and MQTT cloud endpoints with DNS and certificate onboarding, without rooting or writing custom firmware.",
+    "outcome": "A Roborock S8 controlled through a fully local server, with an exact firmware/certificate combination recorded in the compatibility matrix.",
+    "method": "app_api",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-10-08",
+    "catalog_device_ids": [],
+    "tags": ["vacuum", "mqtt", "local-cloud", "dns", "mit"],
+    "risk_level": "medium",
+    "warnings": [
+      "Firmware and certificate combinations materially change compatibility; use the tested-vacuum matrix, not the brand name.",
+      "Several newer Q-series variants are explicitly unsupported.",
+      "DNS and certificate onboarding affect network trust; isolate and audit the local service."
+    ],
+    "sources": [
+      { "label": "Local Roborock Server", "url": "https://github.com/Python-roborock/local_roborock_server", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Tested vacuums matrix", "url": "https://github.com/Python-roborock/local_roborock_server/blob/main/docs/tested_vacuums.md", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "lg-thinq-rethink-local-cloud",
+    "title": "Run LG ThinQ appliances against a local cloud emulator",
+    "device_name": "LG ThinQ air conditioners",
+    "exact_models": ["LW1822HRSM / WIN_056905_WW", "LP1022FVSM / POT_056905_WW"],
+    "category": "other",
+    "summary": "rethink emulates LG ThinQ's cloud locally and translates appliance traffic to MQTT/Home Assistant, with optional bridge mode for retaining the official app.",
+    "outcome": "Local status and control for specific documented ThinQ models without modifying appliance firmware.",
+    "method": "app_api",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-12",
+    "catalog_device_ids": [],
+    "tags": ["lg-thinq", "air-conditioner", "mqtt", "home-assistant", "gpl-2.0"],
+    "risk_level": "medium",
+    "warnings": [
+      "Support levels differ by exact ThinQ model token; do not generalize across all LG appliances.",
+      "Provisioning and a local cloud emulator create a network-security surface that must be isolated and maintained.",
+      "Remote HVAC control should retain manufacturer limits and physical supervision."
+    ],
+    "sources": [
+      { "label": "rethink repository", "url": "https://github.com/anszom/rethink", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "haier-hs25vrb03-local-control",
+    "title": "Speak Haier's encrypted local AC protocol",
+    "device_name": "Haier split air conditioner",
+    "exact_models": ["HS-25VRB03", "AAD933E00", "MK-QTWiFi3.1S", "e.4.3.00 / R_6.0.01"],
+    "category": "other",
+    "summary": "haismart-local implements the encrypted TCP/56800 protocol and records a hardware-confirmed combination down to product code, Wi-Fi module and firmware.",
+    "outcome": "Local power, mode, setpoint, fan, vane, self-clean and energy readings after a one-time cloud login retrieves the device key.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-11",
+    "catalog_device_ids": [],
+    "tags": ["haier", "air-conditioner", "local-control", "energy", "mit"],
+    "risk_level": "medium",
+    "warnings": [
+      "The model sticker alone is insufficient; match product code, U+ ID, module and firmware.",
+      "The one-time cloud login obtains a local key but does not automatically disable vendor cloud access.",
+      "Keep HVAC protections authoritative and verify every write with device readback."
+    ],
+    "sources": [
+      { "label": "haismart-local repository", "url": "https://github.com/enapt/haismart-local", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "rainy75-pro-zmk",
+    "title": "Replace a Rainy 75 Pro keyboard's firmware with ZMK",
+    "device_name": "Wobkey Rainy 75 Pro",
+    "exact_models": ["Rainy 75 Pro ANSI", "Rainy 75 Pro ISO", "Telink TLSR9511 / B91"],
+    "category": "input",
+    "summary": "A hardware-verified ZMK port covers the keyboard's USB, BLE, 83-key matrix and RGB functions while documenting the stock image and hardware recovery route.",
+    "outcome": "An open keyboard firmware replacing the vendor image on verified ANSI and ISO boards.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-10-10",
+    "catalog_device_ids": [],
+    "tags": ["keyboard", "zmk", "telink", "bluetooth", "apache-2.0"],
+    "risk_level": "high",
+    "warnings": [
+      "The proprietary 2.4 GHz dongle mode is not ported; only USB and BLE are supported.",
+      "Keep a stock image. A failed OTA may require a Telink burning board on SWS pads.",
+      "Use releases from the repository; the maintainer warns that third-party firmware downloads may be malware."
+    ],
+    "sources": [
+      { "label": "Rainy75 ZMK repository", "url": "https://github.com/scholzri/rainy75-zmk", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "airpods-pro-2-librepods",
+    "title": "Use AirPods features without Apple's software stack",
+    "device_name": "Apple AirPods Pro 2 USB-C",
+    "exact_models": ["AirPods Pro 2 USB-C", "protocol evidence on firmware 7A305"],
+    "category": "wearable",
+    "summary": "LibrePods reverse-engineers the AirPods protocol to expose noise modes, battery and ear detection on Android and Linux without changing earbud firmware.",
+    "outcome": "A cross-platform protocol client for core AirPods controls and telemetry outside Apple's ecosystem.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-10",
+    "catalog_device_ids": [],
+    "tags": ["airpods", "bluetooth", "android", "linux", "gpl-3.0"],
+    "risk_level": "low",
+    "warnings": [
+      "Protocol behavior changes with earbud firmware; 7A305 evidence is not a promise for later releases.",
+      "Advanced Android integrations may require root, Xposed or specific OS builds.",
+      "Do not represent ear-detection or hearing-related telemetry as medical data."
+    ],
+    "sources": [
+      { "label": "LibrePods repository", "url": "https://github.com/librepods-org/librepods", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "sengled-z01-z02-hub-reclaim",
+    "title": "Reclaim an abandoned Sengled hub as a Zigbee coordinator",
+    "device_name": "Sengled Element Hub",
+    "exact_models": ["Z01-HUB", "Z02-HUB"],
+    "category": "router",
+    "summary": "sengled-hub-reclaim converts first- and second-generation hubs into local EZSP v7 Zigbee coordinators with a dry-run gate, complete backup and retained recovery bank.",
+    "outcome": "A cloud-independent Zigbee coordinator built from a discontinued hub.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-08-30",
+    "catalog_device_ids": [],
+    "tags": ["zigbee", "hub", "reclaim", "firmware", "mit"],
+    "risk_level": "high",
+    "warnings": [
+      "Third-generation Sengled hubs are explicitly incompatible.",
+      "The release is destructive and has a small test population; supervise flashing even though Bank1 is retained.",
+      "Run the compatibility dry-run and verify the full backup before any Bank2 write."
+    ],
+    "sources": [
+      { "label": "Sengled Hub Reclaim", "url": "https://github.com/djshadowxm82/sengled-hub-reclaim", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "geekmagic-open-firmware",
+    "title": "Install open firmware on a GeekMagic pixel display",
+    "device_name": "GeekMagic smart display",
+    "exact_models": ["HelloCubic Lite", "SmallTV-Ultra", "ESP8266", "ST7789 240x240"],
+    "category": "display",
+    "summary": "GeekMagic Open Firmware replaces the stock image over OTA or USB-TTL and includes a rescue access point after repeated boot failures.",
+    "outcome": "A fully open small pixel display with local customization and a documented recovery path.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-07-21",
+    "catalog_device_ids": [],
+    "tags": ["pixel-display", "esp8266", "ota", "creative-coding", "gpl-3.0"],
+    "risk_level": "medium",
+    "warnings": [
+      "The rescue access point is unauthenticated; do not leave it exposed.",
+      "EEPROM secret storage is obfuscation, not encryption.",
+      "Confirm the exact ESP8266/ST7789 board before using an image."
+    ],
+    "sources": [
+      { "label": "GeekMagic Open Firmware", "url": "https://github.com/Times-Z/GeekMagic-Open-Firmware", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "anycubic-kobra-3-rinkhals",
+    "title": "Add an open local stack to an Anycubic Kobra 3",
+    "device_name": "Anycubic Kobra 3 / Combo",
+    "exact_models": ["Kobra 3", "Kobra 3 Combo", "stock firmware 2.4.5 or 2.4.6.7"],
+    "category": "other",
+    "summary": "Rinkhals retains the stock printer UI and features while adding SSH, Mainsail, Fluidd, Moonraker and installable local apps.",
+    "outcome": "A locally extensible 3D printer that keeps the vendor interface while exposing the open Klipper ecosystem.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-10-09",
+    "catalog_device_ids": [],
+    "tags": ["3d-printer", "klipper", "moonraker", "ssh", "mit"],
+    "risk_level": "high",
+    "warnings": [
+      "Kobra X is explicitly unsupported; match the model and stock firmware table.",
+      "Change the documented default root password and isolate the printer before enabling network services.",
+      "Firmware changes affect heaters and motion. Re-test thermal cutoffs and supervise first prints."
+    ],
+    "sources": [
+      { "label": "Rinkhals repository", "url": "https://github.com/rinkhals-community/Rinkhals", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "xiaomi-xiaoai-lx06-patch",
+    "title": "Patch a Xiaomi smart speaker for local audio services",
+    "device_name": "Xiaomi XiaoAI Speaker Pro",
+    "exact_models": ["LX06 / firmware 1.74.10", "L06A", "LX01", "L09A"],
+    "category": "speaker",
+    "summary": "xiaoai-patch modifies the inactive root filesystem to add MPD, Snapcast, Shairport, Squeezelite, Whisper and Home Assistant integrations.",
+    "outcome": "A vendor smart speaker repurposed as a flexible local network audio endpoint.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-09-29",
+    "catalog_device_ids": [],
+    "tags": ["xiaomi", "speaker", "snapcast", "airplay", "home-assistant", "gpl-3.0"],
+    "risk_level": "high",
+    "warnings": [
+      "Have TTL/U-Boot recovery available before writing the inactive root filesystem.",
+      "Encrypted DER-rootfs models such as LX05 and L15A must not be flashed with this path.",
+      "The Linux build and model-specific firmware requirements make this an expert-level modification."
+    ],
+    "sources": [
+      { "label": "xiaoai-patch repository", "url": "https://github.com/duhow/xiaoai-patch", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "vestaboard-cm4-offline",
+    "title": "Take a CM4 Vestaboard fully offline",
+    "device_name": "Vestaboard split-flap display",
+    "exact_models": ["Raspberry Pi CM4 units", "vbctrl", "device-server", "A/B SquashFS layout"],
+    "category": "display",
+    "summary": "vestaboard-offline documents the board's Yocto/CM4 stack and RS485 flap protocol, then replaces its vendor-cloud dependency with a local controller.",
+    "outcome": "A physical split-flap display controlled locally after root/SSH access and vendor-cloud removal.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-09-10",
+    "catalog_device_ids": [],
+    "tags": ["split-flap", "cm4", "rs485", "offline", "mit"],
+    "risk_level": "high",
+    "warnings": [
+      "The local controller binds to 0.0.0.0:7000 without documented authentication; add authentication or isolate the LAN.",
+      "The workflow requires root/SSH and disables the vendor cloud.",
+      "Confirm the CM4/A-B image layout before modifying any Vestaboard revision."
+    ],
+    "sources": [
+      { "label": "Vestaboard Offline", "url": "https://github.com/luizpersechini/vestaboard-offline", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "ulanzi-tc002-custom-runtime",
+    "title": "Replace the runtime on an Ulanzi TC002 Pixbar",
+    "device_name": "Ulanzi Pixbar Smart Pixel Clock II",
+    "exact_models": ["TC002", "SigmaStar SSD21x", "52x16 RGB matrix"],
+    "category": "display",
+    "summary": "tc002-customisation documents stock root ADB and HTTP behavior, a reversible /tmp runtime and an optional replacement runtime written only after device fingerprinting and backup verification.",
+    "outcome": "A locally controlled 52x16 pixel display with an incremental path from reversible experiment to persistent replacement.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-10",
+    "catalog_device_ids": [],
+    "tags": ["pixel-display", "linux", "adb", "security", "no-declared-license"],
+    "risk_level": "high",
+    "warnings": [
+      "The stock device exposes unauthenticated control, root ADB and weak credential storage; use an isolated IoT network.",
+      "Run the reversible in-place mode first and preserve a verified res-partition backup before flashing.",
+      "Replacement runtime is beta-quality and the repository has no declared license."
+    ],
+    "sources": [
+      { "label": "TC002 customisation repository", "url": "https://github.com/atomicstack/tc002-customisation", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "TC002 install guide", "url": "https://github.com/atomicstack/tc002-customisation/blob/main/INSTALL.md", "kind": "guide", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "aciq-k18w-uart-local-control",
+    "title": "Replace an ACiQ mini-split's Wi-Fi module with ESPHome",
+    "device_name": "ACiQ mini-split",
+    "exact_models": ["ACIQ-K18W-W-32-HP2300", "TCL WBR1 / TCLWBR V1.0.0", "RTL8720CF"],
+    "category": "other",
+    "summary": "The project decodes the stock module's 115200 8N1 UART bus and provides an ESPHome takeover with hardware-proven commands, ACKs, heartbeat and a safer receive-only listener mode.",
+    "outcome": "Cloud-free mini-split telemetry and control through an ESP32 connected to the exact CN-16 module bus.",
+    "method": "hardware_bus",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-08-15",
+    "catalog_device_ids": [],
+    "tags": ["air-conditioner", "uart", "esphome", "local-control", "mit"],
+    "risk_level": "high",
+    "warnings": [
+      "Stock-dongle listener and ESP32 takeover configurations are mutually exclusive; two push-pull transmitters can damage hardware.",
+      "The bus is 5 V logic and requires the documented level shifting; wire colors are nonstandard.",
+      "Exact-model only: other ACiQ ducted systems use a different XYE/RS-485 project."
+    ],
+    "sources": [
+      { "label": "ACiQ mini-split protocol", "url": "https://github.com/codypendant/aciq-minisplit-protocol", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "tapo-p110-local-protocol",
+    "title": "Control a Tapo P110 with no cloud account",
+    "device_name": "TP-Link Tapo P110 smart plug",
+    "exact_models": ["P110", "TPAP firmware 1.4.0 or later"],
+    "category": "other",
+    "summary": "tapo-local reimplements the app's SPAKE2+ handshake and AES-128-CCM protocol for local Wi-Fi and BLE relay, metering, protection and history access.",
+    "outcome": "Cloud-free smart-plug control and energy data without flashing the sealed device.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-09-16",
+    "catalog_device_ids": [],
+    "tags": ["smart-plug", "energy", "local-control", "ble", "mit"],
+    "risk_level": "medium",
+    "warnings": [
+      "The local key derives from the MAC plus a fixed app secret; keep the plug on a trusted network segment.",
+      "This is a mains relay. Respect load ratings and constrain automations.",
+      "The repository does not publish a firmware-flash path; this is protocol control, not custom firmware."
+    ],
+    "sources": [
+      { "label": "Tapo Local repository", "url": "https://github.com/carboni123/tapo-local", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "orbit-bhyve-local-ble",
+    "title": "Control firmware-qualified Orbit B-Hyve timers over BLE",
+    "device_name": "Orbit B-Hyve hose timers and XD controllers",
+    "exact_models": ["HT25-0000 fw0085/0041", "HT25G2-0001 fw0111", "HT25A-0001 fw0098", "HT34A-0001 fw0107", "HT32A-0001 fw0107", "HT31-0001 fw0058"],
+    "category": "other",
+    "summary": "orbit-bhyve-ble obtains per-device AES keys once, then uses local BLE with a hardware-and-firmware compatibility matrix rather than claiming blanket brand support.",
+    "outcome": "Local watering status and actuation for six tested model/firmware combinations after one cloud-assisted key retrieval.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-12",
+    "catalog_device_ids": [],
+    "tags": ["irrigation", "bluetooth", "local-control", "compatibility-matrix", "mit"],
+    "risk_level": "medium",
+    "warnings": [
+      "Do not accept vendor firmware updates blindly; encryption and packet trailers may change.",
+      "HT25A-0001 has a hardware-confirmed STOP/duration bug and requires the project's alternate stop command and host timer.",
+      "Firmware recovery is verified only for HT25-0000 fw0085; other proxy recovery paths remain experimental."
+    ],
+    "sources": [
+      { "label": "Orbit B-Hyve BLE", "url": "https://github.com/ljmerza/orbit-bhyve-ble", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "quietcool-it-af-smt-esphome",
+    "title": "Replace QuietCool attic-fan firmware with ESPHome",
+    "device_name": "QuietCool Smart Attic Fan Control",
+    "exact_models": ["IT-AF-SMT", "ESP32-WROOM-32D"],
+    "category": "other",
+    "summary": "quietcool-esphome-native installs over the controller's BLE OTA and preserves fan control, Smart Mode, timers, buttons, LEDs and OEM BLE app control with stock-restore and recovery paths.",
+    "outcome": "Local Home Assistant control of an exact attic-fan controller with end-to-end hardware testing and layered recovery.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-09-22",
+    "catalog_device_ids": [],
+    "tags": ["fan", "esphome", "home-assistant", "ble-ota", "gpl-3.0"],
+    "risk_level": "high",
+    "warnings": [
+      "Preserve thermal and watchdog cutoffs; software control is not a safety system.",
+      "Check the exact controller identity before OTA and keep the stock-restore image available.",
+      "OEM historical analytics and AirControl features are not preserved."
+    ],
+    "sources": [
+      { "label": "QuietCool ESPHome Native", "url": "https://github.com/CrazyCoder/quietcool-esphome-native", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "lifebreath-rnc6-es-proxy",
+    "title": "Proxy a LifeBreath HRV control bus with ESPHome",
+    "device_name": "LifeBreath heat-recovery ventilator",
+    "exact_models": ["RNC6-ES", "DXPL-03 wall panel"],
+    "category": "sensor",
+    "summary": "An ESP32-S3 sits as a protocol-aware proxy on the proprietary three-wire open-collector bus, preserving the original wall panel and timers while adding local Home Assistant control.",
+    "outcome": "Bidirectional local control and telemetry without discarding the appliance's original controls.",
+    "method": "hardware_bus",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-09",
+    "catalog_device_ids": [],
+    "tags": ["ventilation", "esphome", "home-assistant", "open-collector", "mit"],
+    "risk_level": "high",
+    "warnings": [
+      "Only the exact RNC6-ES/DXPL-03 combination is tested.",
+      "The low-voltage bus is inside a 120 V appliance and installation requires cutting a wire; switch off the breaker before opening.",
+      "Never connect 5 V directly to an ESP32 GPIO or hard-drive the open-collector line."
+    ],
+    "sources": [
+      { "label": "LifeBreath HRV ESPHome", "url": "https://github.com/frankaydejay/lifebreath-hrv-esphome", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "charnwood-aire-300-openwood",
+    "title": "Control a Charnwood stove locally with OpenWood",
+    "device_name": "Charnwood Aire 300 wood stove",
+    "exact_models": ["Aire 300", "stove firmware 2.3.36 - 2.1.29", "observed 2.3.82 - 2.1.78"],
+    "category": "other",
+    "summary": "OpenWood reverse-engineers the Charnwood-E Android app and verifies BLE pairing/control, Wi-Fi polling and 21 Home Assistant entities against a live stove.",
+    "outcome": "Local MQTT/Home Assistant integration for one physically tested wood stove while its onboard controls remain authoritative.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-08",
+    "catalog_device_ids": [],
+    "tags": ["wood-stove", "bluetooth", "mqtt", "home-assistant", "gpl-3.0-or-later"],
+    "risk_level": "high",
+    "warnings": [
+      "This controls a real fire. Never use the project as a safety system or justification for unattended operation.",
+      "The Aire 300 is the named live target; broader Charnwood E-series compatibility is not established.",
+      "Preserve manufacturer operating rules and keep the stove's own controls authoritative."
+    ],
+    "sources": [
+      { "label": "OpenWood repository", "url": "https://github.com/trougnouf/openwood", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "microair-398ulbt-local-ble",
+    "title": "Read and guard-write a Micro-Air EasyStart over BLE",
+    "device_name": "Micro-Air EasyStart Flex",
+    "exact_models": ["398ULBT"],
+    "category": "sensor",
+    "summary": "microair-bt derives the OEM BLE protocol and exposes live data plus a guarded, hardware-verified relearn command through an ESPHome proxy.",
+    "outcome": "Local compressor soft-starter telemetry and a narrow verified configuration write for one exact model.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-09-23",
+    "catalog_device_ids": [],
+    "tags": ["hvac", "compressor", "bluetooth", "esphome", "mit"],
+    "risk_level": "high",
+    "warnings": [
+      "SCPT and fault-protection writes are not hardware-verified and remain experimental.",
+      "Writes are refused while the compressor runs unless a user overrides the guard; do not bypass this casually.",
+      "Bad protection values can damage a mains-powered compressor system."
+    ],
+    "sources": [
+      { "label": "microair-bt repository", "url": "https://github.com/joyfulhouse/microair-bt", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "govee-h7172-local-ble",
+    "title": "Run a Govee ice maker without its cloud",
+    "device_name": "Govee portable ice maker",
+    "exact_models": ["H7172"],
+    "category": "other",
+    "summary": "The Home Assistant integration implements the exact model's 20-byte BLE protocol, reverse-engineered from the Android app, including power, work mode and device-only alarms.",
+    "outcome": "Cloud-free control plus low-water and tray-full state that the stock cloud path does not need to mediate.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-09-23",
+    "catalog_device_ids": [],
+    "tags": ["appliance", "bluetooth", "home-assistant", "local-control", "mit"],
+    "risk_level": "medium",
+    "warnings": [
+      "Do not infer support for other Govee ice makers.",
+      "BLE range and single-client contention with the official app must be tested at installation.",
+      "Software alarms do not replace the appliance's physical protections or supervision."
+    ],
+    "sources": [
+      { "label": "Govee H7172 BLE integration", "url": "https://github.com/lyntoo/govee-h7172-ble-ha", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "roomba-692-local-mqtt",
+    "title": "Use a Roomba 692 through its local MQTT API",
+    "device_name": "iRobot Roomba 692",
+    "exact_models": ["Roomba 692"],
+    "category": "other",
+    "summary": "roomba-telemetry uses the reverse-engineered local MQTT/TLS interface for live state, schedules, preferences and mission commands, with one physically verified exact model.",
+    "outcome": "Local vacuum telemetry and control with a pairing-first credential path and a documented cloud-login fallback.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-10-14",
+    "catalog_device_ids": [],
+    "tags": ["vacuum", "mqtt", "local-control", "telemetry", "mit"],
+    "risk_level": "low",
+    "warnings": [
+      "Broader model support comes partly from community references; the physical validation cited here is for Roomba 692.",
+      "Some firmware ignores local pairing and requires the documented cloud credential fallback.",
+      "Protect the vacuum's BLID/password and isolate local MQTT traffic."
+    ],
+    "sources": [
+      { "label": "Roomba Telemetry", "url": "https://github.com/roberjo/roomba-telemetry", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "wii-nunchuk-i2c-capture",
+    "title": "Decode a Wii Nunchuk from a saved I2C capture",
+    "device_name": "Nintendo Wii Nunchuk controller",
+    "exact_models": ["Wired Wii Nunchuk; capture revision not recorded"],
+    "category": "input",
+    "summary": "REA and sigrok decode the extension controller's initialization, register selection and three six-byte sensor/button reads from a pinned logic capture.",
+    "outcome": "A reproducible seven-transaction I2C analysis that can guide controller repurposing without claiming the capture's unknown retail revision.",
+    "method": "hardware_bus",
+    "evidence": "analysis_method",
+    "reproducibility": "method_only",
+    "published_at": "2026-10-14",
+    "catalog_device_ids": [],
+    "tags": ["nunchuk", "i2c", "sigrok", "logic-analyzer", "rea"],
+    "risk_level": "medium",
+    "warnings": [
+      "The capture does not record whether the controller is an official wired unit or a clone; wireless variants use different handshakes.",
+      "Use the correct connector, 3.3 V, SDA/SCL pinout and pull-ups; wrong voltage or pinout can damage controller or host.",
+      "REA analyzed a saved file. It did not acquire traffic from or validate a live Nunchuk."
+    ],
+    "sources": [
+      { "label": "REA hardware corpus", "url": "https://github.com/morluto/rea/blob/1438422dfedf1de29368b595e09a04f1fc10750d/experiments/analysis-efficiency/corpus.json", "kind": "dataset", "checked_at": "2026-10-14" },
+      { "label": "REA signal workflow", "url": "https://github.com/morluto/rea/blob/1438422dfedf1de29368b595e09a04f1fc10750d/experiments/analysis-efficiency/signal-selection-workflows.md", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "sigrok capture collection", "url": "https://github.com/sigrokproject/sigrok-dumps", "kind": "dataset", "checked_at": "2026-10-14" },
+      { "label": "WiiBrew protocol notes", "url": "https://wiibrew.org/wiki/Wiimote/Extension_Controllers/Nunchuck", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "archer-c7-v5-rea-firmware-scan",
+    "title": "Inspect an Archer C7 OpenWrt image with REA",
+    "device_name": "TP-Link Archer C7 v5",
+    "exact_models": ["Archer C7 v5", "OpenWrt 25.12.5 ath79 sysupgrade image"],
+    "category": "router",
+    "summary": "REA pins and statically scans the exact OpenWrt sysupgrade artifact with firmware-region tooling, recording its digest and workflow without claiming a physical flash.",
+    "outcome": "A reproducible firmware-analysis example for signatures and regions, linked to Hackshop's existing Archer C7 device and flash playbook.",
+    "method": "analysis_tool",
+    "evidence": "analysis_method",
+    "reproducibility": "method_only",
+    "published_at": "2026-10-12",
+    "catalog_device_ids": ["tp-link-archer-c7-v5"],
+    "tags": ["router", "openwrt", "firmware-analysis", "binwalk", "rea"],
+    "risk_level": "high",
+    "warnings": [
+      "The captured file is a sysupgrade image, not a stock-to-OpenWrt factory image.",
+      "Static analysis does not prove bootability, partition semantics, runtime behavior or flash safety.",
+      "REA did not flash a physical router; use the separate exact-revision installation and recovery playbook."
+    ],
+    "sources": [
+      { "label": "REA pinned corpus", "url": "https://github.com/morluto/rea/blob/1438422dfedf1de29368b595e09a04f1fc10750d/experiments/analysis-efficiency/corpus.json", "kind": "dataset", "checked_at": "2026-10-14" },
+      { "label": "OpenWrt target index", "url": "https://downloads.openwrt.org/releases/25.12.5/targets/ath79/generic/", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "max3232e-rea-uart-capture",
+    "title": "Recover inverted UART through a MAX3232E capture",
+    "device_name": "Maxim / Analog Devices MAX3232E transceiver",
+    "exact_models": ["MAX3232E", "57,600 baud 8N1 capture"],
+    "category": "other",
+    "summary": "REA validates a pinned sigrok capture and shows why DOUT1 inversion is required to recover five Hello world frames instead of plausible but wrong bytes.",
+    "outcome": "A reusable example of polarity-aware UART decoding across an RS-232 transceiver.",
+    "method": "hardware_bus",
+    "evidence": "analysis_method",
+    "reproducibility": "method_only",
+    "published_at": "2026-10-14",
+    "catalog_device_ids": [],
+    "tags": ["uart", "rs232", "sigrok", "logic-analyzer", "rea"],
+    "risk_level": "medium",
+    "warnings": [
+      "MAX3232E is a component, not a self-contained consumer device.",
+      "RS-232 voltage levels and polarity are not MCU TTL UART; use a proper transceiver and account for inversion.",
+      "REA analyzed an existing saved capture rather than acquiring data from live hardware."
+    ],
+    "sources": [
+      { "label": "REA hardware corpus", "url": "https://github.com/morluto/rea/blob/1438422dfedf1de29368b595e09a04f1fc10750d/experiments/analysis-efficiency/corpus.json", "kind": "dataset", "checked_at": "2026-10-14" },
+      { "label": "REA signal workflow", "url": "https://github.com/morluto/rea/blob/1438422dfedf1de29368b595e09a04f1fc10750d/experiments/analysis-efficiency/signal-selection-workflows.md", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "Analog Devices MAX3232E", "url": "https://www.analog.com/en/products/max3232e.html", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "rea-saved-hardware-analysis",
+    "title": "Analyze saved firmware and signal captures with REA",
+    "device_name": "REA reverse-engineering workbench",
+    "exact_models": ["REA 6.5.0", "commit 1438422dfedf1de29368b595e09a04f1fc10750d"],
+    "category": "other",
+    "summary": "REA combines evidence capture, firmware extraction/signature workflows and saved signal-recording analysis. Its public showcase is software-only; the hardware-bearing evidence lives in its experiment corpus.",
+    "outcome": "A repeatable research method for inspecting files and preserving evidence without overstating live-device validation.",
+    "method": "analysis_tool",
+    "evidence": "analysis_method",
+    "reproducibility": "method_only",
+    "published_at": "2026-10-14",
+    "catalog_device_ids": [],
+    "tags": ["firmware-analysis", "signal-analysis", "research", "evidence", "rea"],
+    "risk_level": "low",
+    "warnings": [
+      "REA's five public showcase cases are software investigations, not hackable-hardware examples.",
+      "Saved-file analysis does not acquire from, execute on or prove behavior of physical hardware.",
+      "Firmware signatures and decoder output do not establish vulnerabilities, bootability or safe flashing."
+    ],
+    "sources": [
+      { "label": "REA homepage", "url": "https://rea.tools/", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "REA showcase", "url": "https://rea.tools/showcase/", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "REA source at inspected commit", "url": "https://github.com/morluto/rea/tree/1438422dfedf1de29368b595e09a04f1fc10750d", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "ilter-della-ac-control-demo",
+    "title": "Reverse-engineer an AC into a menu-bar and glasses UI",
+    "device_name": "DELLA air conditioner (exact model undisclosed)",
+    "exact_models": [],
+    "category": "other",
+    "summary": "Ilter Canberk demonstrated an AC status-bar controller, then ported the same interface to Spectacles with an appliance-anchored Lens Studio overlay.",
+    "outcome": "A compact desktop controller and an AR control surface shown operating the author's air conditioner.",
+    "method": "protocol",
+    "evidence": "author_demo",
+    "reproducibility": "demo_only",
+    "published_at": "2026-10-10",
+    "catalog_device_ids": [],
+    "tags": ["air-conditioner", "menu-bar", "spectacles", "ar", "social-demo"],
+    "risk_level": "medium",
+    "warnings": [
+      "No exact DELLA model, protocol, repository, firmware or recovery path is published in the cited posts.",
+      "A social video proves an author demonstration, not compatibility or safe repeatability.",
+      "Do not conflate this with unrelated TCL or cloud-control projects."
+    ],
+    "sources": [
+      { "label": "AC menu-bar demonstration", "url": "https://x.com/icanberk/status/2109031477484937571", "kind": "social_post", "checked_at": "2026-10-14" },
+      { "label": "Spectacles follow-up", "url": "https://x.com/icanberk/status/2109122304429236559", "kind": "social_post", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "apartment-iot-3d-menu-demo",
+    "title": "Map an apartment's reverse-engineered devices into a 3D menu",
+    "device_name": "Mixed apartment lamps and air conditioners",
+    "exact_models": [],
+    "category": "other",
+    "summary": "0xProbability demonstrated a macOS menu-bar model of an apartment where clicking rendered lamps and ACs controls the physical devices.",
+    "outcome": "A spatial whole-home interface shown controlling multiple real-world devices from one 3D view.",
+    "method": "app_api",
+    "evidence": "author_demo",
+    "reproducibility": "demo_only",
+    "published_at": "2026-10-13",
+    "catalog_device_ids": [],
+    "tags": ["smart-home", "3d-ui", "menu-bar", "lights", "air-conditioner", "social-demo"],
+    "risk_level": "medium",
+    "warnings": [
+      "The post does not disclose exact devices, protocols, source code or per-device readback.",
+      "Treat this as interface inspiration, not a reproducible integration or compatibility claim.",
+      "Whole-home control should preserve device-specific safety limits and authentication."
+    ],
+    "sources": [
+      { "label": "Apartment 3D-menu demonstration", "url": "https://x.com/0xProbabillity/status/2109978137794883621", "kind": "social_post", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "blue-star-ac-mcp-demo",
+    "title": "Expose a Blue Star AC through MCP",
+    "device_name": "Blue Star air conditioner (exact model undisclosed)",
+    "exact_models": [],
+    "category": "other",
+    "summary": "A social demonstration shows a reverse-engineered Blue Star air conditioner exposed through an MCP control surface.",
+    "outcome": "An agent-facing appliance controller demonstrated against the author's AC.",
+    "method": "app_api",
+    "evidence": "author_demo",
+    "reproducibility": "demo_only",
+    "published_at": "2026-10-12",
+    "catalog_device_ids": [],
+    "tags": ["air-conditioner", "mcp", "agent-control", "social-demo"],
+    "risk_level": "medium",
+    "warnings": [
+      "The cited post does not publish an exact model, protocol implementation, repository or recovery path.",
+      "Treat the MCP layer as an interface demonstration, not evidence that an appliance is safely controllable.",
+      "Require explicit confirmation and device readback for consequential HVAC writes."
+    ],
+    "sources": [
+      { "label": "Blue Star AC MCP demonstration", "url": "https://x.com/the_mcnaveen/status/2109599383717335207", "kind": "social_post", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "apple-watch-ultra-2-android-companion",
+    "title": "Pair an Apple Watch Ultra 2 with Android",
+    "device_name": "Apple Watch Ultra 2",
+    "exact_models": ["Ultra 2 / Watch7,5", "watchOS 26.2 / 23S303", "Rooted OnePlus CPH2653"],
+    "category": "wearable",
+    "summary": "Apple Watch Companion reconstructs native Bluetooth, pairing, activation and IDS protocols. The author's hardware journal records optical camera pairing, activation, a visible watch face and encrypted reconnect on the tested Watch and Android phone.",
+    "outcome": "An experimental Android companion with native battery observations, selected settings and partial notification and face-management support on one tested device combination.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "published_at": "2026-10-14",
+    "catalog_device_ids": [],
+    "tags": ["apple-watch", "android", "bluetooth", "pairing", "experimental", "no-declared-license"],
+    "risk_level": "high",
+    "warnings": [
+      "Android HAL support is restricted to rooted OnePlus CPH2653. Retained physical evidence covers Ultra 2 Watch7,5 on watchOS 26.2/23S303.",
+      "Clean Android Companion builds require undistributed optical firmware inputs and private asset-generation tools; this remains an experimental release candidate.",
+      "Calls/audio, Health import, app management and Watch.app parity are incomplete. macOS currently offers discovery and BLE only.",
+      "Preserve pairing records. Uninstalling or clearing app data destroys the saved pair; a general Android pair-export/restore path is not documented.",
+      "The repository has no declared top-level license, and distribution of firmware-derived assets is an open release gate."
+    ],
+    "sources": [
+      { "label": "Apple Watch Companion repository", "url": "https://github.com/LordixDemon/apple_watch_connector", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Hardware pairing and activation journal", "url": "https://github.com/LordixDemon/apple_watch_connector/blob/3af14e0226113d465d3ab84a9d30a16f84c968c0/docs/live-20261006-optical-pairing/RESULT.md", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "Release support and missing build inputs", "url": "https://github.com/LordixDemon/apple_watch_connector/blob/3af14e0226113d465d3ab84a9d30a16f84c968c0/docs/BUILD_AND_RELEASE.md", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "Md Ismail Sojal original demonstration", "url": "https://x.com/0x0SojalSec/status/2110178596107248127", "kind": "social_post", "checked_at": "2026-10-14" },
+      { "label": "Shantanu Goel repost", "url": "https://x.com/shantanugoel/status/2110358601051279455", "kind": "social_post", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "hue-lca003-openhue-ble-schedules",
+    "title": "Control Hue bulbs and store schedules over Bluetooth",
+    "device_name": "Philips Hue White and Color Ambiance bulb",
+    "exact_models": ["LCA003", "Firmware 1.163.1", "OpenHue on macOS 14+"],
+    "category": "bulb",
+    "summary": "OpenHue is a native macOS BLE controller with published GATT protocol notes. Its author decoded on-bulb alarm storage and verified schedule creation on LCA003 firmware 1.163.1.",
+    "outcome": "Local power, brightness, color, scenes and timers, including stored schedules that can fire while the Mac is absent.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "published_at": "2026-08-27",
+    "catalog_device_ids": ["philips-hue-lca003-ble"],
+    "tags": ["philips-hue", "ble", "local-control", "schedules", "macos", "no-declared-license"],
+    "design_ideas": [
+      { "title": "Calendar reminder light", "description": "Have a local Mac scheduler re-arm the bulb's one-shot schedule for the next meeting. The bulb holds the event once synchronized, but daily repetition requires the host.", "use_case": "calendar" },
+      { "title": "AI status lamp", "description": "Map a trusted agent's idle, thinking and ready states to color and brightness. The AI runs on a computer or service; the bulb is its ambient output.", "use_case": "ai_interface" }
+    ],
+    "risk_level": "low",
+    "warnings": [
+      "Stored schedules are physically verified only on LCA003 firmware 1.163.1, are one-shot and need re-arming. Power loss stops the bulb clock until resynchronized.",
+      "OpenHue currently supports one connected BLE client per bulb and does not support bridge-joined bulbs; this is an app support limit, not a universal Hue hardware restriction.",
+      "Factory reset removes pairing and changes the BLE address. Try discoverable pairing before resetting.",
+      "The app is development-signed rather than notarized, and the repository has no declared license."
+    ],
+    "sources": [
+      { "label": "OpenHue repository and protocol", "url": "https://github.com/dw2lam/OpenHue", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Pinned LCA003 verification", "url": "https://github.com/dw2lam/OpenHue/blob/4af711064a928eb90d968dad46fe9a9ba8224433/README.md", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "hue-lca006-hueble-local-control",
+    "title": "Drive a Hue bulb directly from Python",
+    "device_name": "Philips Hue White and Color Ambiance E27 1100-lumen bulb",
+    "exact_models": ["LCA006 / 9290024688", "Discovery tested on firmware 1.104.2"],
+    "category": "bulb",
+    "summary": "MIT-licensed HueBLE uses Bleak to control Hue's BLE GATT interface, exposing power, brightness, color temperature, color, effects and transitions without a Hue Bridge.",
+    "outcome": "A local programmable light for timers, calendar reminders and dashboard-linked state, with tested-model and live-state caveats documented.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": ["philips-hue-lca006-hueble"],
+    "tags": ["philips-hue", "ble", "python", "local-control", "mit"],
+    "design_ideas": [
+      { "title": "Desk focus timer", "description": "Use a Python service to change hue through focus and break periods. Read live state after connecting, and keep the timing logic on the host.", "use_case": "info_panel" },
+      { "title": "Dashboard-linked light", "description": "Connect a calendar or information panel to a local Python BLE service and map a small set of states to color, temperature and brightness.", "use_case": "smart_home" }
+    ],
+    "risk_level": "low",
+    "warnings": [
+      "Automatic discovery is documented as tested only on LCA006 firmware 1.104.2; other models and effects need their own check.",
+      "Call poll_state after connecting before treating default cached values as observed bulb telemetry.",
+      "Factory reset changes the Bluetooth address and removes pairing.",
+      "Concurrent Zigbee and BLE is documented by HueBLE but requires its specific pairing flow."
+    ],
+    "sources": [
+      { "label": "HueBLE implementation", "url": "https://github.com/flip-dots/HueBLE", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Pairing, state and tested-model docs", "url": "https://hueble.readthedocs.io/en/latest/usage.html", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "Exact Hue converter mapping", "url": "https://github.com/Koenkk/zigbee-herdsman-converters/blob/master/src/devices/philips.ts", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "hue-bulbs-zigbee2mqtt-direct-control",
+    "title": "Control Hue bulbs through Zigbee2MQTT",
+    "device_name": "Philips Hue E26/E27 bulbs",
+    "exact_models": ["9290022166 / LCA001 / LCA002 / LCA003", "9290022167 / LTA002"],
+    "category": "bulb",
+    "summary": "Zigbee2MQTT documents direct coordinator support for exact Hue bulbs, including brightness, color temperature, applicable color controls, power-on behavior and Hue-specific effects.",
+    "outcome": "Local MQTT control from calendars, AI agents, information panels or Home Assistant using a supported Zigbee coordinator.",
+    "method": "protocol",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": ["philips-hue-lca003-ble"],
+    "tags": ["philips-hue", "zigbee", "mqtt", "local-control", "ambient-display"],
+    "risk_level": "low",
+    "warnings": [
+      "A supported Zigbee coordinator and running Zigbee2MQTT host are required.",
+      "Moving a bulb to another Zigbee network requires removing or resetting its prior network association.",
+      "White Ambiance LTA002 has no RGB color; choose a supported color bulb for colored AI state indicators.",
+      "Power-on behavior set to off can prevent a wall-switch power cycle from illuminating the bulb."
+    ],
+    "sources": [
+      { "label": "White and Color exact support", "url": "https://www.zigbee2mqtt.io/devices/9290022166.html", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "White Ambiance exact support", "url": "https://www.zigbee2mqtt.io/devices/9290022167.html", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "hue-bridge-v2-local-api",
+    "title": "Build calendar and AI lighting with the Hue Bridge API",
+    "device_name": "Philips Hue Bridge V2 and paired lights",
+    "exact_models": ["Square Hue Bridge V2", "Capabilities read from paired bulb resources"],
+    "category": "bulb",
+    "summary": "Hue's official local REST interface provides bridge discovery, physical link-button authorization, state reads and light commands. Home Assistant adds local push updates on V2 bridges.",
+    "outcome": "A straightforward local integration for existing Hue owners, with per-light capabilities discovered from the bridge.",
+    "method": "app_api",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": [],
+    "tags": ["philips-hue", "official-api", "local-control", "home-assistant", "protocol-native"],
+    "risk_level": "low",
+    "warnings": ["Requires a working bridge and locally authorized application key. Match commands to each bulb's reported capabilities; white-only bulbs cannot display RGB states."],
+    "sources": [
+      { "label": "Hue official local API tutorial", "url": "https://developers.meethue.com/develop/get-started-2/", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "Home Assistant Hue local push integration", "url": "https://www.home-assistant.io/integrations/hue/", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "lilygo-t-display-s3-designs",
+    "title": "Build a tiny color panel on a $9 T-Display-S3",
+    "device_name": "LILYGO T-Display-S3",
+    "exact_models": ["H569 basic / H577 soldered", "H587 / H589 touch variants", "ESP32-S3, 170x320 LCD, 16 MB flash, 8 MB PSRAM"],
+    "category": "display",
+    "summary": "Manufacturer Arduino, PlatformIO and ESP-IDF examples, factory firmware and BOOT/RST recovery make this inexpensive screen a documented native text-and-image client.",
+    "outcome": "A small programmable Wi-Fi display for one appointment, countdown, status or remote AI response.",
+    "method": "repurpose",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": ["lilygo-t-display-s3"],
+    "tags": ["cheap-display", "esp32-s3", "calendar", "ai-interface", "info-panel", "mit"],
+    "price": { "min_usd": 9.04, "max_usd": 14.04, "condition": "new", "availability": "in_stock", "scope": "device_only", "checked_at": "2026-10-14", "source_url": "https://lilygo.cc/products/t-display-s3", "note": "H569 China $9.04; H577 China $9.54 or US $14.04. Touch variants $12.61-$13.02. Add USB power, cable and enclosure; shipping/tax extra. This MCU renders data from a host or remote AI service." },
+    "design_ideas": [
+      { "title": "Next appointment countdown", "description": "Have a trusted calendar service send the next event and minutes remaining over Wi-Fi. The 170x320 screen fits a single event rather than a whole month.", "use_case": "calendar" },
+      { "title": "AI response tile", "description": "Show the latest short response or agent state using native text/image rendering. AI inference and private account access stay on a computer or remote service.", "use_case": "ai_interface" },
+      { "title": "Desk status panel", "description": "Display weather, transit or build status refreshed by an HTTP/MQTT service. Use a native screen layout rather than expecting a desktop web browser.", "use_case": "info_panel" }
+    ],
+    "risk_level": "low",
+    "warnings": ["Match touch versus non-touch variants and GPIO definitions. GPIO15 must enable display power.", "Factory firmware and BOOT/RST download mode provide the documented recovery route.", "There is no onboard SD slot without an add-on, and this board is not a general-purpose LLM computer."],
+    "sources": [
+      { "label": "T-Display-S3 code and factory image", "url": "https://github.com/Xinyuan-LilyGO/T-Display-S3", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Manufacturer setup guide", "url": "https://wiki.lilygo.cc/products/t-display-series/t-display-s3/", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "Dated seller variants", "url": "https://lilygo.cc/products/t-display-s3", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "waveshare-esp32-s3-touch-lcd-7-designs",
+    "title": "Build a 7-inch calendar or room panel for $36.99",
+    "device_name": "Waveshare ESP32-S3-Touch-LCD-7",
+    "exact_models": ["Original touch SKU 27078", "800x480, 16 MB flash, 8 MB PSRAM"],
+    "category": "display",
+    "summary": "Official Arduino/LVGL examples and factory test firmware provide a repeatable starting point for a large native touchscreen layout.",
+    "outcome": "An affordable large-screen renderer for calendars, room status and remote AI interfaces.",
+    "method": "repurpose",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": ["waveshare-esp32-s3-touch-lcd-7"],
+    "tags": ["cheap-display", "lvgl", "calendar", "ai-interface", "info-panel", "apache-2.0"],
+    "price": { "min_usd": 36.99, "max_usd": 36.99, "condition": "new", "availability": "in_stock", "scope": "device_only", "checked_at": "2026-10-14", "source_url": "https://www.waveshare.com/esp32-s3-touch-lcd-7.htm?sku=27078", "note": "Touch SKU27078 only. The $31.99 listing is non-touch SKU30406, a separate variant. Add power/cable, stand or case, and a service supplying calendar or AI data; shipping/tax extra." },
+    "design_ideas": [
+      { "title": "Kitchen calendar", "description": "Render a week view with large event text and weather in LVGL. A trusted backend reduces calendar data to the fields the panel needs.", "use_case": "calendar" },
+      { "title": "Room control panel", "description": "Combine lights, temperature and a few scene buttons on the 800x480 touch screen, using authenticated Home Assistant or MQTT services on the host.", "use_case": "smart_home" },
+      { "title": "AI briefing screen", "description": "Show concise responses and image cards from a remote AI endpoint. This ESP32 runs the interface; it does not host a desktop browser or local LLM.", "use_case": "ai_interface" }
+    ],
+    "risk_level": "low",
+    "warnings": ["Match the original touch board to its firmware; 7B is a different 1024x600 device.", "Use official test firmware/reflash instructions as the recovery path.", "The displayed device price excludes the complete build's power, mounting and backend costs."],
+    "sources": [
+      { "label": "Manufacturer implementation", "url": "https://github.com/waveshareteam/ESP32-S3-Touch-LCD-7", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "LVGL setup", "url": "https://docs.waveshare.com/docs/ESP32/ESP32-S3/ESP32-S3-Touch-LCD-7/Arduino/Arduino-LVGL-Demo", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "Factory firmware and reflashing", "url": "https://docs.waveshare.com/ESP32-S3-Touch-LCD-7/Firmware-Flashing", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "lilygo-t5-epaper-s3-designs",
+    "title": "Make a low-power 4.7-inch e-paper calendar",
+    "device_name": "LILYGO T5 ePaper S3",
+    "exact_models": ["H578 basic / H580 soldered / H716 touch", "ESP32-S3, 960x540 grayscale e-paper"],
+    "category": "display",
+    "summary": "The manufacturer's ESP32-S3 branch supplies display examples and USB download-mode recovery for this 16 MB flash/8 MB PSRAM e-paper board.",
+    "outcome": "A grayscale display for periodic calendar, weather, chores or generated briefing images.",
+    "method": "repurpose",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": ["lilygo-t5-epaper-s3"],
+    "tags": ["cheap-display", "e-paper", "calendar", "low-power", "info-panel", "gpl-3.0"],
+    "price": { "min_usd": 38.99, "max_usd": 39.99, "condition": "new", "availability": "in_stock", "scope": "device_only", "checked_at": "2026-10-14", "source_url": "https://lilygo.cc/products/t5-4-7-inch-e-paper-v2-3", "note": "China H578 $38.99, H580 $39.62, H716 $39.99. Add a compatible battery or USB power and frame; a host renders authenticated calendar/AI images. Shipping/tax extra." },
+    "design_ideas": [
+      { "title": "Daily calendar sheet", "description": "Render the day's agenda and weather as a 960x540 grayscale bitmap on a host, then fetch it periodically and sleep between updates.", "use_case": "calendar" },
+      { "title": "AI morning briefing", "description": "Generate a short briefing remotely and rasterize it into a static grayscale page. Slow, deliberate refreshes suit e-paper better than chat animation.", "use_case": "ai_interface" },
+      { "title": "Chores and room noticeboard", "description": "Show a few tasks or room status changes with occasional full refreshes to limit ghosting.", "use_case": "info_panel" }
+    ],
+    "risk_level": "medium",
+    "warnings": ["Use the esp32s3 branch; classic ESP32 T5 instructions target a different board.", "The manufacturer warns against persistent partial refresh. screen_repair may reduce ghosting but is not guaranteed.", "Use USB BOOT/RST download mode for recovery."],
+    "sources": [
+      { "label": "ESP32-S3 display implementation", "url": "https://github.com/Xinyuan-LilyGO/LilyGo-EPD47/tree/esp32s3", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Seller hardware variants", "url": "https://lilygo.cc/products/t5-4-7-inch-e-paper-v2-3", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "m5stack-coreink-designs",
+    "title": "Use a $29.90 magnetic e-paper status tile",
+    "device_name": "M5Stack CoreInk",
+    "exact_models": ["K048", "ESP32-PICO-D4", "GDEW0154M09, 200x200 monochrome"],
+    "category": "display",
+    "summary": "CoreInk combines a finished magnetic case, RTC and 390 mAh battery with supported M5Unified/M5GFX libraries and factory Easyloader recovery.",
+    "outcome": "A compact battery information tile for one appointment, task, room label or short AI summary.",
+    "method": "repurpose",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": ["m5stack-coreink"],
+    "tags": ["cheap-display", "e-paper", "calendar", "battery", "info-panel"],
+    "price": { "min_usd": 29.90, "max_usd": 29.90, "condition": "new", "availability": "in_stock", "scope": "device_only", "checked_at": "2026-10-14", "source_url": "https://shop.m5stack.com/products/m5stack-esp32-core-ink-development-kit1-54-elnk-display", "note": "K048 includes case and 390mAh battery; seller showed 10+ units. Add USB charging/cable and a data service. Its 200x200 screen is a small tile, not a full calendar page. Shipping/tax extra." },
+    "design_ideas": [
+      { "title": "Next meeting tile", "description": "Show one meeting name and start time on the 200x200 screen, using the RTC between occasional Wi-Fi updates.", "use_case": "calendar" },
+      { "title": "Magnetic room label", "description": "Display occupied/free state, one task or a short summary on a metal surface. Update at least 15 seconds apart as the manufacturer recommends.", "use_case": "info_panel" }
+    ],
+    "risk_level": "low",
+    "warnings": ["Use M5Unified/M5GFX; the old M5Core-Ink library is deprecated.", "The manufacturer recommends at least 15 seconds between refreshes.", "4MB flash and 520KB SRAM constrain layouts; render concise native text/bitmaps."],
+    "sources": [
+      { "label": "Official guide and factory restore", "url": "https://docs.m5stack.com/en/core/CoreInk", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "M5Unified", "url": "https://github.com/m5stack/M5Unified", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "M5GFX", "url": "https://github.com/m5stack/M5GFX", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "ulanzi-tc001-awtrix-ng-designs",
+    "title": "Reflash a Ulanzi pixel clock into an information ticker",
+    "device_name": "Ulanzi TC001 pixel clock",
+    "exact_models": ["TC001 / product 2882", "Classic ESP32, 32x8 LED matrix"],
+    "category": "display",
+    "summary": "AWTRIX NG adds local HTTP/MQTT interfaces and Berry scripts to the TC001, with browser/esptool installation and original-firmware backup instructions.",
+    "outcome": "A local notification, countdown and ambient status ticker on an inexpensive ready-made pixel clock.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": ["ulanzi-tc001-awtrix-ng"],
+    "tags": ["cheap-display", "pixel-clock", "mqtt", "info-panel", "polyform-noncommercial"],
+    "price": { "min_usd": 45.99, "max_usd": 45.99, "condition": "new", "availability": "in_stock", "scope": "device_only", "checked_at": "2026-10-14", "source_url": "https://www.ulanzi.com/products/ulanzi-pixel-smart-clock-2882", "note": "Single TC001 $45.99; the pair offer is $82.78. Add an MQTT/HTTP service for private calendar or AI data. This is a 32x8 ticker, not an HTML calendar. Shipping/tax extra." },
+    "design_ideas": [
+      { "title": "Meeting countdown ticker", "description": "Send the next meeting title, remaining time and a small icon through the local API/MQTT interface.", "use_case": "calendar" },
+      { "title": "Agent notification clock", "description": "Show concise states such as working, done or needs attention from a trusted host. Remote AI produces the state; the device displays it.", "use_case": "ai_interface" },
+      { "title": "Transit and service status", "description": "Cycle a few icons and short lines for departures, weather and service alerts; keep layouts within 32x8 pixels.", "use_case": "info_panel" }
+    ],
+    "risk_level": "medium",
+    "warnings": ["AWTRIX 3 is archived; AWTRIX NG is its current successor.", "NG uses PolyForm Noncommercial and is not an OSI open-source license; read its usage terms.", "Back up original firmware before flashing and match TC001 to its ESP32 image; TC002 is different hardware."],
+    "sources": [
+      { "label": "AWTRIX NG", "url": "https://github.com/Blueforcer/awtrix-ng", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Install and original firmware backup", "url": "https://blueforcer.github.io/awtrix-ng/esp32/getting-started/flashing/", "kind": "guide", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "sunton-cyd-native-panel",
+    "title": "Build a native touchscreen UI on a Cheap Yellow Display",
+    "device_name": "Sunton Cheap Yellow Display",
+    "exact_models": ["ESP32-2432S028R", "2.8-inch resistive touch"],
+    "category": "display",
+    "summary": "The community CYD project publishes board-specific TFT/touch configuration, USB web-flash examples and troubleshooting for the exact resistive-touch board.",
+    "outcome": "A low-cost native color touchscreen for a small agenda, room controller or concise remote AI interface.",
+    "method": "repurpose",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": ["sunton-esp32-2432s028r"],
+    "tags": ["cheap-display", "touchscreen", "calendar", "info-panel", "mit"],
+    "price": { "min_usd": 13.90, "max_usd": 13.90, "condition": "new", "availability": "out_of_stock", "scope": "device_only", "checked_at": "2026-10-14", "source_url": "https://www.makerfabs.com/sunton-esp32-2-8-inch-tft-with-touch.html", "note": "Makerfabs price $13.90, currently out of stock. Verify another seller's exact board/revision before buying. Add USB power, enclosure and a host/data service; shipping/tax extra." },
+    "design_ideas": [
+      { "title": "Compact room dashboard", "description": "Render weather, next event and a few smart-home buttons in a native TFT layout sourced from a trusted host.", "use_case": "info_panel" },
+      { "title": "Touch calendar agenda", "description": "Show a short agenda with large touch targets rather than a full web application. A calendar service on the host supplies event data.", "use_case": "calendar" }
+    ],
+    "risk_level": "low",
+    "warnings": ["Similar two-USB boards may use a different display controller. Check silkscreen and revision.", "Use board-specific TFT/touch setup and the documented USB flashing path.", "The listed seller is out of stock; the price is not a claim of current purchasability."],
+    "sources": [
+      { "label": "CYD community implementations", "url": "https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Exact board setup", "url": "https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display/blob/main/SETUP.md", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "Recovery troubleshooting", "url": "https://github.com/witnessmenow/ESP32-Cheap-Yellow-Display/blob/main/TROUBLESHOOTING.md", "kind": "guide", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "sonoff-nspanel-original-local-dashboard",
+    "title": "Turn an original NSPanel into a local room controller",
+    "device_name": "SONOFF NSPanel original",
+    "exact_models": ["NSPanel-EU", "NSPanel-US", "Original model; excludes NSPanel Pro"],
+    "category": "display",
+    "summary": "The Home Assistant blueprint project documents ESPHome flashing, region-specific Nextion TFT upload and version matching for the original wall panel.",
+    "outcome": "Local lights, climate, scene and room-status controls on a wall-mounted touchscreen.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "repeatable",
+    "catalog_device_ids": ["sonoff-nspanel-original"],
+    "tags": ["wall-panel", "esphome", "home-assistant", "smart-home", "touchscreen"],
+    "price": { "min_usd": 59.90, "max_usd": 59.90, "condition": "new", "availability": "in_stock", "scope": "device_only", "checked_at": "2026-10-14", "source_url": "https://itead.cc/product/sonoff-nspanel-smart-scene-wall-switch/", "note": "Single panel $59.90, pair $108. Add 3.3V serial adapter, Home Assistant host and qualified mains installation. Shipping/tax extra; this is more involved than a USB desk panel." },
+    "design_ideas": [
+      { "title": "Room scene controller", "description": "Use the published blueprint for lights, scenes, climate and room state, backed by a Home Assistant host.", "use_case": "smart_home" },
+      { "title": "Household status panel", "description": "Adapt native status pages for selected calendar or household sensors after matching MCU/TFT versions. Calendar layout is a design extension, not a supplied complete build.", "use_case": "info_panel" }
+    ],
+    "risk_level": "high",
+    "warnings": ["Disconnect from mains before 3.3V serial flashing; installation involves a mains wall switch.", "Keep a stock backup and a serial recovery path. Match the EU/US TFT to hardware.", "ESPHome MCU and Nextion TFT versions must remain compatible; NSPanel Pro is excluded."],
+    "sources": [
+      { "label": "NSPanel Home Assistant Blueprint", "url": "https://github.com/Blackymas/NSPanel_HA_Blueprint", "kind": "repo", "checked_at": "2026-10-14" },
+      { "label": "Install guide", "url": "https://github.com/Blackymas/NSPanel_HA_Blueprint/blob/main/docs/install.md", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "TFT recovery guide", "url": "https://github.com/Blackymas/NSPanel_HA_Blueprint/blob/main/docs/tft_upload.md", "kind": "guide", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "onn-7-2024-stock-kiosk",
+    "title": "Use a $59 Android tablet as a full browser panel",
+    "device_name": "onn 7-inch tablet (2024)",
+    "exact_models": ["2024 7-inch 32GB model", "Android 14 Go / MTK G36"],
+    "category": "display",
+    "summary": "The stock Android tablet can host a browser kiosk through normal app installation. Fully Kiosk documents Android Go restrictions, so exact-unit testing remains necessary.",
+    "outcome": "A full HTML calendar, dashboard or remote AI chat interface on stock Android without a verified root modification.",
+    "method": "repurpose",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "catalog_device_ids": ["onn-7-2024-kiosk"],
+    "tags": ["cheap-display", "android-go", "browser", "calendar", "kiosk", "remote-ai"],
+    "price": { "min_usd": 59.00, "max_usd": 59.00, "condition": "new", "availability": "out_of_stock", "scope": "device_only", "checked_at": "2026-10-14", "source_url": "https://www.walmart.com/ip/5199902435", "note": "Exact 2024 listing $59; checked Indigo option out of stock, other colors/local inventory vary. Add charging, mount and any kiosk software license/backend service; shipping/tax extra." },
+    "design_ideas": [
+      { "title": "Browser family calendar", "description": "Open a responsive HTML calendar in a kiosk app and test wake, WebView, authentication and display behavior on the exact Android Go unit.", "use_case": "calendar" },
+      { "title": "Remote AI chat panel", "description": "Display a web chat interface that talks to a trusted backend. This finding supports a remote-AI client, not local LLM inference.", "use_case": "ai_interface" }
+    ],
+    "risk_level": "low",
+    "warnings": ["This is stock kiosk repurposing; no root exploit is verified.", "Do not conflate the 2024 Android14Go unit with newer Android16 listings.", "Fully Kiosk cautions that Android Go restricts some features; exact-unit testing is required. Disable app administrator permission before uninstalling."],
+    "sources": [
+      { "label": "Exact seller listing", "url": "https://www.walmart.com/ip/5199902435", "kind": "primary_docs", "checked_at": "2026-10-14" },
+      { "label": "Fully Kiosk Android support and limitations", "url": "https://www.fully-kiosk.com/en/", "kind": "primary_docs", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  },
+  {
+    "id": "solum-st-gr29000-openepaperlink",
+    "title": "Reclaim an electronic shelf label as a room status display",
+    "device_name": "SOLUM electronic shelf label",
+    "exact_models": ["ST-GR29000 / 3B1 / SSD1619", "296x128 2.9-inch e-paper", "Two CR2450 cells"],
+    "category": "display",
+    "summary": "OpenEPaperLink's exact-model guide documents ZBS pin programming with AP-Flasher and an access-point workflow for image updates on reclaimed shelf labels.",
+    "outcome": "A small low-power calendar or status label using an OpenEPaperLink AP and host-rendered images, with current sourcing price still unknown.",
+    "method": "firmware",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "catalog_device_ids": [],
+    "tags": ["reclaimed", "e-paper", "shelf-label", "calendar", "openepaperlink", "price-unknown"],
+    "design_ideas": [
+      { "title": "Room booking label", "description": "Render the next booking or free/occupied state on a host and send a 296x128 bitmap through an OpenEPaperLink access point. Add AP, flasher and cells to the build cost.", "use_case": "calendar" },
+      { "title": "Tiny information label", "description": "Show one appliance, task or service status with occasional e-paper updates. Confirm the exact ST-GR29000 variant before sourcing or flashing.", "use_case": "info_panel" }
+    ],
+    "risk_level": "medium",
+    "warnings": ["No current compatible seller price was verified; unrelated Newton Pro listings do not establish the cost.", "NFC ST-GR2900N and low-temperature variants require separate compatibility records.", "Initial pin programming requires AP-Flasher/ZBS hardware; a bad wireless downgrade can require physical reflashing."],
+    "sources": [
+      { "label": "Exact ST-GR29000 guide", "url": "https://github.com/OpenEPaperLink/OpenEPaperLink/wiki/2.9%E2%80%B3-ST%E2%80%90GR29000", "kind": "guide", "checked_at": "2026-10-14" },
+      { "label": "OpenEPaperLink", "url": "https://github.com/OpenEPaperLink/OpenEPaperLink", "kind": "repo", "checked_at": "2026-10-14" }
+    ],
+    "last_verified": "2026-10-14"
+  }
+]

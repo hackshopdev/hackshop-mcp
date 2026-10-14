@@ -5,7 +5,7 @@ import { Platforms } from "../site/lib/platform-types";
 
 describe("site data mirrors", () => {
   it("keeps catalog, tags and platforms byte-identical to the root files", () => {
-    for (const file of ["catalog.json", "tags.md", "platforms.json"]) {
+    for (const file of ["catalog.json", "firmware-playbooks.json", "reverse-engineering-examples.json", "tags.md", "platforms.json"]) {
       expect(readFileSync(join(process.cwd(), "site", file), "utf8")).toBe(
         readFileSync(join(process.cwd(), file), "utf8"),
       );

@@ -4,6 +4,7 @@ import type {
   PlatformBoardPartAlternative,
 } from "../build-plan/types.js";
 import type { FirmwarePlaybook } from "./firmware.js";
+import type { ReverseEngineeringExample } from "./reverse-engineering.js";
 
 export type { BoardDifficulty, FlashOverlay, PlatformBoardPartAlternative };
 
@@ -174,6 +175,7 @@ export interface PrintableFab {
 export interface CoreContext {
   catalog: DeviceEntry[];
   firmwarePlaybooks?: FirmwarePlaybook[];
+  reverseEngineeringExamples?: ReverseEngineeringExample[];
   platforms: Platform[];
   printablesFor(device: DeviceEntry, siteUrl: string): Printable[];
   siteUrl: string;

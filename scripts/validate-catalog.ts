@@ -6,6 +6,7 @@ import { loadCatalog } from "../src/catalog/load.js";
 import { loadPlatforms } from "../src/platforms/load.js";
 import type { Platform } from "../src/platforms/schema.js";
 import { loadFirmwarePlaybooks } from "../src/firmware/load.js";
+import { loadReverseEngineeringExamples } from "../src/reverse-engineering/load.js";
 
 const SDK_DOCS = "https://github.com/facebookincubator/muse-gadget-sdk/";
 
@@ -33,6 +34,7 @@ try {
   const { devices, tags } = loadCatalog();
   const platforms = loadPlatforms(devices);
   const firmwarePlaybooks = loadFirmwarePlaybooks();
+  const reverseEngineeringExamples = loadReverseEngineeringExamples();
   const deviceIds = new Set(devices.map((device) => device.id));
   const problems = platformDataProblems(platforms);
   for (const playbook of firmwarePlaybooks) {
@@ -40,11 +42,16 @@ try {
       problems.push(`${playbook.id}: unknown catalog device_id ${playbook.device_id}`);
     }
   }
+  for (const example of reverseEngineeringExamples) {
+    for (const deviceId of example.catalog_device_ids) {
+      if (!deviceIds.has(deviceId)) problems.push(`${example.id}: unknown catalog device_id ${deviceId}`);
+    }
+  }
   if (problems.length > 0) {
     throw new Error(`platforms.json data problems:\n${problems.map((problem) => `  - ${problem}`).join("\n")}`);
   }
   console.log(
-    `OK: ${devices.length} devices, ${tags.size} tags, ${platforms.length} platforms, ${firmwarePlaybooks.length} firmware playbooks, all schema-valid, no tag/platform/playbook drift.`,
+    `OK: ${devices.length} devices, ${tags.size} tags, ${platforms.length} platforms, ${firmwarePlaybooks.length} firmware playbooks, ${reverseEngineeringExamples.length} reverse-engineering examples, all schema-valid, no catalog link drift.`,
   );
   process.exit(0);
 } catch (err) {
