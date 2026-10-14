@@ -93,7 +93,11 @@ Searches the curated hardware field notebook. Every result carries its exact tar
 
 Use `use_case` for calendar, ai_interface, info_panel, smart_home or art design starters. `max_device_price_usd` matches the lowest dated seller variant and excludes unknown prices. Price results report stock and device-only scope; power, enclosure, host, shipping and tax are extra. MCU AI interfaces receive rendered data from a host or remote service.
 
-The daily discovery/inbox architecture is specified in [the implementation plan](thoughts/shared/plans/2026-10-14-daily-hardware-discovery.md); that pipeline is designed but not activated.
+The approval-gated daily scraper and private `/admin/discoveries` inbox are implemented.
+See [operations and activation checks](docs/hardware-discovery-operations.md) for
+the schedule, provider bounds, reviewer setup and data-only publication workflow.
+The [original implementation plan](thoughts/shared/plans/2026-10-14-daily-hardware-discovery.md)
+is historical design context, not evidence that a provider or schedule is active.
 
 ### Firmware playbook tools
 
