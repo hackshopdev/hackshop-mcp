@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   promote:
-    if: github.repository == 'hackshopdev/hackshop-mcp' && github.ref == 'refs/heads/main' && vars.DISCOVERY_PIPELINE_ENABLED == 'true'
+    if: github.repository == 'hackshopdev/hackshop-mcp' && github.ref == 'refs/heads/main' && vars.DISCOVERY_PIPELINE_ENABLED == 'true' && vars.DISCOVERY_PUBLISHER_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
