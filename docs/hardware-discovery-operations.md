@@ -83,7 +83,9 @@ depend on an earlier runner's local files. Remote results are never deleted.
 
 GitHub repository variables:
 
-- `DISCOVERY_PIPELINE_ENABLED=true` activates both trusted-main workflows.
+- `DISCOVERY_PIPELINE_ENABLED=true` activates trusted-main discovery.
+- `DISCOVERY_PUBLISHER_ENABLED=true` additionally activates the publisher; leave
+  false until the organization allows the repository token to create data PRs.
 
 The publisher uses the ephemeral repository `GITHUB_TOKEN`, with explicit
 contents and pull-request write permissions in its workflow. Repository settings
@@ -91,6 +93,13 @@ must permit Actions to create PRs. It never merges or writes directly to main.
 GitHub may require workflow approval for bot-created PR checks; a successful
 PR creation is not a passed CI or deployed preview. No global personal token is
 copied into repository secrets.
+
+Activation check on October 14: GitHub rejected enabling repository-token PR
+creation with HTTP 409, "The organization does not allow GitHub Actions to create
+or approve pull requests." Discovery and the private review queue can run without
+that permission; automated publication stays disabled. A repository-scoped
+publisher integration or an explicit organization-policy change is required
+before enabling it. Never substitute the operator's broad personal token.
 
 ## Health and recovery
 

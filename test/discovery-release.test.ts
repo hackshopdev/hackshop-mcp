@@ -42,4 +42,8 @@ describe('discovery release contract', () => {
     expect(workflow).toContain('55437:5432');
     expect(workflow).toContain('npm run build --prefix site');
   });
+  it('allows discovery without activating a publisher blocked by organization policy', () => {
+    const workflow = readFileSync('.github/workflows/promote-hardware-discoveries.yml', 'utf8');
+    expect(workflow).toContain("vars.DISCOVERY_PUBLISHER_ENABLED == 'true'");
+  });
 });
