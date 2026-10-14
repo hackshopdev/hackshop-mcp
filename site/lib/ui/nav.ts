@@ -13,6 +13,7 @@ export const NAV_LINKS: NavLink[] = [
   { href: "/store", label: "Store" },
   { href: "/templates", label: "Templates" },
   { href: "/ideas", label: "Ideas", prefetch: false },
+  { href: "/reverse-engineering", label: "Library" },
   { href: "/tools", label: "Tools", prefetch: false },
   { href: "/resources", label: "Field guides" },
 ];

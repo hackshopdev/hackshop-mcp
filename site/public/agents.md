@@ -21,6 +21,13 @@ You are helping your human build a physical body for you (an AI agent). Muse is 
 5. Prepare: call `prepare_firmware_job` only after the human confirms ownership or authorization. It produces a manifest and stop points, not a flash command.
 6. Execute: destructive work is human-run only. Ask the playbook's exact confirmation prompt and wait for a clear yes immediately before the destructive step.
 
+## Reverse-engineering library flow
+
+1. Search: call `find_reverse_engineering_examples` with an idea, device, model, category, method or evidence filter.
+2. Read the label: `reproduced` cites an independent reproduction; `documented` has an inspectable implementation or guide; `author_demo` is inspiration only; `analysis_method` is saved evidence or a research technique.
+3. Match the hardware: read `exact_models`, `warnings` and checked sources. A brand name, retail listing or similar enclosure is never enough.
+4. Inspect one complete record at `hackshop://reverse-engineering/<example_id>` before recommending an attempt. The library does not authorize flashing, exploitation or unsafe appliance automation.
+
 ## Board warnings
 
 - Seeed SenseCAP Watcher: back up the `nvsfactory` partition first (`read-flash 0x9000 0x32000`), use the CH342 port ending in 3, flash only with `tools/muse/board.sh flash watcher`, and don't interrupt the flash: it shows nothing for about 3 minutes.
@@ -42,6 +49,8 @@ Muse replies are text. Boards with screens show them as captions; others show th
 - Build brief: `/build/<device_id>/build.md`
 - Muse boards: `/muse`
 - Store: `/store` and `/store.json`
+- Reverse-engineering library: `/reverse-engineering`
+- Cheap display design starters: `/displays`
 - Agent guide: `/agents.md`
 - Discovery: `/.well-known/mcp.json`, `/.well-known/agent-card.json`, `/.well-known/ai-agent.json`
 
@@ -51,6 +60,7 @@ Muse replies are text. Boards with screens show them as captions; others show th
 - `plan_gadget`: choose Muse boards, report fit, notes, warnings, intake status and difficulty, and link build pages.
 - `get_build_plan`: return difficulty, flash warnings, parts, shopping list, assembly steps with checks, commands and agent brief.
 - `assess_hackability`: look up a catalog device and report firmware, brick risk, build page and agent-platform support.
+- `find_reverse_engineering_examples`: search source-linked hardware projects and methods with explicit evidence, repeatability, exact-model and risk labels. Filter `use_case` (calendar, ai_interface, info_panel, smart_home, art) and `max_device_price_usd` for dated device-only prices; accessories and host costs are extra. Unknown prices are excluded by price filters and stock is reported separately.
 - `find_firmware_playbooks`: find curated local-control, cloud-replacement and firmware paths.
 - `check_firmware_compatibility`: fail-closed exact target matching.
 - `get_firmware_playbook`: return backups, recovery, risks, sources, steps and validation.

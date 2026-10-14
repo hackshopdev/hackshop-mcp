@@ -104,12 +104,22 @@ describe("HS-MCP-003: build resource template", () => {
       readFileSync(join(process.cwd(), "site", "public", ".well-known", "mcp.json"), "utf8"),
     ) as { resources: string[]; resource_templates: string[]; tools: Array<{ name: string }>; stateless: boolean };
     expect(manifest.resources.every((uri) => !uri.includes("{"))).toBe(true);
-    expect(manifest.resource_templates).toEqual(["hackshop://build/{device_id}"]);
+    expect(manifest.resource_templates).toEqual([
+      "hackshop://build/{device_id}",
+      "hackshop://firmware/{playbook_id}",
+      "hackshop://reverse-engineering/{example_id}",
+    ]);
     expect(manifest.tools.map((tool) => tool.name)).toEqual([
       "intake_gadget",
       "plan_gadget",
       "get_build_plan",
       "assess_hackability",
+      "find_reverse_engineering_examples",
+      "find_firmware_playbooks",
+      "check_firmware_compatibility",
+      "get_firmware_playbook",
+      "verify_firmware_artifact",
+      "prepare_firmware_job",
     ]);
     expect(manifest.stateless).toBe(true);
   });

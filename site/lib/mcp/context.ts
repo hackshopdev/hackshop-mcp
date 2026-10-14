@@ -1,5 +1,6 @@
 import platformsJson from "../../platforms.json";
 import firmwarePlaybooksJson from "../../firmware-playbooks.json";
+import reverseEngineeringExamplesJson from "../../reverse-engineering-examples.json";
 import cadManifestJson from "../../public/cad/manifest.json";
 import { loadCatalog } from "../catalog";
 import { Platforms } from "../platform-types";
@@ -10,6 +11,7 @@ import type {
   PrintableFab,
 } from "../core/types";
 import { FirmwarePlaybookCatalog } from "../core/firmware";
+import { ReverseEngineeringExampleCatalog } from "../core/reverse-engineering";
 
 const DEFAULT_SITE_URL = "https://www.hackshop.dev";
 
@@ -30,6 +32,9 @@ interface CadManifest {
 
 const platforms = Platforms.parse(platformsJson);
 const firmwarePlaybooks = FirmwarePlaybookCatalog.parse(firmwarePlaybooksJson);
+const reverseEngineeringExamples = ReverseEngineeringExampleCatalog.parse(
+  reverseEngineeringExamplesJson,
+);
 const cadManifest = cadManifestJson as CadManifest;
 
 export function loadCoreContext(siteUrl = DEFAULT_SITE_URL): CoreContext {
@@ -37,6 +42,7 @@ export function loadCoreContext(siteUrl = DEFAULT_SITE_URL): CoreContext {
   return {
     catalog: devices,
     firmwarePlaybooks,
+    reverseEngineeringExamples,
     platforms,
     printablesFor: printablesForDevice,
     siteUrl,

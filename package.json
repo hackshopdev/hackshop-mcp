@@ -12,6 +12,7 @@
     "dist",
     "catalog.json",
     "firmware-playbooks.json",
+    "reverse-engineering-examples.json",
     "platforms.json",
     "tags.md",
     "examples",

@@ -8,16 +8,21 @@ You describe a project. The agent surfaces 3-5 hackable hardware options you wou
 
 A tinkerer has an idea. The idea would be cooler with the right piece of hardware attached: an old screen, an abandoned smart speaker, a bricked frame, a hackable handheld. The tinkerer doesn't know what hardware exists, what's hackable, or what would creatively *fit* the idea. So the idea stays purely software, or gets paired with a Raspberry Pi.
 
-This is a hardware-knowledge layer on top of LLMs. Eleven tools, 100 researched devices, 15 curated firmware playbooks, one closed-set tag vocabulary, and safety rules that fail closed when brick risk or exact firmware compatibility is unknown. `simulate_assembly` drops a proposed robot into a MuJoCo physics world and tells you, honestly, whether it would actually move.
+This is a hardware-knowledge layer on top of LLMs. Twelve tools, 110 researched devices, 15 curated firmware playbooks, 46 source-linked reverse-engineering examples, one closed-set tag vocabulary, and safety rules that fail closed when brick risk or exact firmware compatibility is unknown. `simulate_assembly` drops a proposed robot into a MuJoCo physics world and tells you, honestly, whether it would actually move.
 
 hackshop knows Meta's Muse Gadgets SDK: ESP32 boards and Linux machines that can become a physical body for Muse, Meta's personal AI agent. Muse recommendations include the SDK tier, a ski-style difficulty level, board-specific flash warnings, setup path, supported features, printable stand/enclosure links when available, and the required terms caveat: personal, non-commercial use only, at most 50 devices per token, no selling or public marketplace listing, and revocable access.
 
 ## Status
 
-v0.0.7 is published on npm and hosted at `https://www.hackshop.dev/mcp`. The repository now also contains an unreleased Firmware Playbooks slice: 15 curated playbooks and five deterministic MCP tools. The npm server additionally includes `propose_hardware` and `simulate_assembly`. The simulation layer is live at [hackshop.dev](https://hackshop.dev). Source: [github.com/hackshopdev/hackshop-mcp](https://github.com/hackshopdev/hackshop-mcp).
+v0.0.7 is published on npm and hosted at `https://www.hackshop.dev/mcp`. The repository now also contains unreleased Firmware Playbooks and Reverse Engineering Library slices: 15 curated playbooks, 46 evidence-labeled examples and six deterministic MCP tools across them. The npm server additionally includes `propose_hardware` and `simulate_assembly`. The simulation layer is live at [hackshop.dev](https://hackshop.dev). Source: [github.com/hackshopdev/hackshop-mcp](https://github.com/hackshopdev/hackshop-mcp).
 
 ### Changelog
 
+- **Unreleased — Reverse Engineering Library**
+  - Forty-six source-linked records covering exact-model documented builds, independent replications, author demos and saved-evidence analysis methods.
+  - Eleven display design starters at `/displays`, with eight dated seller price observations and device-budget/use-case filters in MCP. The catalog adds eight exact display devices and two Hue bulbs.
+  - `find_reverse_engineering_examples` plus index/item resources expose exact models, outcomes, evidence, repeatability, risk, warnings and checked sources.
+  - REA's public showcase remains labeled software-only; its Archer C7 firmware, Wii Nunchuk I²C and MAX3232E UART corpus artifacts are represented as analysis methods, not physical-device proof.
 - **Unreleased — Firmware Playbooks**
   - Fifteen curated playbooks spanning five supported TECHO5 Echo targets, OpenWrt, Tasmota, Thingino, a Wyze overlay, Hue/Zigbee, SoundTouch Reborn, dorita980 and Valetudo.
   - Exact, fail-closed compatibility checks for model, codename, hardware revision, SoC, sensor, radio and firmware where a playbook requires them.
@@ -82,6 +87,14 @@ Returns 3-5 hardware proposals, each with:
 
 Lookup by id, exact name, or substring. Returns the same shape as a single proposal plus any curated firmware-playbook summaries. Use when you have a device in mind and want to verify hackability before searching for one to buy.
 
+### `find_reverse_engineering_examples(query?, category?, evidence?, method?, use_case?, max_device_price_usd?, limit?)`
+
+Searches the curated hardware field notebook. Every result carries its exact target when published, outcome, evidence label, reproducibility, risk, compatibility/safety warnings and source-check date. `reproduced` cites an independent reproduction; `documented` means an inspectable implementation or guide exists; `author_demo` remains inspiration-only; `analysis_method` describes saved evidence or research tooling and does not imply live-device validation.
+
+Use `use_case` for calendar, ai_interface, info_panel, smart_home or art design starters. `max_device_price_usd` matches the lowest dated seller variant and excludes unknown prices. Price results report stock and device-only scope; power, enclosure, host, shipping and tax are extra. MCU AI interfaces receive rendered data from a host or remote service.
+
+The daily discovery/inbox architecture is specified in [the implementation plan](thoughts/shared/plans/2026-10-14-daily-hardware-discovery.md); that pipeline is designed but not activated.
+
 ### Firmware playbook tools
 
 - `find_firmware_playbooks(query, device_id?, intervention?, risk_tolerance?, limit?)` finds curated local-control and firmware paths, preferring the least-invasive match.
@@ -126,8 +139,10 @@ Both hosted MCP and npm expose:
 - `hackshop://muse/sdk-terms` - text summary of Muse SDK token terms.
 - `hackshop://catalog/tags` - catalog tag list.
 - `hackshop://firmware/playbooks` - compact index of the curated firmware playbooks.
+- `hackshop://reverse-engineering/examples` - the source-linked example index with evidence and reproducibility labels.
 - Template `hackshop://build/{device_id}` (from `resources/templates/list`) - the build plan JSON, e.g. `hackshop://build/seeed-sensecap-watcher`.
 - Template `hackshop://firmware/{playbook_id}` - one complete firmware playbook, e.g. `hackshop://firmware/techo5-echo-dot-2`.
+- Template `hackshop://reverse-engineering/{example_id}` - one complete research record, e.g. `hackshop://reverse-engineering/wii-nunchuk-i2c-capture`.
 - Prompt `plan-muse-gadget` - tells an agent to do intake, call `plan_gadget`, call `get_build_plan`, show the shopping list, ask before buying, assemble, flash and pair.
 
 The hosted MCP is stateless: JSON-RPC over POST, no `mcp-session-id`; GET and DELETE return 405. CORS allows any origin so browser agents can call it. The planner is also a plain HTTP API: `POST https://www.hackshop.dev/api/plan` (OpenAPI at `https://www.hackshop.dev/openapi.json`).

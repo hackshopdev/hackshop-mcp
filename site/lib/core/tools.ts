@@ -28,6 +28,10 @@ import {
   verifyFirmwareArtifact,
   verifyFirmwareArtifactInput,
 } from "./firmware-tools.js";
+import {
+  findReverseEngineeringExamples,
+  findReverseEngineeringExamplesInput,
+} from "./reverse-engineering-tools.js";
 import type { CoreContext, DeviceEntry, Platform, PlatformBoard } from "./types.js";
 
 export const getBuildPlanInput = z.object({
@@ -68,6 +72,7 @@ export interface CoreTool<Input, Output> {
     | "plan_gadget"
     | "get_build_plan"
     | "assess_hackability"
+    | "find_reverse_engineering_examples"
     | "find_firmware_playbooks"
     | "check_firmware_compatibility"
     | "get_firmware_playbook"
@@ -225,6 +230,54 @@ export const CORE_TOOLS = [
     zodSchema: assessHackabilityInput,
     run: assessHackability,
   } satisfies CoreTool<z.infer<typeof assessHackabilityInput>, AssessOutput>,
+  {
+    name: "find_reverse_engineering_examples",
+    title: "Find reverse-engineering examples",
+    description:
+      "Search Hackshop's curated hardware reverse-engineering examples and research methods. With no query, returns the newest dated examples first. Evidence labels distinguish reproduced work, documented implementations, author demos and analysis methods; they do not imply compatibility with similar-looking hardware.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          maxLength: 2000,
+          default: "",
+          description: "Optional case-insensitive search across title, device, exact models, summary, outcome and tags. Empty returns the latest examples.",
+        },
+        category: {
+          type: "string",
+          enum: ["display", "speaker", "input", "sensor", "bulb", "sbc", "handheld", "mini-pc", "wearable", "router", "other"],
+        },
+        evidence: {
+          type: "string",
+          enum: ["reproduced", "documented", "author_demo", "analysis_method"],
+        },
+        method: {
+          type: "string",
+          enum: ["root", "firmware", "protocol", "app_api", "hardware_bus", "repurpose", "analysis_tool"],
+        },
+        use_case: {
+          type: "string",
+          enum: ["calendar", "ai_interface", "info_panel", "smart_home", "art"],
+          description: "Filter source-backed design starters by intended use.",
+        },
+        max_device_price_usd: {
+          type: "number",
+          exclusiveMinimum: 0,
+          description: "Maximum lowest-listed device price in USD; unknown prices excluded. Accessories, host, shipping and tax are extra; availability is returned separately.",
+        },
+        limit: {
+          type: "number",
+          minimum: 1,
+          maximum: 50,
+          default: 20,
+        },
+      },
+    },
+    outputSchema: OBJECT_OUTPUT_SCHEMA,
+    zodSchema: findReverseEngineeringExamplesInput,
+    run: findReverseEngineeringExamples,
+  } satisfies CoreTool<z.infer<typeof findReverseEngineeringExamplesInput>, unknown>,
   {
     name: "find_firmware_playbooks",
     title: "Find firmware playbooks",

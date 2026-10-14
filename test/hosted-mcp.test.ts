@@ -32,6 +32,7 @@ describe("hosted MCP route", () => {
       "plan_gadget",
       "get_build_plan",
       "assess_hackability",
+      "find_reverse_engineering_examples",
       "find_firmware_playbooks",
       "check_firmware_compatibility",
       "get_firmware_playbook",
@@ -53,6 +54,15 @@ describe("hosted MCP route", () => {
     expect(planJson.picks.map((pick: { device_id: string }) => pick.device_id))
       .toContain("seeed-sensecap-indicator");
 
+    const examples = await rpc("tools/call", {
+      name: "find_reverse_engineering_examples",
+      arguments: {},
+    });
+    const examplesJson = JSON.parse(examples.result.content[0].text);
+    expect(examples.result.structuredContent).toEqual(examplesJson);
+    expect(examplesJson.total).toBeGreaterThan(0);
+    expect(examplesJson.matches.length).toBeGreaterThan(0);
+
     const badBuild = await rpc("tools/call", {
       name: "get_build_plan",
       arguments: { device_id: "nope" },
@@ -67,6 +77,15 @@ describe("hosted MCP route", () => {
     expect(boardsJson.some((board: { device_id: string }) => board.device_id === "m5stack-sticks3"))
       .toBe(true);
 
+    const reverseEngineeringIndex = await rpc("resources/read", {
+      uri: "hackshop://reverse-engineering/examples",
+    });
+    const reverseEngineeringIndexJson = JSON.parse(
+      reverseEngineeringIndex.result.contents[0].text,
+    );
+    expect(reverseEngineeringIndexJson.total).toBeGreaterThan(0);
+    expect(reverseEngineeringIndexJson.evidence_note).toMatch(/not blanket compatibility/);
+
     const templates = await rpc("resources/templates/list");
     expect(templates.result.resourceTemplates).toContainEqual(
       expect.objectContaining({
@@ -77,6 +96,12 @@ describe("hosted MCP route", () => {
     expect(templates.result.resourceTemplates).toContainEqual(
       expect.objectContaining({
         uriTemplate: "hackshop://firmware/{playbook_id}",
+        mimeType: "application/json",
+      }),
+    );
+    expect(templates.result.resourceTemplates).toContainEqual(
+      expect.objectContaining({
+        uriTemplate: "hackshop://reverse-engineering/{example_id}",
         mimeType: "application/json",
       }),
     );

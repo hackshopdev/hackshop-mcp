@@ -16,7 +16,9 @@ import {
 import { loadCatalog } from "./catalog/load.js";
 import { loadFirmwarePlaybooks } from "./firmware/load.js";
 import type { FirmwarePlaybook } from "./core/firmware.js";
+import type { ReverseEngineeringExample } from "./core/reverse-engineering.js";
 import type { DeviceEntry } from "./catalog/schema.js";
+import { loadReverseEngineeringExamples } from "./reverse-engineering/load.js";
 import { loadPlatforms } from "./platforms/load.js";
 import { printablesFor, setLoadedPlatforms } from "./platforms/index.js";
 import type { Platform } from "./platforms/schema.js";
@@ -52,7 +54,7 @@ import type { CoreContext } from "./core/types.js";
 const NAME = "hackshop-mcp";
 const VERSION = "0.0.7";
 const STDIO_INSTRUCTIONS =
-  "hackshop maps a natural-language project idea to hackable, repurposable, or protocol-native hardware. For firmware reuse, call find_firmware_playbooks, then check_firmware_compatibility with exact observed identifiers before get_firmware_playbook or prepare_firmware_job; destructive actions are human-run only. For Muse agent-body gadgets, ask the intake questions from intake_gadget, then call plan_gadget with the answers; it is deterministic, instant and key-free. get_build_plan returns the parts, flash warnings and assembly checks. Use propose_hardware for broader repurposing ideas and existing hardware, especially when the host can sample or ANTHROPIC_API_KEY is set. hackshop never buys anything: show the exact items, sellers and total, ask \"Place this order for $<total> at <seller>?\" and wait for a clear yes. Anonymous usage telemetry (tool names and timings only) is on by default; set HACKSHOP_TELEMETRY=0 to turn it off.";
+  "hackshop maps a natural-language project idea to hackable, repurposable, or protocol-native hardware. Use find_reverse_engineering_examples for curated real-world examples and research methods; evidence labels distinguish repeatable work from author demos and do not imply compatibility. For firmware reuse, call find_firmware_playbooks, then check_firmware_compatibility with exact observed identifiers before get_firmware_playbook or prepare_firmware_job; destructive actions are human-run only. For Muse agent-body gadgets, ask the intake questions from intake_gadget, then call plan_gadget with the answers; it is deterministic, instant and key-free. get_build_plan returns the parts, flash warnings and assembly checks. Use propose_hardware for broader repurposing ideas and existing hardware, especially when the host can sample or ANTHROPIC_API_KEY is set. hackshop never buys anything: show the exact items, sellers and total, ask \"Place this order for $<total> at <seller>?\" and wait for a clear yes. Anonymous usage telemetry (tool names and timings only) is on by default; set HACKSHOP_TELEMETRY=0 to turn it off.";
 
 const CORE_TOOL_NAMES = new Set<string>(CORE_TOOLS.map((tool) => tool.name));
 
@@ -62,6 +64,7 @@ export function createToolRunner(context: {
   server?: Server;
   tags?: string[];
   firmwarePlaybooks?: FirmwarePlaybook[];
+  reverseEngineeringExamples?: ReverseEngineeringExample[];
 }): (name: string, args: unknown) => Promise<{
   out: unknown;
   degraded?: boolean;
@@ -88,6 +91,7 @@ export function createToolRunner(context: {
           context.platforms,
           context.tags,
           context.firmwarePlaybooks,
+          context.reverseEngineeringExamples,
         ),
       );
       return runnerResult(result);
@@ -108,11 +112,13 @@ function coreContext(
   platforms: Platform[],
   tags?: string[],
   firmwarePlaybooks?: FirmwarePlaybook[],
+  reverseEngineeringExamples?: ReverseEngineeringExample[],
 ): CoreContext {
   const siteUrl = siteUrlFromEnv();
   return {
     catalog,
     firmwarePlaybooks: firmwarePlaybooks ?? loadFirmwarePlaybooks(),
+    reverseEngineeringExamples: reverseEngineeringExamples ?? loadReverseEngineeringExamples(),
     platforms,
     printablesFor: (device, baseUrl) => printablesFor(device as DeviceEntry, baseUrl),
     siteUrl,
@@ -139,11 +145,12 @@ async function main(): Promise<void> {
   // Boot validation. Refuses to start on bad catalog/tags.
   const { devices, tags } = loadCatalog();
   const firmwarePlaybooks = loadFirmwarePlaybooks();
+  const reverseEngineeringExamples = loadReverseEngineeringExamples();
   const sortedTags = [...tags].sort();
   const platforms = loadPlatforms(devices);
   setLoadedPlatforms(platforms);
   process.stderr.write(
-    `[hackshop-mcp] Catalog loaded: ${devices.length} devices, ${tags.size} tags, ${platforms.length} platforms, ${firmwarePlaybooks.length} firmware playbooks.\n`,
+    `[hackshop-mcp] Catalog loaded: ${devices.length} devices, ${tags.size} tags, ${platforms.length} platforms, ${firmwarePlaybooks.length} firmware playbooks, ${reverseEngineeringExamples.length} reverse-engineering examples.\n`,
   );
 
   // Note: sampling is a CLIENT capability, not a server one. We don't declare
@@ -233,7 +240,13 @@ async function main(): Promise<void> {
   }));
 
   server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-    const ctx = coreContext(devices, platforms, sortedTags, firmwarePlaybooks);
+    const ctx = coreContext(
+      devices,
+      platforms,
+      sortedTags,
+      firmwarePlaybooks,
+      reverseEngineeringExamples,
+    );
     const resource = readCoreResource(request.params.uri, ctx);
     if (!resource) {
       throw new McpError(RESOURCE_NOT_FOUND_CODE, resourceNotFoundMessage(request.params.uri, ctx));
@@ -259,6 +272,7 @@ async function main(): Promise<void> {
     server,
     tags: sortedTags,
     firmwarePlaybooks,
+    reverseEngineeringExamples,
   });
 
   server.setRequestHandler(CallToolRequestSchema, async (request) => {

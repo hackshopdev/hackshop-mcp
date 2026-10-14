@@ -399,6 +399,7 @@ describe("header nav (item 14)", () => {
       ["Store", "/store"],
       ["Templates", "/templates"],
       ["Ideas", "/ideas"],
+      ["Library", "/reverse-engineering"],
       ["Tools", "/tools"],
       ["Field guides", "/resources"],
     ]);
