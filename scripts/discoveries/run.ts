@@ -9,6 +9,7 @@ import { canonicalSourceUrl, digest, existingIdentityIndex, githubProject, norma
 import { createScrapeCreatorsClient, SCRAPECREATORS_COVERAGE_NOTE } from "./scrapecreators.js";
 import { harvestGrokCliResult, sendGrokCliRequest, type GrokCli } from "./grok.js";
 import { researchPost, type ResearchDocument } from "./research.js";
+import { isHardwarePost, rankHardwarePosts } from "./relevance.js";
 import { createWorkerClient, type WorkerClient } from "./queue.js";
 
 const QuerySchema = z.array(z.object({ id: z.string().regex(/^[a-z0-9-]+$/), query: z.string().min(3).max(500) }).strict()).length(6);
@@ -16,7 +17,6 @@ type Query = z.infer<typeof QuerySchema>[number];
 const { IngestItem } = ((contractModule as any).default ?? contractModule) as typeof import("../../site/lib/discoveries/types.js");
 type Ingest = z.infer<typeof IngestItem>;
 const LIMIT = 5;
-const HARDWARE_TERMS = /reverse.engineer|rooted|jailbreak|firmware|esp32|photo.frame|hue|zigbee|bluetooth|mqtt|echo.show|echo.dot|smart.clock|apple.watch|calendar|dashboard/i;
 
 export function discoveryWindow(now: Date) {
   const backfill = now.getUTCDay() === 0;
@@ -83,11 +83,13 @@ export async function runDiscovery(options: {
     function rememberSeeds(posts: DiscoveredPost[]) {
       const stored = new Map<string, DiscoveredPost>((checkpoints.discovered_posts ?? []).map((post: DiscoveredPost) => [post.id, post]));
       for (const post of posts) {
-        if (!HARDWARE_TERMS.test(post.text) || identity.sources.has(canonicalSourceUrl(post.url)) || queuedSources.has(canonicalSourceUrl(post.url)) || (post.publishedAt && (post.publishedAt < window.start || post.publishedAt > window.end))) continue;
-        if (stored.size >= LIMIT && !stored.has(post.id)) continue;
-        stored.set(post.id, { ...post, text: post.text.slice(0, 250), links: post.links.filter((link) => link.length <= 256).slice(0, 2) });
+        if (!isHardwarePost(post) || identity.sources.has(canonicalSourceUrl(post.url)) || queuedSources.has(canonicalSourceUrl(post.url)) || (post.publishedAt && (post.publishedAt < window.start || post.publishedAt > window.end))) continue;
+        stored.set(post.id, post);
       }
-      checkpoints.discovered_posts = [...stored.values()];
+      // Later device-specific queries can displace early commentary from the
+      // recoverable five-seed window, without retaining full provider replies.
+      checkpoints.discovered_posts = rankHardwarePosts([...stored.values()].filter(isHardwarePost)).slice(0, LIMIT)
+        .map((post) => ({ ...post, text: post.text.slice(0, 250), links: post.links.filter((link) => link.length <= 256).slice(0, 2) }));
     }
     const harvestedProjects = new Set<string>();
     const knownRequests = new Set(pending.runs.map((old) => old.grok_receipt?.request_id).filter(Boolean));
@@ -110,7 +112,7 @@ export async function runDiscovery(options: {
               const receiptProjects = new Set<string>();
               const unique = result.posts.filter((post) => {
                 const key = projectKey([...post.links, post.url]);
-                if (identity.sources.has(canonicalSourceUrl(post.url)) || queuedSources.has(canonicalSourceUrl(post.url)) || harvestedProjects.has(key) || receiptProjects.has(key)) return false;
+                if (!isHardwarePost(post) || identity.sources.has(canonicalSourceUrl(post.url)) || queuedSources.has(canonicalSourceUrl(post.url)) || harvestedProjects.has(key) || receiptProjects.has(key)) return false;
                 receiptProjects.add(key); return true;
               });
               const ingested = await options.queue.harvest({ request_id: old.grok_receipt!.request_id, status, result_hash: hash, items: unique.map((post) => initialItem(post)) });
@@ -164,8 +166,8 @@ export async function runDiscovery(options: {
       const post = postFromPending(candidate);
       if (post && !identity.sources.has(canonicalSourceUrl(post.url))) jobs.set(post.id, { post, candidate, researchKey: candidate.id ? `research:${candidate.id}:${candidate.draft_version ?? 1}` : `research:${post.id}` });
     }
-    for (const post of suggestions) {
-      if (HARDWARE_TERMS.test(post.text) && !identity.sources.has(canonicalSourceUrl(post.url)) && !queuedSources.has(canonicalSourceUrl(post.url)) && !jobs.has(post.id)) jobs.set(post.id, { post, researchKey: `research:${post.id}` });
+    for (const post of rankHardwarePosts(suggestions.filter(isHardwarePost))) {
+      if (!identity.sources.has(canonicalSourceUrl(post.url)) && !queuedSources.has(canonicalSourceUrl(post.url)) && !jobs.has(post.id)) jobs.set(post.id, { post, researchKey: `research:${post.id}` });
     }
     const projects = new Set<string>();
     const selected = [...jobs.values()].filter(({ post, researchKey }) => {

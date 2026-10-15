@@ -10,7 +10,10 @@ remains the publication authority for the website and hosted MCP.
    the GrokBot webhook through the bundled CLI. It does not use the Grok website,
    direct xAI calls or an AI Gateway fallback. How GrokBot accesses Grok upstream
    is not independently verified. An accepted request is not completed research.
-2. Bounded primary-source research creates drafts. Exact model, compatibility,
+2. A physical-hardware relevance filter removes software-only reverse-engineering
+   hype. Author builds with source links rank ahead of commentary, across all
+   queries rather than first-query order. Ranking does not establish proof.
+   Bounded primary-source research creates drafts. Exact model, compatibility,
    prices and AI execution that have not been established remain unknown.
 3. The designated Clerk reviewer edits, rejects, requests more research, or
    approves the exact draft version and SHA-256 hash in the inbox.
@@ -52,7 +55,7 @@ package is a versioned snapshot and is not released by a website deployment.
   fresh runners. Same-day replay does not resend ambiguous paid calls.
 - At most ten outstanding relay receipts are checked per run, rotating by UTC
   day so permanently pending older requests do not starve newer completions.
-  Every bounded callback lead is queued before its receipt becomes terminal;
+  Every bounded relevant hardware callback lead is queued before terminal state;
   the five-candidate limit applies to research, not retained leads.
 - Searches overlap 72 hours; Sunday uses a bounded 14-day backfill. Indexed X
   search and Grok coverage are partial. An empty result is not proof that no new
@@ -143,5 +146,12 @@ public publication are separate facts and must be reported separately.
 GrokBot readiness also requires a completed authenticated callback round trip;
 HTTP acceptance alone is insufficient. The earlier CLI request
 `codex_20261014_162503_a8e8fe08` remained pending on its October 14 status check.
-It was not resubmitted. The CLI-only workflow remains local until released and
-its repository secrets, reviewer access and enable flag are verified.
+It was not resubmitted. The CLI-only scraper and private inbox were released and
+activated on October 14. Its first dispatched run, `38656200486`, saved five
+unreviewed raw leads and finished with partial coverage: ScrapeCreators completed,
+while the retained GrokBot job remained pending and consumed that day's submission
+allowance. Some raw leads were software commentary; the follow-up relevance filter
+prevents those from crowding out hardware in future runs. Existing records remain
+unreviewed and nothing was published. Reviewer access and server-only permissions
+were verified live. Automatic publication remains disabled by organization policy.
+Check the live inbox and Actions for fresh status; this is a dated activation record.
