@@ -9,13 +9,10 @@ export interface NavLink {
 }
 
 export const NAV_LINKS: NavLink[] = [
-  { href: "/muse", label: "Muse gadgets" },
-  { href: "/store", label: "Store" },
-  { href: "/templates", label: "Templates" },
-  { href: "/ideas", label: "Ideas", prefetch: false },
-  { href: "/reverse-engineering", label: "Library" },
-  { href: "/tools", label: "Tools", prefetch: false },
-  { href: "/resources", label: "Field guides" },
+  { href: "/muse", label: "Build" },
+  { href: "/community", label: "Community" },
+  { href: "/learn", label: "Learn" },
+  { href: "/store", label: "Hardware" },
 ];
 
 export const MY_BUILDS_LABEL = "My builds";

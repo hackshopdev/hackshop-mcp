@@ -5,6 +5,7 @@ import { editorialPosts } from "@/lib/editorial";
 import { TOOLS } from "@/lib/tools/catalog";
 import { MODEL_DEVICE_IDS } from "@/lib/models/boards";
 import { embodimentRecipeSlugs } from "@/lib/embodiment-recipes";
+import { communityEditorialEntries } from "@/lib/community/editorial";
 
 const site = "https://www.hackshop.dev";
 
@@ -21,6 +22,7 @@ const TOOLS_UPDATED = new Date("2026-10-05T00:00:00Z");
 const MODELS_UPDATED = new Date("2026-10-05T00:00:00Z");
 const RECIPES_UPDATED = new Date("2026-10-07T00:00:00Z");
 const REVERSE_ENGINEERING_UPDATED = new Date("2026-10-14T00:00:00Z");
+const COMMUNITY_UPDATED = new Date("2026-10-15T00:00:00Z");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -54,6 +56,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${site}/store`, lastModified: STORE_UPDATED, changeFrequency: "daily", priority: 0.85 },
     { url: `${site}/templates`, lastModified: TEMPLATES_UPDATED, changeFrequency: "monthly", priority: 0.7 },
     { url: `${site}/ideas`, lastModified: new Date("2026-10-05T00:00:00Z"), changeFrequency: "daily", priority: 0.75 },
+    { url: `${site}/community`, lastModified: COMMUNITY_UPDATED, changeFrequency: "weekly", priority: 0.75 },
+    { url: `${site}/learn`, lastModified: COMMUNITY_UPDATED, changeFrequency: "monthly", priority: 0.8 },
+    ...communityEditorialEntries().map((entry) => ({
+      url: `${site}/community/${entry.slug}`,
+      lastModified: COMMUNITY_UPDATED,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     { url: `${site}/resources`, lastModified: RESOURCES_INDEX_UPDATED, changeFrequency: "weekly", priority: 0.8 },
     { url: `${site}/reverse-engineering`, lastModified: REVERSE_ENGINEERING_UPDATED, changeFrequency: "weekly", priority: 0.82 },
     { url: `${site}/displays`, lastModified: REVERSE_ENGINEERING_UPDATED, changeFrequency: "weekly", priority: 0.8 },
