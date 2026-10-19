@@ -393,15 +393,12 @@ describe("site copy guards", () => {
 });
 
 describe("header nav (item 14)", () => {
-  it("links every section, including pages from other branches", () => {
+  it("keeps build, community, learning and hardware entry points in the primary navigation", () => {
     expect(NAV_LINKS.map((link) => [link.label, link.href])).toEqual([
-      ["Muse gadgets", "/muse"],
-      ["Store", "/store"],
-      ["Templates", "/templates"],
-      ["Ideas", "/ideas"],
-      ["Library", "/reverse-engineering"],
-      ["Tools", "/tools"],
-      ["Field guides", "/resources"],
+      ["Build", "/muse"],
+      ["Community", "/community"],
+      ["Learn", "/learn"],
+      ["Hardware", "/store"],
     ]);
     const header = site("components/SiteHeaderBar.tsx");
     expect(header).toContain("aria-expanded={open}");

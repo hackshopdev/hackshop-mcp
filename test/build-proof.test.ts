@@ -128,4 +128,64 @@ describe("featured build proof", () => {
       "interactive_3d.source_href is required",
     );
   });
+
+  it("does not accept an animation as a physical demo merely because a boolean says so", () => {
+    expect(isFeaturedBuildReady({
+      ...COMPLETE_PROOF,
+      demo_video: { ...COMPLETE_PROOF.demo_video!, kind: "concept-animation", shows_real_hardware: true },
+    })).toBe(false);
+  });
+
+  it.each([NaN, Infinity, -Infinity, "42", null, undefined, 0, -1])(
+    "rejects invalid runtime duration %j",
+    (duration_seconds) => {
+      expect(isFeaturedBuildReady({
+        ...COMPLETE_PROOF,
+        demo_video: { ...COMPLETE_PROOF.demo_video!, duration_seconds },
+      })).toBe(false);
+    },
+  );
+
+  it.each([null, undefined, [], "proof", 42, {}, { ...COMPLETE_PROOF, maturity: "production-certified" }])(
+    "fails closed without throwing for malformed runtime proof %j",
+    (proof) => {
+      expect(() => buildProofIssues(proof as BuildProofBundle)).not.toThrow();
+      expect(isFeaturedBuildReady(proof as BuildProofBundle)).toBe(false);
+    },
+  );
+
+  it.each([
+    { interactive_3d: "not a model" },
+    { interactive_3d: { ...COMPLETE_PROOF.interactive_3d, authoring: "unknown" } },
+    { interactive_3d: { ...COMPLETE_PROOF.interactive_3d, browser: "html" } },
+    { demo_video: [] },
+    { demo_video: { ...COMPLETE_PROOF.demo_video, kind: "walkthrough" } },
+    { demo_video: { ...COMPLETE_PROOF.demo_video, shows_real_hardware: "true" } },
+    { demo_video: { ...COMPLETE_PROOF.demo_video, resolution: { width: NaN, height: 1080 } } },
+    { demo_video: { ...COMPLETE_PROOF.demo_video, resolution: { width: 1920, height: -1 } } },
+    { finished_build_photo: { status: "unknown" } },
+    { finished_build_photo: { status: "unavailable", reason: "later" } },
+    { finished_build_photo: { ...COMPLETE_PROOF.finished_build_photo, alt: null } },
+    { finished_build_photo: { ...COMPLETE_PROOF.finished_build_photo, source_href: 42 } },
+  ])("rejects malformed nested proof fields without throwing: %j", (change) => {
+    const proof = { ...COMPLETE_PROOF, ...change };
+    expect(() => buildProofIssues(proof as BuildProofBundle)).not.toThrow();
+    expect(isFeaturedBuildReady(proof as BuildProofBundle)).toBe(false);
+  });
+
+  it.each(["javascript:alert(1)", "data:text/html,x", "//evil.test/x", "http://example.com/x", "https://user:pass@example.com/x", "https://localhost/x", "https://127.0.0.1/x", "\\\\evil.test\\x"])(
+    "rejects unsafe URLs in every featured-media slot: %s",
+    (href) => {
+      const variants = [
+        { interactive_3d: { ...COMPLETE_PROOF.interactive_3d, href } },
+        { interactive_3d: { ...COMPLETE_PROOF.interactive_3d, source_href: href } },
+        { demo_video: { ...COMPLETE_PROOF.demo_video, href } },
+        { demo_video: { ...COMPLETE_PROOF.demo_video, poster_href: href } },
+        { demo_video: { ...COMPLETE_PROOF.demo_video, source_href: href } },
+        { finished_build_photo: { ...COMPLETE_PROOF.finished_build_photo, href } },
+        { finished_build_photo: { ...COMPLETE_PROOF.finished_build_photo, source_href: href } },
+      ];
+      for (const change of variants) expect(isFeaturedBuildReady({ ...COMPLETE_PROOF, ...change } as BuildProofBundle)).toBe(false);
+    },
+  );
 });

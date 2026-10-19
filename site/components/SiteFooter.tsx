@@ -22,8 +22,13 @@ export function SiteFooter() {
             <Link href="/muse">Muse gadgets</Link>
             <Link href="/store">Store</Link>
             <Link href="/templates">Templates</Link>
+            <Link href="/community">Community builds</Link>
+            <Link href="/ideas">Ideas</Link>
+            <Link href="/learn">Learn to build</Link>
             <Link href="/reverse-engineering">Reverse engineering library</Link>
             <Link href="/displays">Cheap display designs</Link>
+            <Link href="/models">Interactive hardware models</Link>
+            <Link href="/tools">Tools</Link>
             <Link href="/projects">My builds</Link>
           </div>
           <div>
