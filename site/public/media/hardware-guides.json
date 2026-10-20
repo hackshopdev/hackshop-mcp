@@ -1,0 +1,169 @@
+{
+  "version": 1,
+  "reviewedAt": "2026-10-20",
+  "noticeUrl": "/media/hardware/NOTICE.txt",
+  "guides": [
+    {
+      "slug": "pf1007l-linux-dashboard",
+      "hackshopHardwareTested": false,
+      "preview": {
+        "kind": "frame",
+        "title": "A frame, a spare card, your dashboard",
+        "description": "Rotate the exterior and switch the sample calendar on or off. The loose card illustrates the spare-card approach, not a verified slot location.",
+        "disclaimer": "Interactive render — not a photo or hardware proof. Approximate exterior, not measured CAD. Sample data, no live calendar.",
+        "license": "MIT"
+      },
+      "photos": [
+        {
+          "src": "/media/hardware/biuframe-wes-bos.jpg",
+          "title": "Related build: Wes Bos's family dashboard",
+          "alt": "Wes Bos holding a physical photo frame displaying a family dashboard.",
+          "creator": "Wes Bos",
+          "sourceUrl": "https://github.com/wesbos/photo-frame-dashboard/blob/7e39fa425a25d96931d41358953e497d6a0026b3/docs/images/dashboard-on-frame.jpg",
+          "license": "MIT",
+          "licenseUrl": "https://github.com/wesbos/photo-frame-dashboard/blob/34d04b8d1ccc1b987cceed45f743983dff2eb141/LICENSE",
+          "changes": "Unmodified original documentation photograph. Copyright 2026 Wes Bos; MIT notice included.",
+          "scope": "Physical BIUFRAME running Android, not the Linux PF1007L build. Included as a related dashboard reference, not proof of this guide's installation.",
+          "reuse": "hosted-license",
+          "sha256": "d495ba374c5d50933220dfa394fe7b29674e9692b8345b9f64c47af7a5c3f7bc",
+          "width": 1920,
+          "height": 1080
+        }
+      ],
+      "videos": [
+        {
+          "provider": "x",
+          "url": "https://x.com/redp314/status/2109699021799293244",
+          "title": "Creator demo: Omarchy on an Allwinner frame",
+          "creator": "@redp314",
+          "durationSeconds": 14.333,
+          "role": "creator-demo",
+          "scope": "Short creator-posted demonstration of the microSD Linux project, not a step-by-step install or an independent Hackshop test. See the pinned guide for exact board and recovery limits.",
+          "reuse": "native-embed-only"
+        },
+        {
+          "provider": "youtube",
+          "url": "https://www.youtube.com/watch?v=ZLycoUMltNI",
+          "title": "Related walkthrough: Jailbreaking a $50 photo frame",
+          "creator": "Wes Bos / Syntax",
+          "role": "related-walkthrough",
+          "scope": "Wes Bos's longer Android BIUFRAME walkthrough. Different Rockchip hardware: do not use its flashing instructions for the Allwinner PF1007L Linux route. The title's price is historical, not a current quote.",
+          "reuse": "native-embed-only"
+        }
+      ],
+      "missing": "An exact PF1007L Linux installation and recovery walkthrough, and a separately licensed finished-build photograph, are still missing."
+    },
+    {
+      "slug": "house-control-hue-home-assistant",
+      "hackshopHardwareTested": false,
+      "preview": {
+        "kind": "home",
+        "title": "Try a lamp in a small sample room",
+        "description": "Rotate the room and toggle the simulated lamp. The scene is an original sample layout, not the creator's apartment or a connection to your home.",
+        "disclaimer": "Interactive render — not a photo or hardware proof. Original illustrative room, not a measured CAD model. All controls are simulated; no devices connected.",
+        "license": "MIT"
+      },
+      "photos": [
+        {
+          "src": "/media/hardware/hue-white-bulb.jpg",
+          "title": "Hardware reference: a Philips Hue white bulb",
+          "alt": "A physical Philips Hue white bulb on a white surface.",
+          "creator": "Gregory Varnum",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Philips_Hue_white_bulb_-_June_2018_(1944).jpg",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "changes": "Wikimedia's 1280px reduction; no crop or other changes. This image remains CC BY-SA 4.0.",
+          "scope": "Real hardware reference, not the creator's bulb or evidence that this exact unit was tested with House Control.",
+          "reuse": "hosted-license",
+          "sha256": "040052906ccef40552ff588b0e71dafc3a3afa49c054328a11e1c89fa37c9136",
+          "width": 1280,
+          "height": 853
+        },
+        {
+          "src": "/media/hardware/hue-bridge-gen2.jpg",
+          "title": "Hardware reference: a second-generation Hue Bridge",
+          "alt": "A person holding a powered Philips Hue Bridge with blue status lights.",
+          "creator": "Harborsparrow",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Philips_Hue_bridge_Gen_2.jpg",
+          "license": "CC0 1.0",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+          "changes": "Unmodified original photograph.",
+          "scope": "Real Hue Bridge reference. Not the creator's home installation, and not an exact-unit compatibility test.",
+          "reuse": "hosted-license",
+          "sha256": "3ecdd34adf393dd00ac2d17cc9a3c3e8d009b5b859b92476390e04becb7f0723",
+          "width": 500,
+          "height": 406
+        },
+        {
+          "src": "/media/hardware/house-control-simulated-ui.png",
+          "title": "App screenshot: simulated demo plan",
+          "alt": "House Control's sample room, air-conditioner sheet and color picker; these are software renders, not photos.",
+          "creator": "0xProbability",
+          "sourceUrl": "https://github.com/0xProbabillity/house-control/blob/0ddadcb7cc34c0f43f7cfd83d05680fef355e40a/docs/hero.png",
+          "license": "MIT",
+          "licenseUrl": "https://github.com/0xProbabillity/house-control/blob/0ddadcb7cc34c0f43f7cfd83d05680fef355e40a/LICENSE",
+          "changes": "Unmodified original documentation screenshot. Copyright 2026 0xProbability; MIT notice included.",
+          "scope": "Software screenshot, not a photograph. The source commit explicitly says these screenshots use a bundled demo plan with simulated devices.",
+          "reuse": "hosted-license",
+          "sha256": "6472249757c8a09b8f6a4d9b6ff190a7bb393c703240535e30486da7152f37cc",
+          "width": 2176,
+          "height": 1270
+        }
+      ],
+      "videos": [
+        {
+          "provider": "x",
+          "url": "https://x.com/0xProbabillity/status/2109978137794883621",
+          "title": "Creator demo: the apartment in a Mac menu bar",
+          "creator": "@0xProbabillity",
+          "durationSeconds": 17.6,
+          "role": "creator-demo",
+          "scope": "Short screen demo of the 3D app. The maker reports controlling real devices; the video does not independently show a physical Hue lamp responding or an end-to-end setup.",
+          "reuse": "native-embed-only"
+        }
+      ],
+      "missing": "No end-to-end House Control + Hue/Home Assistant setup walkthrough, or independently verified lamp-to-screen recording, was found in the checked primary sources."
+    },
+    {
+      "slug": "siri-remote-linux-event-reader",
+      "hackshopHardwareTested": false,
+      "preview": {
+        "kind": "remote",
+        "title": "A remote, a Linux host, a button event",
+        "description": "Rotate the A1962-inspired exterior and trigger an illustrative button event. The host box and event indicators are conceptual, not a working Bluetooth emulator.",
+        "disclaimer": "Interactive render — not a photo or hardware proof. Approximate exterior, not measured CAD. Simulated button event; no Bluetooth connection or keystroke injection.",
+        "license": "MIT"
+      },
+      "photos": [
+        {
+          "src": "/media/hardware/siri-remote-gen1.jpg",
+          "title": "Hardware reference: a first-generation Siri Remote",
+          "alt": "A black first-generation Siri Remote with a white ring around the Menu button, on blue fabric.",
+          "creator": "Jiří Sedláček",
+          "sourceUrl": "https://commons.wikimedia.org/wiki/File:Overview_of_Remote_controller_of_Apple_TV_in_Michle,_Prague.jpg",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "changes": "Wikimedia's 1280px reduction; no crop or other changes. This image remains CC BY-SA 4.0.",
+          "scope": "Real first-generation remote reference, not the author's tested A1962 unit. The file description does not establish its exact model; check the rear model number before following this guide.",
+          "reuse": "hosted-license",
+          "sha256": "6d4e0c0f3d22ae6ba37e2e1eb6183e577fe56f16db24228ed094b55db72e4c50",
+          "width": 1280,
+          "height": 853
+        }
+      ],
+      "videos": [
+        {
+          "provider": "x",
+          "url": "https://x.com/alexzfunk/status/2108585025205592408",
+          "title": "Creator demo: a gen-1 Siri Remote on Linux",
+          "creator": "@alexzfunk",
+          "durationSeconds": 9.514,
+          "role": "creator-demo",
+          "scope": "Brief creator-posted demonstration, not a pairing/permissions/reconnect walkthrough or proof of keyboard and voice support. The pinned README remains the compatibility boundary.",
+          "reuse": "native-embed-only"
+        }
+      ],
+      "missing": "A full exact-model setup and sleep/reconnect walkthrough is still missing; this short clip is not one. Hackshop has not tested physical hardware."
+    }
+  ]
+}

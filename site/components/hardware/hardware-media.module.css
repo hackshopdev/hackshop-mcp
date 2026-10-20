@@ -1,0 +1,33 @@
+.media { min-width: 0; }
+.media p { max-width: 72ch; }
+.preview { margin: 0 0 48px; }
+.preview h2 { margin: 12px 0 14px; }
+.renderLabel, .stageLabel { color: #ffd7ad; background: #35291d; border: 1px solid #75512e; padding: 6px 10px; width: fit-content; font-size: .8rem; font-weight: 750; border-radius: 5px; }
+.disclaimer { border-left: 3px solid #ff9d4d; padding: 10px 14px; background: #221e18; font-size: .92rem; }
+.previewClosed { min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 24px; background: #20292f; border-radius: 10px; }
+.previewClosed p:last-child { font-size: .82rem; margin: 14px 0 0; }
+.media button { cursor: pointer; border: 1px solid #77848a; border-radius: 6px; background: #303b42; color: #f4f4f2; font-family: inherit; font-size: .86rem; font-weight: 650; line-height: 1.4; padding: 10px 13px; }
+.media button:hover { border-color: #ff9d4d; }
+.media button:focus-visible, .stage canvas:focus-visible { outline: 3px solid #83dfcf; outline-offset: 3px; }
+.media button[aria-pressed="true"] { background: #49311d; border-color: #ff9d4d; }
+.stage { position: relative; width: 100%; height: clamp(320px, 48vw, 440px); background: #20292f; overflow: hidden; border-radius: 10px; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.stageLabel { position: absolute; top: 12px; left: 12px; pointer-events: none; background: #20292fe8; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.hint { font-size: .83rem; color: #abb8bc !important; }
+.photos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 20px; }
+.photo { margin: 0; min-width: 0; }
+.photo:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.photo img { display: block; width: 100%; height: auto; border-radius: 7px; background: #252525; }
+.photo h3 { font-size: 1.02rem; margin: 14px 0 8px; }
+.photo p { font-size: .9rem; line-height: 1.6; margin-bottom: 10px; }
+.credit { color: #aaa9a3 !important; font-size: .78rem !important; overflow-wrap: anywhere; }
+.videoBlock { margin: 26px 0 32px; padding-bottom: 26px; border-bottom: 1px solid #3a3a3a; }
+.videoBlock h3 { margin: 0 0 10px; }
+.videoBlock > p, .creatorVideo p { font-size: .92rem; }
+.consent { padding: 20px; background: #20292f; border: 1px solid #44545e; border-radius: 8px; margin-bottom: 12px; }
+.creatorVideo { min-width: 0; }
+.creatorVideo > div { max-width: 100%; }
+.reuse { font-size: .82rem; margin-top: 30px !important; }
+.media hr { border: 0; border-top: 1px solid #41413c; margin: 38px 0; }
+@media (max-width: 640px) { .photos { grid-template-columns: 1fr; } .previewClosed { padding: 18px; } .stage { height: 350px; } .controls button { flex: 1 1 auto; } }

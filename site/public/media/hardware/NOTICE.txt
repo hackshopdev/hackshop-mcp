@@ -1,0 +1,70 @@
+Hackshop field-guide media notices
+Reviewed: 2026-10-20
+
+Per-file sources, scope, SHA-256 and reuse mode: /media/hardware-guides.json
+Real photographs are reference images, not Hackshop physical-build evidence.
+The original procedural Three.js scenes are illustrative renders, not measured CAD.
+Native X and YouTube embeds remain with their creators. No redistribution,
+download, remix or editing rights in those videos are granted by this repository.
+Screenshots from other people's posts and seller photographs were not copied.
+
+biuframe-wes-bos.jpg
+  Original documentation photograph by Wes Bos, Copyright (c) 2026 Wes Bos.
+  Repository commit: 7e39fa425a25d96931d41358953e497d6a0026b3
+  MIT license commit: 34d04b8d1ccc1b987cceed45f743983dff2eb141 (2026-10-19)
+  Original contribution: docs/images/dashboard-on-frame.jpg
+  Unmodified. Licensed under the MIT notice below. Related Android BIUFRAME,
+  NOT a photograph of the PF1007L Linux build.
+
+house-control-simulated-ui.png
+  Original documentation screenshot by 0xProbability.
+  Copyright (c) 2026 0xProbability.
+  Repository commit: 0ddadcb7cc34c0f43f7cfd83d05680fef355e40a
+  Original contribution: docs/hero.png
+  Unmodified. Licensed under the MIT notice below. The source commit says
+  screenshots show a bundled demo plan with simulated devices. NOT a photo.
+
+hue-white-bulb.jpg
+  Gregory Varnum, Philips Hue white bulb - June 2018 (1944).jpg
+  https://commons.wikimedia.org/wiki/File:Philips_Hue_white_bulb_-_June_2018_(1944).jpg
+  CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/
+  Wikimedia 1280px reduction, no crop or other changes. This image and any
+  adaptations remain under CC BY-SA 4.0, not this repository's MIT license.
+
+hue-bridge-gen2.jpg
+  Harborsparrow, Philips Hue bridge Gen 2.jpg
+  https://commons.wikimedia.org/wiki/File:Philips_Hue_bridge_Gen_2.jpg
+  CC0 1.0: https://creativecommons.org/publicdomain/zero/1.0/
+  Original unmodified photograph.
+
+siri-remote-gen1.jpg
+  Jiří Sedláček, Overview of Remote controller of Apple TV in Michle, Prague.jpg
+  https://commons.wikimedia.org/wiki/File:Overview_of_Remote_controller_of_Apple_TV_in_Michle,_Prague.jpg
+  CC BY-SA 4.0: https://creativecommons.org/licenses/by-sa/4.0/
+  Wikimedia 1280px reduction, no crop or other changes. This image and any
+  adaptations remain under CC BY-SA 4.0, not this repository's MIT license.
+  Exact rear model number is not established by the file's description.
+
+MIT License (applies to the two named documentation assets above, each with
+its own copyright holder as identified above)
+
+Copyright (c) 2026 Wes Bos
+Copyright (c) 2026 0xProbability
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

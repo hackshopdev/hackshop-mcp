@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { HardwareGuideMedia } from "@/components/hardware/HardwareGuideMedia";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -112,7 +113,10 @@ export default async function ResourceArticle({ params }: Props) {
           </div>
         </header>
         <div className={styles.articleLayout}>
-          <article className={styles.article} dangerouslySetInnerHTML={{ __html: post.bodyHtml }} />
+          <article className={styles.article}>
+            <HardwareGuideMedia slug={post.slug} />
+            <div dangerouslySetInnerHTML={{ __html: post.bodyHtml }} />
+          </article>
           <aside className={styles.sidebar}>
             <h2>Related guides</h2>
             {related.map((item) => (
