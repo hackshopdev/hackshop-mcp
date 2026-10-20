@@ -1208,5 +1208,40 @@
       { "label": "OpenEPaperLink", "url": "https://github.com/OpenEPaperLink/OpenEPaperLink", "kind": "repo", "checked_at": "2026-10-14" }
     ],
     "last_verified": "2026-10-14"
+  },
+  {
+    "id": "alexa-jukebox-personal-music-radio",
+    "title": "Jukebox for Alexa: personal MP3s and internet radio",
+    "device_name": "Amazon Echo with an Alexa AudioPlayer custom skill",
+    "exact_models": [],
+    "category": "speaker",
+    "summary": "A source-checked custom-skill design inspired by the levelsio prompt supplied by a reader. Amazon's AudioPlayer guide and sample provide the starting point; S3 or R2 presigned GET URLs can keep the music bucket private. This is a design guide, not a released Jukebox implementation or a Hackshop-tested Echo build.",
+    "outcome": "Implementation path: enable AudioPlayer, map voice requests to a personal music library or radio list, issue HTTPS playback URLs, and handle playback events and pause/resume. Library matching, album ordering, shuffle and radio recovery remain application work. Alexa and Amazon cloud services stay in place; no firmware replacement or root access is involved.",
+    "method": "app_api",
+    "evidence": "documented",
+    "reproducibility": "limited",
+    "catalog_device_ids": [],
+    "tags": ["alexa", "echo", "jukebox", "mp3", "internet-radio", "audioplayer", "s3", "r2", "supported-integration", "design-guide", "not-hardware-tested"],
+    "risk_level": "low",
+    "warnings": [
+      "Documentation supports the integration pattern, not this complete implementation. Exact Echo generation, locale and firmware are unknown; no physical playback, long resume, queue continuity or reconnect test is claimed.",
+      "The original X link and attribution were supplied by a reader; the post was not independently retrieved. No implementation repository or creator media permission was established. No third-party photo or video is rehosted.",
+      "Use a development-stage custom skill on devices registered to the same developer account; this is not Amazon's enterprise private-skill distribution mechanism. Cloud hosting, storage and transfer may incur costs.",
+      "Audio URLs, including streams referenced inside playlists, must meet Alexa's HTTPS, trusted-certificate, port and encoding requirements. No named radio station or stream endpoint has been verified for this entry; check availability, region and permitted use before adding one.",
+      "Keep the bucket private and grant the skill only the required list/read permissions. Presigned URLs are bearer credentials: never publish or log them. AWS temporary credentials can expire before a requested 12-hour URL lifetime; R2 signing uses its S3 API hostname, not a custom domain.",
+      "AudioPlayer tokens are limited to 1024 characters and must not contain customer data. Use opaque identifiers, not music paths or secrets; ENQUEUE requires a matching expectedPreviousToken. A database-free queue is a proposed design, not a validated guarantee.",
+      "Test real playback, pause/resume, track changes and radio failures on the target Echo. The simulator does not render AudioPlayer playback; that limitation does not make every simulator error harmless. Use only music and streams you are permitted to play."
+    ],
+    "sources": [
+      { "label": "Reader-supplied levelsio Jukebox prompt (post not independently retrieved)", "url": "https://x.com/i/status/2112624509714849840", "kind": "social_post", "checked_at": "2026-10-20" },
+      { "label": "Amazon AudioPlayer implementation guide", "url": "https://developer.amazon.com/en-US/docs/alexa/custom-skills/use-long-form-audio.html", "kind": "primary_docs", "checked_at": "2026-10-20" },
+      { "label": "Amazon AudioPlayer requests, queue and token reference", "url": "https://developer.amazon.com/en-US/docs/alexa/custom-skills/audioplayer-interface-reference.html", "kind": "primary_docs", "checked_at": "2026-10-20" },
+      { "label": "Amazon audio-player sample (starting point, not the Jukebox implementation)", "url": "https://github.com/alexa-samples/skill-sample-nodejs-audio-player", "kind": "repo", "checked_at": "2026-10-20" },
+      { "label": "AWS presigned URL security and credential expiry", "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html", "kind": "primary_docs", "checked_at": "2026-10-20" },
+      { "label": "Cloudflare R2 presigned URLs", "url": "https://developers.cloudflare.com/r2/api/s3/presigned-urls/", "kind": "primary_docs", "checked_at": "2026-10-20" },
+      { "label": "Amazon development-stage skill access", "url": "https://developer.amazon.com/en-US/docs/alexa/devconsole/test-and-submit-your-skill.html", "kind": "primary_docs", "checked_at": "2026-10-20" },
+      { "label": "Amazon simulator limitations", "url": "https://developer.amazon.com/en-US/docs/alexa/devconsole/alexa-simulator.html", "kind": "primary_docs", "checked_at": "2026-10-20" }
+    ],
+    "last_verified": "2026-10-20"
   }
 ]
