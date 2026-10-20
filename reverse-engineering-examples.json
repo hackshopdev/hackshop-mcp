@@ -35,33 +35,107 @@
   },
   {
     "id": "aimor-pf1007l-photo-frame",
-    "title": "Reclaim the Allwinner photo frame hiding under the same listing",
-    "device_name": "AiMOR / BIUFRAME Allwinner photo frame",
-    "exact_models": ["PF1007L", "Allwinner A33", "Android 6.0.1"],
-    "category": "display",
-    "summary": "A separate guide covers the Allwinner A33 PF1007L now commonly shipped under the BIUFRAME listing, with identity-dependent paths through stock ADB, an AiMOR-mediated temporary root, FEL or a guarded boot patch.",
-    "outcome": "A local kiosk or dashboard on the Allwinner frame without applying the incompatible Rockchip instructions.",
+    "tags": [
+      "photo-frame",
+      "allwinner",
+      "android",
+      "linux",
+      "omarchy",
+      "microsd",
+      "calendar",
+      "kiosk",
+      "variant-sensitive",
+      "not-hardware-tested"
+    ],
+    "title": "Run an Allwinner PF1007L as an Android or Linux dashboard",
     "method": "root",
+    "outcome": "A source-linked choice between an Android kiosk and an experimental Linux web-view calendar or information panel, with exact-unit checks and a recovery-first guide. The author's working setup is distinct from the original image-builder artifact validated in QEMU; a fresh card still needs testing on the actual frame.",
+    "sources": [
+      {
+        "url": "https://www.hackshop.dev/resources/pf1007l-linux-dashboard",
+        "kind": "guide",
+        "label": "Hackshop setup guide and editable recovery-planning diagram",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://github.com/wesbos/photo-frame-dashboard/blob/main/docs/pf1007l-start-here.md",
+        "kind": "guide",
+        "label": "PF1007L start page",
+        "checked_at": "2026-10-14"
+      },
+      {
+        "url": "https://github.com/wesbos/photo-frame-dashboard/blob/main/docs/devices.md",
+        "kind": "primary_docs",
+        "label": "Photo-frame device index",
+        "checked_at": "2026-10-14"
+      },
+      {
+        "url": "https://github.com/wesbos/photo-frame-dashboard",
+        "kind": "repo",
+        "label": "Photo Frame Dashboard repository",
+        "checked_at": "2026-10-14"
+      },
+      {
+        "url": "https://github.com/pangoleen/ormarch-picture-frame/blob/4207b5c2f6d6615bf6a18fb725cc7a77dd532065/README.md",
+        "kind": "repo",
+        "label": "Pinned experimental Omarchy frame implementation",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://github.com/pangoleen/ormarch-picture-frame/blob/4207b5c2f6d6615bf6a18fb725cc7a77dd532065/docs/reinstall.md",
+        "kind": "guide",
+        "label": "Pinned Linux restore and spare-card procedure",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://github.com/pangoleen/ormarch-picture-frame/blob/4207b5c2f6d6615bf6a18fb725cc7a77dd532065/image/README.md",
+        "kind": "guide",
+        "label": "Image-builder artifact validation boundaries",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://github.com/pangoleen/ormarch-picture-frame/blob/4207b5c2f6d6615bf6a18fb725cc7a77dd532065/docs/hardware.md",
+        "kind": "guide",
+        "label": "Pinned hardware observations and limits",
+        "checked_at": "2026-10-20"
+      }
+    ],
+    "summary": "The existing Android kiosk route now has a separately bounded Linux option: pangoleen's Omarchy project documents an experimental microSD installation for one PF1007L configuration. These paths share a hardware family, not universal firmware compatibility. Hackshop has not built or physically tested the Linux installation.",
+    "category": "display",
     "evidence": "documented",
-    "reproducibility": "limited",
-    "published_at": "2026-10-08",
-    "catalog_device_ids": [],
-    "tags": ["photo-frame", "allwinner", "android", "kiosk", "variant-sensitive", "no-declared-license"],
-    "design_ideas": [
-      { "title": "Room information display", "description": "Use the board-specific kiosk path to show an HTML calendar, weather or household page. Confirm the firmware and browser capability first; this is separate from the Rockchip frame design.", "use_case": "info_panel" }
+    "warnings": [
+      "Android and Linux are separate procedures. Do not apply Rockchip/Synergy 10X1 instructions to an Allwinner frame, and do not infer the Linux configuration from an Amazon listing or the PF1007L name alone.",
+      "Require exact identity checks and a byte-verified backup before a write. Preserve the original card, use a separate removable microSD for the Linux route, and stop on identity, disk, size or hash mismatches. The Linux project does not support installing to internal eMMC.",
+      "The Linux README reports one working configuration; the original image-builder documentation includes QEMU-only validation and unproven hardware steps. This is limited, source-documented evidence, not independent reproduction or a tested fresh-card install by Hackshop.",
+      "Matching proprietary touch firmware must come from the owner's original backup. The Linux project's original scripts are MIT-licensed; upstream software and firmware keep their own licenses. Do not redistribute private backups, vendor blobs or credentials.",
+      "No current exact-variant seller price is verified. Include the card, power, mounting and recovery host in the total; a historical low price is not current availability.",
+      "No built-in microphone is verified on the Linux target. The reported local dictation path receives audio from a Mac; do not advertise a standalone voice assistant.",
+      "Stock Android units may expose root ADB or vendor remote-root services. Isolate them from untrusted networks. Read the current unit-specific security and recovery notes before changing their services.",
+      "No Hackshop real-device walkthrough or finished-build photo is available. Our setup diagram is an illustration, not physical proof."
     ],
     "risk_level": "high",
-    "warnings": [
-      "Do not use the Synergy 10X1/Rockchip guide on this board. Confirm model string, SoC, USB IDs, fingerprint and partitions first.",
-      "Require a byte-verified backup before any write and stop on every identity or hash mismatch.",
-      "Some units expose unauthenticated root ADB or a vendor remote-root path; isolate them from untrusted networks."
+    "device_name": "PF1007L Allwinner photo-frame family (variant-specific routes)",
+    "design_ideas": [
+      {
+        "title": "Calendar web view",
+        "use_case": "calendar",
+        "description": "On the exact supported route, start with one read-only browser calendar with large type, a stale-data timestamp and an offline state. Test cold boot and recovery before mounting. This is a design suggestion, not a reproduced installation."
+      },
+      {
+        "title": "Room information or remote-AI panel",
+        "use_case": "info_panel",
+        "description": "Use a host-backed status page or remote-AI client in a single web view. Keep credentials on a trusted backend; no local LLM capability or built-in microphone is established."
+      }
     ],
-    "sources": [
-      { "label": "PF1007L start page", "url": "https://github.com/wesbos/photo-frame-dashboard/blob/main/docs/pf1007l-start-here.md", "kind": "guide", "checked_at": "2026-10-14" },
-      { "label": "Photo-frame device index", "url": "https://github.com/wesbos/photo-frame-dashboard/blob/main/docs/devices.md", "kind": "primary_docs", "checked_at": "2026-10-14" },
-      { "label": "Photo Frame Dashboard repository", "url": "https://github.com/wesbos/photo-frame-dashboard", "kind": "repo", "checked_at": "2026-10-14" }
+    "exact_models": [
+      "PF1007L / Allwinner A33 (original Android route)",
+      "Android 6.0.1 (original Android route)",
+      "Linux author target: Humblestead HM-PF1007-BK / EFERCRO PF1007L, A33, 1 GB RAM, Silead touch, AIC8800DC"
     ],
-    "last_verified": "2026-10-14"
+    "published_at": "2026-10-08",
+    "last_verified": "2026-10-20",
+    "reproducibility": "limited",
+    "catalog_device_ids": []
   },
   {
     "id": "echo-show-5-2nd-gen-hey-muse",
