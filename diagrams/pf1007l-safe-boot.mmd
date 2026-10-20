@@ -1,0 +1,10 @@
+graph TD
+  title[PF1007L Linux planning aid - not a device demo] --> identify[Identify the exact Allwinner board]
+  identify --> match{Matches the documented unit?}
+  match -->|No or uncertain| stop[Stop - do not adapt Rockchip instructions]
+  match -->|Yes| backup[Keep original card and verified backup]
+  backup --> build[Build for a spare microSD with matching touch firmware]
+  build --> test[Test USB recovery and the full boot label]
+  test --> result{Device checks pass?}
+  result -->|No| recover[Stop and use the documented recovery path]
+  result -->|Yes| dashboard[Add one calendar or information web view]
