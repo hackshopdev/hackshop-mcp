@@ -12,6 +12,7 @@ hackshop helps an agent plan and build a physical body for itself. Muse gadgets 
 - Store JSON (every board and part, seller links, difficulty, prices checked date): `https://www.hackshop.dev/store.json`
 - Reverse-engineering library: `https://www.hackshop.dev/reverse-engineering`
 - Cheap display design starters: `https://www.hackshop.dev/displays`
+- Field-guide media ledger: `https://www.hackshop.dev/media/hardware-guides.json` (per-image source, license, attribution, hash and evidence scope; videos marked `native-embed-only` are not licensed downloads; Three.js previews are renders, not hardware proof)
 - Agent guide: `https://www.hackshop.dev/agents.md`
 - Source: `https://github.com/hackshopdev/hackshop-mcp`
 
