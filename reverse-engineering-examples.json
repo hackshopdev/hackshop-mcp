@@ -779,28 +779,86 @@
   },
   {
     "id": "apartment-iot-3d-menu-demo",
-    "title": "Map an apartment's reverse-engineered devices into a 3D menu",
-    "device_name": "Mixed apartment lamps and air conditioners",
-    "exact_models": [],
-    "category": "other",
-    "summary": "0xProbability demonstrated a macOS menu-bar model of an apartment where clicking rendered lamps and ACs controls the physical devices.",
-    "outcome": "A spatial whole-home interface shown controlling multiple real-world devices from one 3D view.",
+    "tags": [
+      "smart-home",
+      "house-control",
+      "3d-ui",
+      "threejs",
+      "menu-bar",
+      "hue",
+      "home-assistant",
+      "tuya",
+      "macos",
+      "ios",
+      "mcp",
+      "not-hardware-tested"
+    ],
+    "title": "Control a 3D home with House Control, Hue and Home Assistant",
     "method": "app_api",
-    "evidence": "author_demo",
-    "reproducibility": "demo_only",
-    "published_at": "2026-10-13",
-    "catalog_device_ids": [],
-    "tags": ["smart-home", "3d-ui", "menu-bar", "lights", "air-conditioner", "social-demo"],
-    "risk_level": "medium",
-    "warnings": [
-      "The post does not disclose exact devices, protocols, source code or per-device readback.",
-      "Treat this as interface inspiration, not a reproducible integration or compatibility claim.",
-      "Whole-home control should preserve device-specific safety limits and authentication."
-    ],
+    "outcome": "A documented path from a simulated 3D floor plan to explicitly linked lights and climate devices, plus optional permission-limited agent access. This enriches the existing apartment example; it is not a new hardware model, a universal reverse-engineering exploit or independent real-device verification.",
     "sources": [
-      { "label": "Apartment 3D-menu demonstration", "url": "https://x.com/0xProbabillity/status/2109978137794883621", "kind": "social_post", "checked_at": "2026-10-14" }
+      {
+        "url": "https://www.hackshop.dev/resources/house-control-hue-home-assistant",
+        "kind": "guide",
+        "label": "Hackshop setup guide and integration-boundary diagram",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://x.com/0xProbabillity/status/2109978137794883621",
+        "kind": "social_post",
+        "label": "Apartment 3D-menu demonstration",
+        "checked_at": "2026-10-14"
+      },
+      {
+        "url": "https://github.com/0xProbabillity/house-control/blob/88c84cca77fc12f9297dc91ba28ce58bc9f316d7/README.md",
+        "kind": "repo",
+        "label": "Pinned House Control implementation and license notice",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://github.com/0xProbabillity/house-control/blob/88c84cca77fc12f9297dc91ba28ce58bc9f316d7/docs/connections.md",
+        "kind": "guide",
+        "label": "Pinned platform connections and limitations",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://github.com/0xProbabillity/house-control/blob/88c84cca77fc12f9297dc91ba28ce58bc9f316d7/docs/ai-access.md",
+        "kind": "guide",
+        "label": "Pinned AI Access permissions and privacy",
+        "checked_at": "2026-10-20"
+      }
     ],
-    "last_verified": "2026-10-14"
+    "summary": "0xProbabillity's apartment interface now has an inspectable MIT-licensed House Control implementation. Its Three.js floor plan connects through documented integrations including Hue Bridge, Home Assistant and Smart Life/Tuya. Unlinked devices remain simulated; no exact lamp or AC compatibility has been independently verified by Hackshop.",
+    "category": "other",
+    "evidence": "documented",
+    "warnings": [
+      "The repository documents integrations, not blanket model compatibility. Exact hardware models, firmware and Hackshop physical tests remain unknown. A moving Three.js scene does not prove a real device changed state.",
+      "Hue Bridge and Home Assistant use local routes; Smart Life/Tuya uses its cloud. The iPhone editions differ. Per the connection guide, Apple Home on Mac is linking/simulated; real Apple Home control occurs on iPhone.",
+      "AI Access is optional and may open a tunnel. Anyone holding its private link can exercise enabled permissions; some documented action links can mutate device state. Start read-only, limit scope and duration, never publish the link, and stop it when finished.",
+      "Room names, device state and floor plans may be visible to the agent provider and handled by the tunnel provider. Keep sign-ins and tokens private; do not treat a tunnel or a simulated plan as a privacy or safety guarantee.",
+      "Begin with a low-risk lamp, retain physical controls and device-specific limits, and verify actual state before permitting climate or whole-home actions. This listing does not connect to or control your home.",
+      "Follow the pinned release/build verification instructions; do not bypass operating-system security checks automatically. Code licensing does not by itself grant permission to reuse every creator photo or video.",
+      "No Hackshop real-device walkthrough or finished-build photo is available. Our integration diagram is an illustration; no creator media is rehosted."
+    ],
+    "risk_level": "medium",
+    "device_name": "House Control for Mac / iPhone with mixed smart-home devices",
+    "design_ideas": [
+      {
+        "title": "One-room lamp control",
+        "use_case": "smart_home",
+        "description": "Start with the bundled simulated plan, then deliberately link one low-risk lamp through Hue or Home Assistant and verify physical state changes in both directions. Keep other devices simulated until individually checked."
+      },
+      {
+        "title": "Scoped agent room interface",
+        "use_case": "ai_interface",
+        "description": "Explore the interface without hardware first. If agent access is later enabled, start read-only, use narrow permissions and short expiry, and protect the private link like a credential."
+      }
+    ],
+    "exact_models": [],
+    "published_at": "2026-10-13",
+    "last_verified": "2026-10-20",
+    "reproducibility": "limited",
+    "catalog_device_ids": []
   },
   {
     "id": "blue-star-ac-mcp-demo",
