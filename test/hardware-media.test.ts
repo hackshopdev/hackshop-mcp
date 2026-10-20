@@ -54,6 +54,8 @@ describe("reusable hardware guide media", () => {
     expect(component).toContain("photo.scope");
     expect(component).toContain("photo.licenseUrl");
     expect(component).toContain("video.scope");
+    expect(component).toContain("<HardwarePreview key={media.slug}");
+    expect(component).toContain("<CreatorVideo key={video.url}");
     const embed = readFileSync(join(root, "site/components/hardware/CreatorVideo.tsx"), "utf8");
     expect(embed).toContain("useState(false)");
     expect(embed).toContain("createTweet");

@@ -8,7 +8,7 @@ export function HardwareGuideMedia({ slug }: { slug: string }) {
   if (!media) return null;
   return (
     <div className={styles.media} id="media">
-      <HardwarePreview preview={media.preview} />
+      <HardwarePreview key={media.slug} preview={media.preview} />
       <section aria-label="Reference photos and screenshots">
         <h2>Reference photos &amp; screenshots</h2>
         <p>These are credited source images, not Hackshop's own finished builds. Read the scope below each image.</p>
@@ -34,7 +34,7 @@ export function HardwareGuideMedia({ slug }: { slug: string }) {
           <div className={styles.videoBlock} key={video.url}>
             <h3>{video.title}</h3>
             <p>{video.scope}</p>
-            <CreatorVideo video={video} />
+            <CreatorVideo key={video.url} video={video} />
           </div>
         ))}
         <p className={styles.disclaimer}><strong>Still missing:</strong> {media.missing}</p>
