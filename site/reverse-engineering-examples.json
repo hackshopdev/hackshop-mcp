@@ -1243,5 +1243,80 @@
       { "label": "Amazon simulator limitations", "url": "https://developer.amazon.com/en-US/docs/alexa/devconsole/alexa-simulator.html", "kind": "primary_docs", "checked_at": "2026-10-20" }
     ],
     "last_verified": "2026-10-20"
+  },
+  {
+    "id": "siri-remote-a1962-linux-events",
+    "tags": [
+      "siri-remote",
+      "a1962",
+      "linux",
+      "bluetooth-le",
+      "hidraw",
+      "input",
+      "event-reader",
+      "owned-hardware",
+      "voice-unverified",
+      "not-hardware-tested"
+    ],
+    "title": "Read a gen-1 Apple Siri Remote on Linux",
+    "method": "protocol",
+    "outcome": "A source-documented starting point for reusing an owned remote as a Linux event source. The pinned README reports sleep/reconnect testing on its author's host; A1513 support, optional virtual-keyboard behavior and unreleased voice functionality are not hardware-validated by this entry.",
+    "sources": [
+      {
+        "url": "https://www.hackshop.dev/resources/siri-remote-linux-event-reader",
+        "kind": "guide",
+        "label": "Hackshop event-reader guide and editable setup diagram",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://github.com/a-funk/open-appleremote/blob/1e6e190c3c29a3d2d8cad2c38c09f8953e9633e3/README.md",
+        "kind": "repo",
+        "label": "Pinned open-appleremote implementation and test scope",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://github.com/a-funk/open-appleremote/blob/1e6e190c3c29a3d2d8cad2c38c09f8953e9633e3/docs/PROTOCOL.md",
+        "kind": "guide",
+        "label": "Pinned measured, reported and guessed protocol notes",
+        "checked_at": "2026-10-20"
+      },
+      {
+        "url": "https://github.com/a-funk/open-appleremote/blob/1e6e190c3c29a3d2d8cad2c38c09f8953e9633e3/udev/71-appleremote.rules",
+        "kind": "primary_docs",
+        "label": "Pinned device-access rules and permission warnings",
+        "checked_at": "2026-10-20"
+      }
+    ],
+    "summary": "The MIT-licensed open-appleremote project documents finding, unlocking and reading touch/button reports from an A1962 on Linux, with protocol notes and a non-audio sample capture. This entry covers the event-reader path; Hackshop has not physically reproduced it.",
+    "category": "input",
+    "evidence": "documented",
+    "warnings": [
+      "The pinned README reports A1962 on Linux with BlueZ 5.72 and Linux 6.17 on the author's host. A1513 is expected but untested there; gen-2/gen-3 Siri Remotes and the old infrared Apple Remote are not supported targets of this record.",
+      "The optional virtual keyboard is not hardware-tested according to the README. Voice is unreleased and tested with synthetic/replayed captures in this package; illustrative voice commands and protocol observations do not establish a live working voice assistant.",
+      "Grant only the hidraw access required to observe the remote. Optional uinput access permits keystroke injection by programs with that permission; do not enable it automatically or run all code as root.",
+      "The documented reconnect workaround disables LE privacy on the host, affecting more than this remote. Assess that tradeoff explicitly rather than making it an automatic setup step.",
+      "Raw Bluetooth captures can contain sensitive traffic and voice; remote names may expose serial numbers. Keep captures private, use the non-audio public sample for illustrations, and distinguish replay from live readings.",
+      "No current used-device price or Hackshop hardware reproduction was verified. No finished-build photo or real-device video is provided; the setup diagram is an original illustration, not physical proof."
+    ],
+    "risk_level": "medium",
+    "device_name": "Apple Siri Remote (gen 1)",
+    "design_ideas": [
+      {
+        "title": "Read-only input explorer",
+        "use_case": "info_panel",
+        "description": "Observe an owned A1962's touch and button events before binding any action. A replay of the bundled sample illustrates decoding only; it is not live-device proof."
+      },
+      {
+        "title": "Future scene or media remote",
+        "use_case": "smart_home",
+        "description": "After exact-host testing, consider mapping observed events to low-risk media or light-scene actions. This is an application idea; virtual keyboard and voice behavior need separate validation."
+      }
+    ],
+    "exact_models": [
+      "A1962 (author-tested target)"
+    ],
+    "last_verified": "2026-10-20",
+    "reproducibility": "limited",
+    "catalog_device_ids": []
   }
 ]
