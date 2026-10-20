@@ -1,0 +1,9 @@
+graph TD
+  title[Siri Remote event-reader illustration - not a device demo] --> model[A1962 gen-1 remote - author-tested target]
+  model --> pair[Pair with a Linux BlueZ host]
+  pair --> permission[Grant only the needed hidraw access]
+  permission --> unlock[Project unlock and decode path]
+  unlock --> events[Read touch and button events]
+  events --> check[Test sleep and reconnect on your host]
+  events --> replay[Sample replay - not live hardware proof]
+  check --> optional[Keyboard and voice need separate validation]

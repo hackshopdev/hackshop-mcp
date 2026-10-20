@@ -1,5 +1,6 @@
 import wave2Posts from "../../content/editorial/wave2-content.json";
 import wave3Posts from "../../content/editorial/wave3-content.json";
+import hardwareInboxGuides from "../../content/editorial/hardware-inbox-guides.json";
 
 export type EditorialPost = {
   number: number;
@@ -51,6 +52,7 @@ export const EDITORIAL_CLUSTERS: Array<{ id: EditorialCluster; title: string; bl
 ];
 
 export const editorialPosts: EditorialPost[] = [
+  ...(hardwareInboxGuides as EditorialPost[]),
   ...(wave3Posts as EditorialPost[]),
   ...(wave2Posts as EditorialPost[]).map((post) => ({ ...post, cluster: post.cluster ?? ("field-guides" as const) })),
 ];

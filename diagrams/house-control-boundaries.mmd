@@ -1,0 +1,9 @@
+graph TD
+  title[House Control illustration - not a device demo] --> ui[3D floor plan on Mac or iPhone]
+  ui --> demo[Unlinked devices - simulation only]
+  ui --> connected[Link devices through one chosen route]
+  connected --> local[Local: Hue Bridge, Home Assistant, or Apple Home on iPhone]
+  connected --> cloud[Cloud: Smart Life edition uses Tuya]
+  ui --> access[Optional AI Access - off by default in this guide]
+  access --> guard[Private link - narrow permissions and expiry]
+  guard --> stopped[Stop access when finished]
