@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { POST } from "../site/app/mcp/route";
 
 const HEADERS = {
@@ -131,4 +131,28 @@ describe("hosted MCP route", () => {
     expect(buildJson.device_id).toBe("m5stack-sticks3");
     expect(buildJson.shopping_list.items[0].buy_options.length).toBeGreaterThan(0);
   });
+});
+
+
+it("marks canonical hosted QA calls before URL stripping, keeps raw PostHog and suppresses aggregate GA4", async () => {
+  const requests: {url:string; body:Record<string,unknown>}[] = [];
+  vi.stubEnv("POSTHOG_PROJECT_TOKEN","phc_qa_test");
+  vi.stubEnv("GA_MEASUREMENT_PROTOCOL_API_SECRET","unit-test-only");
+  vi.stubGlobal("fetch",async (url:unknown,init:RequestInit) => {
+    requests.push({url:String(url),body:JSON.parse(String(init.body))});
+    return new Response("{}",{status:200});
+  });
+  try {
+    const call = (url:string) => POST(new Request(url,{method:"POST",headers:HEADERS,body:JSON.stringify({jsonrpc:"2.0",id:99,method:"tools/call",params:{name:"find_reverse_engineering_examples",arguments:{}}})}));
+    expect((await call("https://www.hackshop.dev/mcp?pb_traffic_type=qa&pb_qa_run=qa-exclusion-check-20261027&token=private")).status).toBe(200);
+    const qa = requests.find(r=>r.url.includes("posthog.com"))?.body as {properties:Record<string,unknown>};
+    expect(qa.properties).toMatchObject({qa_traffic:true,is_internal:true,mcp_qa_attribution_version:"2026-10-27",pb_qa_run:"qa-exclusion-check-20261027",transport:"http"});
+    expect(JSON.stringify(qa)).not.toContain("private");
+    expect(requests.some(r=>r.url.includes("google-analytics.com"))).toBe(false);
+    requests.length=0;
+    expect((await call("https://www.hackshop.dev/mcp")).status).toBe(200);
+    const ordinary = requests.find(r=>r.url.includes("posthog.com"))?.body as {properties:Record<string,unknown>};
+    expect(ordinary.properties).toMatchObject({qa_traffic:false,mcp_qa_attribution_version:"2026-10-27"});
+    expect(ordinary.properties).not.toHaveProperty("is_internal");
+  } finally {vi.unstubAllGlobals();vi.unstubAllEnvs();}
 });
