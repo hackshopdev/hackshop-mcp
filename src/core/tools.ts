@@ -115,7 +115,7 @@ export const CORE_TOOLS = [
     name: "intake_gadget",
     title: "Get the intake questions",
     description:
-      "Return the 4 intake questions (where it lives, how you interact, room sensing, budget), why each matters and how each answer maps to plan_gadget. Ask the human these, then call plan_gadget with `answers`. No input.",
+      "Return four hardware-planning intake questions covering placement, interaction, room sensing and budget, with answer options and their planning meanings. No input.",
     inputSchema: {
       type: "object",
       properties: {},
@@ -128,7 +128,7 @@ export const CORE_TOOLS = [
     name: "plan_gadget",
     title: "Plan a Muse gadget",
     description:
-      "Deterministically plan a physical body for an AI agent using Meta Muse boards. Ask the intake questions first (intake_gadget, or the `questions` this returns until `intake.complete` is true), then pass the human's choices as `answers`. Inputs: `idea` 3-2000 chars (optional when `answers` or `needs` are given); `answers` {size, interaction, sensing, budget} using the intake option values; `platform` one of muse-esp32, muse-linux, any (default any); `budget_usd` number greater than 0, up to 100000; `owned_device_ids` up to 50 catalog ids; `needs` values: " +
+      "Deterministically plan a physical body for an AI agent using Meta Muse boards. Partial intake answers produce remaining questions and an intake completion status. Inputs: `idea` 3-2000 chars (optional when `answers` or `needs` are given); `answers` {size, interaction, sensing, budget} using the intake option values; `platform` one of muse-esp32, muse-linux, any (default any); `budget_usd` number greater than 0, up to 100000; `owned_device_ids` up to 50 catalog ids; `needs` values: " +
       `${NEED_VALUES.join(", ")}; ` +
       "`size` one of pocket, desk, wall, hidden, any (default any); `limit` 1-5 (default 3). Boards that meet the hard needs and the budget rank first, cheapest first. Returns fit, notes, warnings, intake status, questions, picks with difficulty, terms and next steps.",
     inputSchema: {
@@ -282,7 +282,7 @@ export const CORE_TOOLS = [
     name: "find_firmware_playbooks",
     title: "Find firmware playbooks",
     description:
-      "Find curated owner-authorized firmware, local-protocol and cloud-replacement playbooks. Results prefer the least-invasive path and are not compatibility approval; call check_firmware_compatibility before preparation.",
+      "Find curated owner-authorized firmware, local-protocol and cloud-replacement playbooks. Results rank less-invasive paths first and contain research guidance rather than device compatibility approval.",
     inputSchema: {
       type: "object",
       properties: {
@@ -401,6 +401,13 @@ export function coreToolDefinitions() {
     description: tool.description,
     inputSchema: tool.inputSchema,
     outputSchema: tool.outputSchema,
+    annotations: {
+      title: tool.title,
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
   }));
 }
 

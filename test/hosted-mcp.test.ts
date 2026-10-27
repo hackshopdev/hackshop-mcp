@@ -17,6 +17,24 @@ async function rpc(method: string, params?: unknown) {
 }
 
 describe("hosted MCP route", () => {
+  it("declares deterministic tool effects and task-focused descriptions for directory clients", async () => {
+    const { result } = await rpc("tools/list");
+    for (const tool of result.tools) {
+      expect(tool.annotations).toEqual({
+        title: tool.title,
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      });
+      expect(tool.description).not.toMatch(/ask the human|ask the intake|then call|call check_firmware_compatibility/i);
+    }
+    const { result: build } = await rpc("tools/call", {
+      name: "get_build_plan", arguments: { device_id: "m5stack-sticks3" },
+    });
+    expect(JSON.stringify(build.structuredContent)).not.toMatch(/[?&](?:tag|campid|affiliate_id)=/i);
+  });
+
   it("handles initialize, deterministic tools and resources", async () => {
     const init = await rpc("initialize", {
       protocolVersion: "2025-06-18",
