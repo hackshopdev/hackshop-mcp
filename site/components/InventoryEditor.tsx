@@ -11,7 +11,7 @@ interface DeviceLite {
   id: string;
   name: string;
   category: string;
-  image_url: string | null;
+  imageUrl: string | null;
 }
 
 export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
@@ -212,14 +212,14 @@ export function InventoryEditor({ devices }: { devices: DeviceLite[] }) {
                   color: "var(--muted)",
                 }}
               >
-                {failedImg.has(d.id) ? (
+                {!d.imageUrl || failedImg.has(d.id) ? (
                   <span style={{ fontSize: 11, color: "var(--muted)" }}>
                     {d.category.slice(0, 3).toUpperCase()}
                   </span>
                 ) : (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
-                    src={`/api/img?slug=${d.id}`}
+                    src={d.imageUrl}
                     alt={d.name}
                     width={48}
                     height={48}

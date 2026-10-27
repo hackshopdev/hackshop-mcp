@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { pageMetadata } from "@/lib/page-metadata";
 import { loadCatalog } from "@/lib/catalog";
 import { InventoryEditor } from "@/components/InventoryEditor";
+import { hasImage } from "@/lib/image-sources";
 
 export const metadata = pageMetadata(
   "Your inventory · hackshop-mcp",
@@ -17,7 +18,7 @@ export default function InventoryPage() {
       id: d.id,
       name: d.name,
       category: d.category,
-      image_url: d.image_url ?? null,
+      imageUrl: hasImage(d.id) ? `/api/img?slug=${encodeURIComponent(d.id)}` : null,
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
