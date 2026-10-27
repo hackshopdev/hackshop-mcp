@@ -94,6 +94,8 @@ async function sendPosthog(event: ServerEvent): Promise<void> {
 // GA4 Measurement Protocol mirror. Opt-in: needs an API secret created under
 // GA4 Admin > Data streams > Measurement Protocol API secrets.
 async function sendGoogleAnalytics(event: ServerEvent): Promise<void> {
+  // Retain the raw QA audit in PostHog, without polluting aggregate GA4 totals.
+  if (event.properties?.qa_traffic === true) return;
   const apiSecret = process.env.GA_MEASUREMENT_PROTOCOL_API_SECRET?.trim();
   if (!apiSecret) return;
   const measurementId = getGoogleAnalyticsMeasurementId(

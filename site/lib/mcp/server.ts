@@ -24,6 +24,7 @@ import {
   resourceNotFoundMessage,
 } from "../core/resources";
 import { anonymousRequestId, captureServerEvent } from "../serverAnalytics";
+import { hostedMcpQaAttribution } from "./qa-attribution";
 import type { CoreContext } from "../core/types";
 
 const HOSTED_INSTRUCTIONS =
@@ -60,6 +61,7 @@ export function createHostedMcpServer(ctx: CoreContext, request: Request): Serve
         ok,
         error: !ok,
         transport: "http",
+        ...hostedMcpQaAttribution(request),
       },
     });
 
